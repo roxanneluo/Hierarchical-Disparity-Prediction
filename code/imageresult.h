@@ -1,5 +1,6 @@
 #ifndef __IMAGERESULT__
 #define __IMAGERESULT__
+#include <cstdio>
 #include "forests.h"
 #include "gridcode.h"
 #include "mylib.h"
@@ -106,6 +107,11 @@ void draw_tree_difference(Grid<type> &img, Grid<type> &origin, Edge *tree1, int 
     draw_tree(img, inter, cnti, times);
     draw_tree(img, only1, cnt1, times, 255);
     draw_tree(img, only2, cnt2, times, 0);
+}
+
+template <class type>
+void draw(type img, bool rgb) {
+    printf("%d\n", rgb);
 }
 
 template <class type>

@@ -4,7 +4,7 @@
 #include "iomanager.h"
 #include "timekeeper.h"
 #include "refinement.h"
-#include ""imageresult.h
+#include "imageresult.h"
 
 #include "filter.h"
 
@@ -74,9 +74,10 @@ timer.check("ctmf for     ");
 	left_graph.build_MST();
 	right_graph.build_MST();
 	int times = 3;
-	draw_tree_and_RGBimage(left_tree_img,rgb_left, left_graph.trees, left_graph.n, times);
-	draw_tree_and_RGBimage(right_tree_img,rgb_right, right_graph.trees, right_graph.n, times);
-
+	//draw_tree_and_RGBimage(left_tree_img,rgb_left, left_graph.trees, left_graph.n, times);
+	//draw_tree_and_RGBimage(right_tree_img,rgb_right, right_graph.trees, right_graph.n, times);
+    draw(rgb_left, true);
+    draw(left_graph, false);
 	forest_left.init(left_graph);
 	forest_right.init(right_graph);
 	forest_left.order_of_visit();

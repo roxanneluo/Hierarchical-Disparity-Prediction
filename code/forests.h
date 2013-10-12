@@ -13,6 +13,24 @@ class Edge {
 public :
     int a, b; // Node ID
     int weight;
+
+    bool operator > (Edge &e) {
+        //if (e.a > e.b)  {int temp = e.a; e.a = e.b; e.b = temp;}
+
+        if (weight > e.weight) return true;
+        else if (weight < e.weight) return false;
+
+        if (a > e.a) return true;
+        else if (a < e.a) return false;
+
+        if (b > e.b) return true;
+        else return false;
+    }
+
+    bool operator == (Edge &e) {
+        //if (e.a > e.b)  {int temp = e.a; e.a = e.b; e.b = temp;}
+        return (weight == e.weight) && (a == e.a) && (b == e.b);
+    }
 };
 bool smaller_edge(const Edge & a, const Edge &b) {return a.weight < b.weight;}
 
@@ -24,7 +42,7 @@ class MergeSet {
         return f[x];
     }
 public :
-    void init(int x) { 
+    void init(int x) {
         n = x; f = (int*) malloc((n + 2) * sizeof(int));
         for (int i = 0; i <= n; ++i) f[i] = i;
     }
@@ -48,7 +66,7 @@ public :
     int H, W; // graph info
     int node_number(int x, int y) { return x * W + y + 1; }
     void node_location(int p, int &x, int &y) {--p; x = p / W; y = p % W; }
-	
+
 	template <class type>
     void collect_edges(Array3<type> & rgb) {
         H = rgb.height; W = rgb.width;
@@ -58,24 +76,24 @@ public :
         trees = (Edge *) malloc((n + 2) * sizeof(Edge));
         int k = 0;
         for (int i = 0; i < H; ++i)
-        for (int j = 0; j < W; ++j) 
+        for (int j = 0; j < W; ++j)
             for (int p = 0; p < 2; ++p)
-            for (int q = 0; q < 2; ++q) if (p + q == 1) 
+            for (int q = 0; q < 2; ++q) if (p + q == 1)
             if (i + p < H && j + q < W) {
-                ++k;  
-                edges[k].a = node_number(i, j); 
+                ++k;
+                edges[k].a = node_number(i, j);
                 edges[k].b = node_number(i+p, j+q);
-                edges[k].weight = mylib::max3abs(rgb[0][i][j] - rgb[0][i+p][j+q], 
+                edges[k].weight = mylib::max3abs(rgb[0][i][j] - rgb[0][i+p][j+q],
                                      rgb[1][i][j] - rgb[1][i+p][j+q],
                                      rgb[2][i][j] - rgb[2][i+p][j+q]); // ERROR: max not min
             }
 //        cout << k << ' ' << m << endl;
     }
-    
+
     void build_MST() {
         std::sort(edges + 1, edges + m + 1, smaller_edge); // this is not good.. a bit lazy
         mset.init(n); ts = 0;
-        for (int i = 1; i <= m; ++i) 
+        for (int i = 1; i <= m; ++i)
             if (mset.merge(edges[i].a, edges[i].b)) {
                 trees[++ts] = edges[i];
 //                cout << ts << endl;
@@ -131,7 +149,7 @@ public :
 		for (int i = 1; i <= n; ++i) nodes[i].ord = -1;
 		int num = 0;
 		while (1) {
-			int root = -1; 
+			int root = -1;
 			for (int i = 1; i <= n; ++i) if (nodes[i].ord == -1)
 			{ root = i; break; }
 			if (root == -1) break;
@@ -145,12 +163,12 @@ public :
 				for (int j = 0; j < nodes[t].degree; ++j) {
 					int p = nodes[t].next_node[j];
 					if (!visited[p]) {
-						order[++num] = p;						
+						order[++num] = p;
 						nodes[p].ord = num;
 						nodes[p].up_weight = nodes[t].edge_weight[j];
                         visited[p] = true;
 					}
-				} 
+				}
 			} // end for bfs
 //            cout << num << endl;
 		}// end for the while
@@ -176,8 +194,8 @@ public :
 //                    cout << d << ' ' << nodes[p].x << ' ' << nodes[p].y << endl;
 					double value_p = backup[d][nodes[p].x][nodes[p].y];
 					double value_q = backup[d][nodes[q].x][nodes[q].y];
-					value_p += w * value_q;                               
-					backup[d][nodes[p].x][nodes[p].y] = value_p;         
+					value_p += w * value_q;
+					backup[d][nodes[p].x][nodes[p].y] = value_p;
 				}
 			}
 		}
