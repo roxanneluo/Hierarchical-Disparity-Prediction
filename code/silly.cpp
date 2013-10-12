@@ -4,6 +4,7 @@
 #include "iomanager.h"
 #include "timekeeper.h"
 #include "refinement.h"
+#include ""imageresult.h
 
 #include "filter.h"
 
@@ -24,7 +25,7 @@ TimeKeeper timer;
 Grid<unsigned char> occlusion_left, occlusion_right;
 
 template <class type>
-void refinement(Grid<type>& d_left, Grid<type>& d_right) 
+void refinement(Grid<type>& d_left, Grid<type>& d_right)
 {
 	find_stable_pixels(d_left, d_right, occlusion_left, occlusion_right);
 	update_matching_cost(cost_left, cost_right, d_left, d_right, occlusion_left, occlusion_right);
@@ -44,7 +45,7 @@ int main(int args, char ** arg) {
     if (args >= 3) {
 		max_disparity = atoi(arg[3]);
 		scale = 256 / max_disparity;
-    } 
+    }
     if (args >= 4) {
         scale = atoi(arg[4]);
     }
@@ -54,13 +55,13 @@ timer.reset();
 //	const int h = rgb_left.height;
 //	const int w = rgb_left.width;
 
-    
+
 timer.check("load         ");
     compute_gradient(left_gradient, rgb_left);
 	compute_gradient(right_gradient, rgb_right);
 timer.check("gradient     ");
 	compute_first_cost(cost_left, cost_right, rgb_left, rgb_right, left_gradient, right_gradient, max_disparity); // ERROR: use exact max_disparity
-    
+
 timer.check("initial cost ");
     for (int i = 0; i < 3; ++i){
         median_filter(rgb_left[i]);
@@ -72,6 +73,10 @@ timer.check("ctmf for     ");
 	right_graph.collect_edges(rgb_right);
 	left_graph.build_MST();
 	right_graph.build_MST();
+	int times = 3;
+	draw_tree_and_RGBimage(left_tree_img,rgb_left, left_graph.trees, left_graph.n, times);
+	draw_tree_and_RGBimage(right_tree_img,rgb_right, right_graph.trees, right_graph.n, times);
+
 	forest_left.init(left_graph);
 	forest_right.init(right_graph);
 	forest_left.order_of_visit();
@@ -88,7 +93,7 @@ timer.check("unref-dispar ");
     refinement(disparity_left, disparity_right);
     median_filter(disparity_left);
     median_filter(disparity_right);
-    
+
 	//disparity_left_ctmf.reset(h, w);
 	//disparity_right_ctmf.reset(h, w);
 	// disparity_left_ctmf.copy(disparity_left);
