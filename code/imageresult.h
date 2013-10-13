@@ -120,4 +120,18 @@ void draw_tree_differenceRGB(Grid<type> &img, Array3<type> &rgb, Edge *tree1, in
     rgb2gray(gray, rgb, 127.5, 0.35);
     draw_tree_difference(img, gray, tree1, n1, tree2, n2, times);
 }
+
+template<class type>
+void compute_support(Grid<type> &support, Forest &forest, int x, int y, int W, double sigma) {
+    forest.order_of_visit(x, y, W);
+    forest.compute_support(support, sigma);
+}
+
+template <class type>
+void draw_support_map(Grid<type> &output_support, Forest &support_forest, Graph &g, int x, int y, int times, double sigma = 0.1*255) {
+    Grid<type> small_support;
+    small_support.reset(g.H, g.W);
+    compute_support(small_support, support_forest, x, y, g.W, sigma);
+    draw_tree_and_image(output_support, small_support, g.trees, g.n, times);
+}
 #endif // ___IMAGERESULT__
