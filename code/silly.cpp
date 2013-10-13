@@ -4,7 +4,7 @@
 #include "iomanager.h"
 #include "timekeeper.h"
 #include "refinement.h"
-#include "imageresult.h"
+//#include "imageresult.h"
 
 #include "filter.h"
 
@@ -23,6 +23,11 @@ int scale = 16;
 TimeKeeper timer;
 
 Grid<unsigned char> occlusion_left, occlusion_right;
+
+// for image result
+/*Forest left_support_forest, right_support_forest;
+Grid<unsigned char> left_support_map, right_support_map;
+Grid<unsigned char> left_tree_img, right_tree_img;*/
 
 template <class type>
 void refinement(Grid<type>& d_left, Grid<type>& d_right)
@@ -73,11 +78,16 @@ timer.check("ctmf for     ");
 	right_graph.collect_edges(rgb_right);
 	left_graph.build_MST();
 	right_graph.build_MST();
-	int times = 3;
-	//draw_tree_and_RGBimage(left_tree_img,rgb_left, left_graph.trees, left_graph.n, times);
-	//draw_tree_and_RGBimage(right_tree_img,rgb_right, right_graph.trees, right_graph.n, times);
-    draw(rgb_left, true);
-    draw(left_graph, false);
+
+	/*int times = 3;
+	int x = 252, y = 167;
+	draw_tree_and_RGBimage(left_tree_img,rgb_left, left_graph.trees, left_graph.n, times);
+	draw_tree_and_RGBimage(right_tree_img,rgb_right, right_graph.trees, right_graph.n, times);
+	left_support_forest.init(left_graph);
+	right_support_forest.init(right_graph);
+    draw_support_map(left_support_map, left_support_forest, left_graph, x, y, times);
+    draw_support_map(right_support_map, right_support_forest, right_graph, x, y, times);
+*/
 	forest_left.init(left_graph);
 	forest_right.init(right_graph);
 	forest_left.order_of_visit();
@@ -105,6 +115,10 @@ timer.check("get disparity");
 	//save_image("leftdisparity_ctmf.pgm", disparity_left_ctmf, scale);
 	save_image("rightdisparity_ctmf.pgm", disparity_right, scale);
 	//save_image("rightdisparity_ctmf.pgm", disparity_right_ctmf, scale);
+	/*save_image("lefttreeimage.pgm", left_tree_img);
+	save_image("righttreeimage.pgm", right_tree_img);
+	save_image("leftsupportmap.pgm", left_support_map);
+	save_image("rightsupportmap.pgm", right_support_map);*/
 timer.get_total_time();
     return 0;
 }

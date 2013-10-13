@@ -1,6 +1,7 @@
 #ifndef FORESTS_CODE_H_OCT_2013
 #define FORESTS_CODE_H_OCT_2013
 #include <cstdlib>
+#include <cstdio>
 #include <algorithm>
 #include <cmath>
 
@@ -144,9 +145,36 @@ public :
             nodes[bb].add_edge(aa, zz);
         }
     }
+    void order_of_visit(int rootx, int rooty, int W) {
+		order = (int * ) malloc((n + 2) * sizeof(int));
+		for (int i = 1; i <= n; ++i) visited[i] = false;
+		int num = 0;
+
+        int root = rooty*W+rootx+1;
+//            cout << root << endl;
+        order[++num] = root;
+        nodes[root].ord = num;
+        nodes[root].up_weight = 0;
+        visited[root] = true;
+        for (int i = num; i <= num; ++i) { // this is a bfs
+            int t = order[i];
+            for (int j = 0; j < nodes[t].degree; ++j) {
+                int p = nodes[t].next_node[j];
+                if (!visited[p]) {
+                    order[++num] = p;
+                    nodes[p].ord = num;
+                    nodes[p].up_weight = nodes[t].edge_weight[j];
+                    visited[p] = true;
+                }
+            }
+        } // end for bfs
+	}
 	void order_of_visit() {
 		order = (int * ) malloc((n + 2) * sizeof(int));
-		for (int i = 1; i <= n; ++i) nodes[i].ord = -1;
+		for (int i = 1; i <= n; ++i) {
+                nodes[i].ord = -1;
+                visited[i] = false;
+		}
 		int num = 0;
 		while (1) {
 			int root = -1;
@@ -217,6 +245,24 @@ public :
 			}
 		}
 	} // compute cost on tree
+
+    template <class type>
+	void compute_support(Grid<type> &support, double sigma = 255 * 0.1) {
+	    update_table(sigma);
+        backup.reset(1, support.height, support.width);
+
+	    support[nodes[order[1]].x][nodes[order[1]].y]=backup[0][nodes[order[1]].x][nodes[order[1]].y] = 255;
+        for (int i = 1; i <= n; ++i) {
+            int p = order[i];
+            for (int j = 0; j < nodes[p].degree; ++j) {
+                int q = nodes[p].next_node[j];
+                if (nodes[q].ord < nodes[p].ord) continue;
+
+                support[nodes[q].x][nodes[q].y] = backup[0][nodes[q].x][nodes[q].y]
+                                                = backup[0][nodes[p].x][nodes[p].y]*table[nodes[q].up_weight];
+            }
+        }
+	}
 };
 
 #endif
