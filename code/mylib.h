@@ -14,7 +14,8 @@ int randint(int a, int b) {
 	return p + a;
 }
 
-double fabs(double x) { if (x < 0) x=-x; return x; }
+template <class type>
+type ABS(type x) { if (x < 0) x=-x; return x; }
 
 template <class type>
 type min(type a, type b) { if (a < b) return a; return b; }

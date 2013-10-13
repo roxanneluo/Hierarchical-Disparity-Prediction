@@ -18,10 +18,10 @@ def get_disp(who):
     conn.request('GET', url_1 + who + url_2)
     return conn.getresponse().read()
     
-for pic in pic_names :
-    t = int(get_disp(pic))
-    size = 3
-    with open(other_path + pic + '/spec.txt', 'w') as f :
-        f.write(str(t / size) + '\n' + str(size))
-
+def get_disparity_and_scale() :
+    for pic in pic_names :
+        t = int(get_disp(pic))
+        size = 3
+        with open(other_path + pic + '/spec.txt', 'w') as f :
+            f.write(str(t / size) + '\n' + str(size))
 

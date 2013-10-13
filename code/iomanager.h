@@ -47,6 +47,42 @@ void load_image(const char * filename, Array3<type> & rgb) {
 }
 
 template <class type>
+void load_image_gray(const char * filename, Grid<type> & gray) { 
+	// return if it is successfull
+	FILE * f = fopen(filename, "rb");
+	fread(buff, 1, BUF_LEN, f);
+	fclose(f);
+	int i = 0;
+	while (buff[i]) {
+		if (buff[i] == 'P') {++i; break; }
+		++i;
+	}
+	//int type = buff[i] - '0'; 
+    ++i; // i shall assume it is exactly P5 type
+	int value[3], count = 0;
+	while (buff[i] && count < 3) {
+		if (buff[i] == '#') {
+			while (buff[i] != '\n') ++i;
+			++i;
+		} else 
+		if (!isdigit(buff[i])) ++i;
+		else {
+			int k = 0;
+			while (isdigit(buff[i])) 
+				k = k * 10 + buff[i++] - '0';
+			value[count++] = k;
+		}
+	}
+	// now take down the last end-of-line
+	while (buff[i] != '\n') ++i;
+
+	gray.reset(value[1], value[0]);
+    for (int x = 0; x < gray.height; ++x)
+        for (int y = 0; y < gray.width; ++y) 
+				gray[x][y] = (unsigned char) (buff[i++]);
+}
+
+template <class type>
 void save_image(const char * filename, Grid<type> &gray, int scale = 1) {
 	FILE * f = fopen(filename, "wb");
 	fprintf(f, "P5\n");

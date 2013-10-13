@@ -1,9 +1,10 @@
-# Object files
+#temperary files
 *.o
 *.ko
 *.slo
 *.lo
 *.h.gch
+*.swp
 
 # Libraries
 *.lib
@@ -22,10 +23,8 @@
 *.out
 *.app
 
-# unit test files
-test.cpp
-
 #test data
+test.cpp
 testdata*
 *.zip
 *.ppm

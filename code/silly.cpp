@@ -42,21 +42,21 @@ timer.check("refinement   ");
 }
 
 
-int main(int args, char ** arg) {
-	if (args >= 2) {
-		strcpy(file_name[0], arg[1]);
-		strcpy(file_name[1], arg[2]);
+int main(int args, char ** argv) {
+	if (args > 2) {
+		strcpy(file_name[0], argv[1]);
+		strcpy(file_name[1], argv[2]);
     }
-    if (args >= 3) {
-		max_disparity = atoi(arg[3]);
+    if (args > 3) {
+		max_disparity = atoi(argv[3]);
 		scale = 256 / max_disparity;
     }
-    if (args >= 4) {
-        scale = atoi(arg[4]);
+    if (args > 4) {
+        scale = atoi(argv[4]);
     }
-	if (args >= 6) {
-		strcpy(file_name[2], arg[5]);
-		strcpy(file_name[3], arg[6]);
+	if (args > 6) {
+		strcpy(file_name[2], argv[5]);
+		strcpy(file_name[3], argv[6]);
     }
 timer.reset();
 try {

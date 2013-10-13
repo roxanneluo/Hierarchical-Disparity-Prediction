@@ -45,9 +45,9 @@ int max_disparity)
 			for (int y = 0; y < W; ++y) {
 				double cost = 0;
 				for (int c = 0; c < 3; ++c) 
-					cost += mylib::fabs(rgb_left[c][x][y] - rgb_right[c][x][mylib::max(y - d,0)]);
+					cost += mylib::ABS(rgb_left[c][x][y] - rgb_right[c][x][mylib::max(y - d,0)]);
 				cost = mylib::min(cost / 3.0, max_color_difference); // here is weired
-				double cost_gradient = mylib::min(mylib::fabs(graient_left[x][y] - gradient_right[x][mylib::max(0, y - d)]), max_gradient_color_difference);
+				double cost_gradient = mylib::min((double) mylib::ABS(graient_left[x][y] - gradient_right[x][mylib::max(0, y - d)]), max_gradient_color_difference);
 				cost_left[d][x][y] = weight_on_color * cost + (1 - weight_on_color) * cost_gradient;
 			}
     for (int x = 0; x < H; ++x) // this part is merged , by the doc
