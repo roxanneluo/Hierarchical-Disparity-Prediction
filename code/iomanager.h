@@ -8,8 +8,8 @@
 
 const int BUF_LEN = 3030303;
 char buff[BUF_LEN];
-template <class type>
 
+template <class type>
 void load_image(const char * filename, Array3<type> & rgb) { 
 	// return if it is successfull
 	FILE * f = fopen(filename, "rb");
@@ -59,6 +59,26 @@ void save_image(const char * filename, Grid<type> &gray, int scale = 1) {
     fwrite(buff, 1, cnt, f);
 	fclose(f);
 }
+
+template <class type>
+void save_image_rgb(const char * filename, Array3<type> & rgb, int scale = 1) {
+    // remember th filename should be  .ppm 
+	FILE * f = fopen(filename, "wb");
+	fprintf(f, "P6\n");
+	fprintf(f, "#Produced by my silly program\n");
+	fprintf(f, "%d %d\n255\n", rgb.width, rgb.height);
+    int cnt = 0;
+    for (int i = 0; i < rgb.height; ++i) 
+		for (int j = 0; j < rgb.width; ++j) {
+            buff[cnt++] = rgb[1][i][j] * scale;
+            buff[cnt++] = rgb[2][i][j] * scale;
+            buff[cnt++] = rgb[0][i][j] * scale;
+            // why not the order of 0 1 2 ? i dont know
+        }
+    fwrite(buff, 1, cnt, f);
+	fclose(f);
+}
+
 /* 
 
 bad code...

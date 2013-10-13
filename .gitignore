@@ -21,3 +21,6 @@
 *.exe
 *.out
 *.app
+
+# unit test files
+test.cpp
