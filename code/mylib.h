@@ -6,11 +6,12 @@
 namespace mylib {
 
 int randint(int a, int b) {
+    // uniformly random integer int [a, b]
 	int k = b - a + 1;
 	if (k < 1) return a;
 	int p = rand() * rand() + rand();
-	p = ((p % k) + k) % k;
-	return k + a;
+	p = p % k;   if (p < 0) p += k;
+	return p + a;
 }
 
 double fabs(double x) { if (x < 0) x=-x; return x; }

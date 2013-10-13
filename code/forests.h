@@ -171,26 +171,24 @@ public :
 	}
 	void order_of_visit() {
 		order = (int * ) malloc((n + 2) * sizeof(int));
-		for (int i = 1; i <= n; ++i) {
+		for (int i = 1; i <= n; ++i) 
                 nodes[i].ord = -1;
-                visited[i] = false;
-		}
 		int num = 0;
 		while (1) {
 			int root = -1;
-			for (int i = 1; i <= n; ++i) if (nodes[i].ord == -1)
-			{ root = i; break; }
+			for (int i = 1, j = mylib::randint(1, n); i <= n; ++i) {
+                if (nodes[i].ord == -1) { root = i; break; }
+                if (++j > n) j = 1;
+            }
 			if (root == -1) break;
-//            cout << root << endl;
 			order[++num] = root;
 			nodes[root].ord = num;
 			nodes[root].up_weight = 0;
-            visited[root] = true;
 			for (int i = num; i <= num; ++i) { // this is a bfs
 				int t = order[i];
 				for (int j = 0; j < nodes[t].degree; ++j) {
 					int p = nodes[t].next_node[j];
-					if (!visited[p]) {
+                    if (nodes[p].ord == -1) {
 						order[++num] = p;
 						nodes[p].ord = num;
 						nodes[p].up_weight = nodes[t].edge_weight[j];
@@ -198,9 +196,7 @@ public :
 					}
 				}
 			} // end for bfs
-//            cout << num << endl;
 		}// end for the while
-//        for (int i = 1; i <= n; ++i) if (nodes[order[i]].ord != i) cout << i << " bad" << endl;
 	}
 	void update_table(double sigma ) {
 		table[0] = 1;

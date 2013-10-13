@@ -9,7 +9,7 @@
 #include "filter.h"
 
 
-char file_name[2][30] = {"left.ppm", "right.ppm"};
+char file_name[4][300] = {"left.ppm", "right.ppm", "silly_left.pgm", "silly_right.pgm" };
 
 Array3<unsigned char> rgb_left, rgb_right; // int -> unsigned char
 Grid<unsigned char> disparity_left, disparity_left_ctmf, disparity_right, disparity_right_ctmf; // int -> unsigned char
@@ -54,12 +54,22 @@ int main(int args, char ** arg) {
     if (args >= 4) {
         scale = atoi(arg[4]);
     }
+	if (args >= 6) {
+		strcpy(file_name[2], arg[5]);
+		strcpy(file_name[3], arg[6]);
+    }
 timer.reset();
+try {
+    puts(file_name[0]);
+    puts(file_name[1]);
 	load_image(file_name[0], rgb_left);
 	load_image(file_name[1], rgb_right);
+} catch (...) {
+    puts("Error loading file");
+    return 0;
+}
 //	const int h = rgb_left.height;
 //	const int w = rgb_left.width;
-
 
 timer.check("load         ");
     compute_gradient(left_gradient, rgb_left);
@@ -111,10 +121,8 @@ timer.check("unref-dispar ");
 	// disparity_right_ctmf.copy(disparity_right);
 	// ctmf(disparity_right[0], disparity_right_ctmf[0], w, h, w, w, 2, 1, w * h);
 timer.check("get disparity");
-	save_image("leftdisparity_ctmf_refined_morefil2.pgm", disparity_left, scale);
-	//save_image("leftdisparity_ctmf.pgm", disparity_left_ctmf, scale);
-	save_image("rightdisparity_ctmf.pgm", disparity_right, scale);
-	//save_image("rightdisparity_ctmf.pgm", disparity_right_ctmf, scale);
+	save_image(file_name[2], disparity_left, scale);
+	save_image(file_name[3], disparity_right, scale);
 	/*save_image("lefttreeimage.pgm", left_tree_img);
 	save_image("righttreeimage.pgm", right_tree_img);
 	save_image("leftsupportmap.pgm", left_support_map);
