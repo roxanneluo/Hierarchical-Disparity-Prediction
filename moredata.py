@@ -25,3 +25,21 @@ def get_disparity_and_scale() :
         with open(other_path + pic + '/spec.txt', 'w') as f :
             f.write(str(t / size) + '\n' + str(size))
 
+def gray_ppm2pgm(name) :
+    path = other_path + name
+    res = ':)'
+    try :
+        #res = subprocess.check_output(['./test.exe', path + '/displeft.ppm', path + '/displeft.pgm'])
+        #res = subprocess.check_output(['./test.exe', path + '/dispright.ppm', path + '/dispright.pgm'])
+        res = subprocess.check_output(['rm', path + '/dispright.ppm',])
+        print name + ': ' + res
+        res = subprocess.check_output(['rm', path + '/displeft.ppm',])
+        print name + ': ' + res
+        res = subprocess.check_output(['rm', path + '/disleft.pgm',])
+        print name + ': ' + res
+    except :
+        res = 'not found'
+        print name + ': ' + res
+
+for x in pic_names :
+    gray_ppm2pgm(x)

@@ -21,8 +21,8 @@ def run_test_with_path(path) :
         'bin/silly.out', 
         path + 'left.ppm', path + 'right.ppm', 
         para[0], para[1],
-        'bin/silly_left.pgm',
-        'bin/silly_right.pgm', 
+        left_result,
+        right_result,
     ])
     print what
 
@@ -31,9 +31,9 @@ def run_test_with_path(path) :
 def check_results(p) :
     #global left_restult
     #global right_result
-    res = subprocess.check_output(['bin/checker.out', left_result, p + 'displeft.ppm', '3'])
+    res = subprocess.check_output(['bin/checker.out', left_result, p + 'displeft.pgm', sys.argv[2],])
     print "Check left :\n" + res
-    res = subprocess.check_output(['bin/checker.out', right_result, p + 'dispright.ppm', '3'])
+    res = subprocess.check_output(['bin/checker.out', right_result, p + 'dispright.pgm', sys.argv[2],])
     print "Check right :\n" + res
 
 

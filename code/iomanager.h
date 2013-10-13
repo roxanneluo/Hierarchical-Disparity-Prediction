@@ -37,13 +37,13 @@ void load_image(const char * filename, Array3<type> & rgb) {
 		}
 	}
 	// now take down the last end-of-line
-	while (buff[i] != '\n') ++i;
+	while (buff[i] != '\n') ++i; // after the while  buff[i] == \n
 
 	rgb.reset(3, value[1], value[0]);
     for (int x = 0; x < rgb.height; ++x)
         for (int y = 0; y < rgb.width; ++y) 
             for (int color = 0; color < 3; ++color)
-				rgb[color][x][y] = (unsigned char) (buff[i++]);
+				rgb[color][x][y] = (unsigned char) (buff[++i]);
 }
 
 template <class type>
@@ -79,7 +79,7 @@ void load_image_gray(const char * filename, Grid<type> & gray) {
 	gray.reset(value[1], value[0]);
     for (int x = 0; x < gray.height; ++x)
         for (int y = 0; y < gray.width; ++y) 
-				gray[x][y] = (unsigned char) (buff[i++]);
+            gray[x][y] = (unsigned char) (buff[++i]);
 }
 
 template <class type>
