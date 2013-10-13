@@ -24,3 +24,7 @@
 
 # unit test files
 test.cpp
+
+#test data
+testdata*
+*.zip
