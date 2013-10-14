@@ -5,7 +5,7 @@ import subprocess
 import httplib
 
 NOW_PATH = ""
-other_path = 'testdata/Middlebury_others/'
+other_path = 'testdata/Middlebury_4/'
 
 pic_names = subprocess.check_output(['ls', other_path]).split()
 
@@ -34,17 +34,9 @@ def check_results(p) :
     para = 0
     with open(p + 'spec.txt','r') as f :
         para = f.read().split()
-    res = subprocess.check_output(['bin/checker.out',
-                                   left_result,
-                                   p + 'displeft.pgm',
-                                   sys.argv[2],
-                                   para[1],])
+    res = subprocess.check_output(['bin/checker.out', left_result, p + 'displeft.pgm', sys.argv[2], para[1],])
     print "Check left :\n" + res
-    res = subprocess.check_output(['bin/checker.out',
-                                   right_result,
-                                   p + 'dispright.pgm',
-                                   sys.argv[2],
-                                   para[1],])
+    res = subprocess.check_output(['bin/checker.out', right_result, p + 'dispright.pgm', sys.argv[2], para[1],])
     print "Check right :\n" + res
 
 
