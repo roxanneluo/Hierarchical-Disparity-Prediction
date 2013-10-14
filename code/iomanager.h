@@ -105,12 +105,9 @@ void save_image_rgb(const char * filename, Array3<type> & rgb, int scale = 1) {
 	fprintf(f, "%d %d\n255\n", rgb.width, rgb.height);
     int cnt = 0;
     for (int i = 0; i < rgb.height; ++i) 
-		for (int j = 0; j < rgb.width; ++j) {
-            buff[cnt++] = rgb[1][i][j] * scale;
-            buff[cnt++] = rgb[2][i][j] * scale;
-            buff[cnt++] = rgb[0][i][j] * scale;
-            // why not the order of 0 1 2 ? i dont know
-        }
+		for (int j = 0; j < rgb.width; ++j) 
+            for (int c = 0; c < 3; c++) 
+                buff[cnt++] = rgb[c][i][j] * scale;
     fwrite(buff, 1, cnt, f);
 	fclose(f);
 }
