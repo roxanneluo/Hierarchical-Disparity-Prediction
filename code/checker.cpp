@@ -29,6 +29,7 @@ int main(int args, char ** argv) {
 
     // Update the errormap.
     disparity_errormap.reset(h, w);
+    disparity_errormap.zero();
     int total = 0, correct = 0;
     for (int i = pad1; i < h - pad1; ++i) 
     for (int j = pad2; j < w - pad2; ++j) {
