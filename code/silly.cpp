@@ -22,7 +22,7 @@ Forest forest_left, forest_right;
 int max_disparity = 16;
 int scale = 16;
 
-TimeKeeper timer;
+//TimeKeeper timer;
 
 Grid<unsigned char> occlusion_left, occlusion_right;
 
@@ -40,7 +40,7 @@ void refinement(Grid<type>& d_left, Grid<type>& d_right) {
 
   forest_left.compute_cost_on_tree(cost_left, 255 * 0.05);
   forest_right.compute_cost_on_tree(cost_right, 255 * 0.05);
-  timer.check("refinement   ");
+  //timer.check("refinement   ");
   compute_disparity(cost_left, d_left);
   compute_disparity(cost_right, d_right);
 }
@@ -63,10 +63,8 @@ int main(int args, char ** argv) {
     strcpy(file_name[3], argv[6]);
   }
 
-timer.reset();
+//timer.reset();
   try {
-    puts(file_name[0]);
-    puts(file_name[1]);
     load_image(file_name[0], rgb_left);
     load_image(file_name[1], rgb_right);
   } catch (...) {
@@ -76,19 +74,19 @@ timer.reset();
 //	const int h = rgb_left.height;
 //	const int w = rgb_left.width;
 
-timer.check("load         ");
+//timer.check("load         ");
   compute_gradient(left_gradient, rgb_left);
   compute_gradient(right_gradient, rgb_right);
-timer.check("gradient     ");
+//timer.check("gradient     ");
   compute_first_cost(cost_left, cost_right, rgb_left, rgb_right,
       left_gradient, right_gradient, max_disparity);
-timer.check("initial cost ");
+//timer.check("initial cost ");
   for (int i = 0; i < 3; ++i){
     median_filter(rgb_left[i]);
     median_filter(rgb_right[i]);
   }
 
-timer.check("ctmf for     ");
+//timer.check("ctmf for     ");
   left_graph.collect_edges(rgb_left);
   right_graph.collect_edges(rgb_right);
   left_graph.build_MST();
@@ -113,26 +111,26 @@ timer.check("ctmf for     ");
   forest_right.init(right_graph);
   forest_left.order_of_visit();
   forest_right.order_of_visit();
-timer.check("MST          ");
+//timer.check("MST          ");
   forest_left.compute_cost_on_tree(cost_left);
   forest_right.compute_cost_on_tree(cost_right);
-timer.check("update a-cost");
+//timer.check("update a-cost");
   compute_disparity(cost_left, disparity_left);
   compute_disparity(cost_right, disparity_right);
   median_filter(disparity_left);
   median_filter(disparity_right);
-timer.check("unref-dispar ");
+//timer.check("unref-dispar ");
   refinement(disparity_left, disparity_right);
   median_filter(disparity_left);
   median_filter(disparity_right);
 
-timer.check("get disparity");
+//timer.check("get disparity");
   save_image(file_name[2], disparity_left, scale);
   save_image(file_name[3], disparity_right, scale);
   // save_image("lefttreeimage.pgm", left_tree_img);
   // save_image("righttreeimage.pgm", right_tree_img);
   // save_image("leftsupportmap.pgm", left_support_map);
   // save_image("rightsupportmap.pgm", right_support_map);
-timer.get_total_time();
+//timer.get_total_time();
   return 0;
 }

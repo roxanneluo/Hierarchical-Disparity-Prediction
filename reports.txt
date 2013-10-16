@@ -15,3 +15,4 @@ Using random spanning tree, different random seed
 Middlebury_others/*
 # Total/Correct/Ratio
 5884098 4696008 0.7980846002
+
