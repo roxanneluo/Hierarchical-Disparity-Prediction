@@ -1,0 +1,7 @@
+# Test report:
+Oct.16
+the algorithm proposed by the paper.
+tested all images in Middlebury_others
+Total/Correct/Ratio
+5884098 4324893 0.7350137608177159
+
