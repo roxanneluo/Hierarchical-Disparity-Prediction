@@ -2,10 +2,8 @@ import os
 import sys
 import subprocess
 
-import httplib
-
 NOW_PATH = ""
-other_path = 'testdata/Middlebury_others/'
+other_path = 'testdata/Middlebury_4/'
 
 pic_names = subprocess.check_output(['ls', other_path]).split()
 
@@ -27,33 +25,44 @@ def run_test_with_path(path) :
     print what
 
 
+total = 0
+correct = 0
 
 def check_results(p) :
-    #global left_restult
-    #global right_result
+    global correct
+    global total
     para = 0
+    tolerance = '1'
     with open(p + 'spec.txt','r') as f :
         para = f.read().split()
-    res = subprocess.check_output(['bin/checker.out',
+    res = subprocess.check_output(['bin/checker1.out',
                                    left_result,
                                    p + 'displeft.pgm',
-                                   sys.argv[2],
+                                   tolerance,
                                    para[1],])
-    print "Check left :\n" + res
-    res = subprocess.check_output(['bin/checker.out',
+    print res
+    tmp = map(int, res.split())
+    correct = correct + tmp[0]
+    total = total + tmp[1]
+    print float(tmp[0]) / tmp[1]
+    res = subprocess.check_output(['bin/checker1.out',
                                    right_result,
                                    p + 'dispright.pgm',
-                                   sys.argv[2],
+                                   tolerance,
                                    para[1],])
-    print "Check right :\n" + res
+    print res
+    tmp = map(int, res.split())
+    correct = correct + tmp[0]
+    total = total + tmp[1]
+    print float(tmp[0]) / tmp[1]
 
 
-thepath = 0
-try :
-    y = int(sys.argv[1])
-    thepath = other_path + pic_names[int(sys.argv[1])] + '/'
-except ValueError :
-    thepath = other_path + name + '/'
+for who in pic_names :
+    print "~~~ "+ who +" ~~~"
+    thepath = other_path + who + '/'
+    run_test_with_path(thepath)
+    check_results(thepath)
 
-run_test_with_path(thepath)
-check_results(thepath)
+print "----- Final result -----"
+print "Total = {}\nCorrect = {}\n".format(total, correct)
+print "Overall ratio = %.10f" % (float(correct)/ total)
