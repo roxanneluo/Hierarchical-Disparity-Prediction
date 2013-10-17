@@ -7,6 +7,7 @@
 
 #include "gridcode.h"
 #include "mylib.h"
+#include "edge/edge.h"
 
 const float sigma_const = 255 * 0.1;
 
@@ -69,13 +70,15 @@ public :
     void node_location(int p, int &x, int &y) {--p; x = p / W; y = p % W; }
 
 	template <class type>
-    void collect_edges(Array3<type> & rgb) {
+    void collect_edges(Array3<type> & rgb, bool edge_aware = false, int w = 1, int a = 1, int b = 8) {
         H = rgb.height; W = rgb.width;
         n = H * W;
+       // printf("H = %d, W = %d\n",H,W);
         m = 2 * H * W - H - W;
         edges = (Edge *) malloc((m + 2) * sizeof(Edge));
         trees = (Edge *) malloc((n + 2) * sizeof(Edge));
         int k = 0;
+        double sigmaa, sigmab;
         for (int i = 0; i < H; ++i)
         for (int j = 0; j < W; ++j)
             for (int p = 0; p < 2; ++p)
@@ -87,6 +90,12 @@ public :
                 edges[k].weight = mylib::max3abs(rgb[0][i][j] - rgb[0][i+p][j+q],
                                      rgb[1][i][j] - rgb[1][i+p][j+q],
                                      rgb[2][i][j] - rgb[2][i+p][j+q]); // ERROR: max not min
+                if (edge_aware) {
+                    sigmaa = sigma(rgb, i, j, w, b);
+                    sigmab = sigma(rgb, i+p, j+q, w, b);
+                    //printf("<%d, %d, %f>,<%d,%d,%f>\n", i,j,sigmaa, i+p, j+q,sigmab);
+                    edges[k].weight = mylib::min(edges[k].weight*mylib::max(sigmaa, sigmab)/a, 255.0);
+                }
             }
 //        cout << k << ' ' << m << endl;
     }
@@ -171,7 +180,7 @@ public :
 	}
 	void order_of_visit() {
 		order = (int * ) malloc((n + 2) * sizeof(int));
-		for (int i = 1; i <= n; ++i) 
+		for (int i = 1; i <= n; ++i)
                 nodes[i].ord = -1;
 		int num = 0;
 		while (1) {

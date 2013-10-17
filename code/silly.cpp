@@ -22,6 +22,9 @@ Forest forest_left, forest_right;
 int max_disparity = 16;
 int scale = 16;
 
+int w = 1, b = 8;
+double a = 1;
+
 //TimeKeeper timer;
 
 Grid<unsigned char> occlusion_left, occlusion_right;
@@ -87,13 +90,13 @@ int main(int args, char ** argv) {
   }
 
 //timer.check("ctmf for     ");
-  left_graph.collect_edges(rgb_left);
-  right_graph.collect_edges(rgb_right);
+  left_graph.collect_edges(rgb_left, false, w, a, b);
+  right_graph.collect_edges(rgb_right, false, w, a, b);
   left_graph.build_MST();
   right_graph.build_MST();
 
-  /*
-  int times = 3;
+
+  /*int times = 3;
   int x = 252, y = 167;
   draw_tree_and_RGBimage(left_tree_img, rgb_left,
       left_graph.trees, left_graph.n, times);
@@ -104,8 +107,8 @@ int main(int args, char ** argv) {
   draw_support_map(left_support_map, left_support_forest,
       left_graph, x, y, times)
   draw_support_map(right_support_map, right_support_forest,
-      right_graph, x, y, times);
-  */
+      right_graph, x, y, times);*/
+
 
   forest_left.init(left_graph);
   forest_right.init(right_graph);
@@ -120,9 +123,9 @@ int main(int args, char ** argv) {
   median_filter(disparity_left);
   median_filter(disparity_right);
 //timer.check("unref-dispar ");
-  refinement(disparity_left, disparity_right);
-  median_filter(disparity_left);
-  median_filter(disparity_right);
+//  refinement(disparity_left, disparity_right);
+//  median_filter(disparity_left);
+//  median_filter(disparity_right);
 
 //timer.check("get disparity");
   save_image(file_name[2], disparity_left, scale);

@@ -1,3 +1,13 @@
+/**
+ to draw the difference of 2 trees, use the following 2 functions:
+ void draw_tree_difference(Grid<type> &img, Grid<type> &origin, Edge *tree1, int n1, Edge *tree2, int n2, int times)
+ void draw_tree_differenceRGB(Grid<type> &img, Array3<type> &rgb, Edge *tree1, int n1, Edge *tree2, int n2, int times)
+
+ origin is the input image. if it's rgb, use draw_tree_differenceRGB; if it's gray, use draw_tree_difference.
+ img is the output image. each pixel in img is times times larger than in origin.
+ tree1 and tree2 are 2 input trees, and n1, n2 are the size of them respectively.
+**/
+
 #ifndef __IMAGERESULT__
 #define __IMAGERESULT__
 #include <cstdio>
