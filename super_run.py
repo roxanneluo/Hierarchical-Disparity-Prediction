@@ -9,8 +9,9 @@ DATASETS = (
     'Middlebury_others',
 )
 ALGORITHMS = (
-    'Original',
-    'RandTree',
+#    'Original',
+#    'RandTree',
+    'silly',
 )
 
 data_path = ''
@@ -27,7 +28,7 @@ def run_test_with_path(path, left_result, right_result) :
     with open(path + 'spec.txt','r') as f :
         para = f.read().split()
     what = subprocess.check_output([
-        'bin/' + algoritm + '.out', 
+        'bin/' + algoritm + '.exe', 
         path + 'left.ppm', path + 'right.ppm', 
         para[0], para[1],
         left_result, right_result,

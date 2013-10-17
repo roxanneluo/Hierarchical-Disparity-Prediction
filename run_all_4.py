@@ -44,9 +44,9 @@ def check_results(p) :
         correct = correct + tmp[0]
         total = total + tmp[1]
         rati = float(tmp[0]) / tmp[1]
-        print rati
+        print (rati)
     except CalledProcessError :
-        print 'null'
+        print ('null')
     try :
         res = subprocess.check_output(['bin/checker1.out',
                                        right_result,
