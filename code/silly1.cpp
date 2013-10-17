@@ -8,7 +8,6 @@
 
 #include "filter.h"
 
-
 char file_name[4][300] =
     {"left.ppm", "right.ppm", "silly_left.pgm", "silly_right.pgm"};
 
@@ -101,8 +100,8 @@ int main(int args, char ** argv) {
 
   left_graph.collect_edges(rgb_left);
   right_graph.collect_edges(rgb_right);
-  left_graph.build_MST();
-  right_graph.build_MST();
+  left_graph.build_RandTree();
+  right_graph.build_RandTree();
 
   forest_left.init(left_graph);
   forest_right.init(right_graph);

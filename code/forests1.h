@@ -92,7 +92,7 @@ public :
 //        cout << k << ' ' << m << endl;
     }
 
-    void build_MST() {
+    void build_RandTree() {
         //std::sort(edges + 1, edges + m + 1, smaller_edge); // this is not good.. a bit lazy
         srand(time(NULL));
         std::random_shuffle(edges + 1, edges + m + 1);
