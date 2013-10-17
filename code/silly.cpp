@@ -4,7 +4,7 @@
 #include "iomanager.h"
 #include "timekeeper.h"
 #include "refinement.h"
-//#include "imageresult.h"
+#include "imageresult.h"
 
 #include "filter.h"
 
@@ -30,9 +30,9 @@ double a = 1;
 Grid<unsigned char> occlusion_left, occlusion_right;
 
 // for image result
-/*Forest left_support_forest, right_support_forest;
+Forest left_support_forest, right_support_forest;
 Grid<unsigned char> left_support_map, right_support_map;
-Grid<unsigned char> left_tree_img, right_tree_img;*/
+Grid<unsigned char> left_tree_img, right_tree_img;
 
 template <class type>
 void refinement(Grid<type>& d_left, Grid<type>& d_right) {
@@ -48,6 +48,24 @@ void refinement(Grid<type>& d_left, Grid<type>& d_right) {
   compute_disparity(cost_right, d_right);
 }
 
+void draw_tree() { 
+  int times = 3;
+  int x = 252, y = 167;
+  draw_tree_and_RGBimage(left_tree_img, rgb_left,
+      left_graph.trees, left_graph.n, times);
+  draw_tree_and_RGBimage(right_tree_img, rgb_right,
+      right_graph.trees, right_graph.n, times);
+  left_support_forest.init(left_graph);
+  right_support_forest.init(right_graph);
+  draw_support_map(left_support_map, left_support_forest,
+      left_graph, x, y, times);
+  draw_support_map(right_support_map, right_support_forest,
+      right_graph, x, y, times);
+  save_image("MST_lefttreeimage.pgm", left_tree_img);
+  save_image("MST_righttreeimage.pgm", right_tree_img);
+  save_image("MST_leftsupportmap.pgm", left_support_map);
+  save_image("MST_rightsupportmap.pgm", right_support_map);
+}
 
 int main(int args, char ** argv) {
   if (args > 2) {
@@ -95,25 +113,13 @@ int main(int args, char ** argv) {
   left_graph.build_MST();
   right_graph.build_MST();
 
-
-  /*int times = 3;
-  int x = 252, y = 167;
-  draw_tree_and_RGBimage(left_tree_img, rgb_left,
-      left_graph.trees, left_graph.n, times);
-  draw_tree_and_RGBimage(right_tree_img, rgb_right,
-      right_graph.trees, right_graph.n, times);
-  left_support_forest.init(left_graph);
-  right_support_forest.init(right_graph);
-  draw_support_map(left_support_map, left_support_forest,
-      left_graph, x, y, times)
-  draw_support_map(right_support_map, right_support_forest,
-      right_graph, x, y, times);*/
-
-
   forest_left.init(left_graph);
   forest_right.init(right_graph);
   forest_left.order_of_visit();
   forest_right.order_of_visit();
+
+  draw_tree();
+
 //timer.check("MST          ");
   forest_left.compute_cost_on_tree(cost_left);
   forest_right.compute_cost_on_tree(cost_right);
@@ -123,17 +129,13 @@ int main(int args, char ** argv) {
   median_filter(disparity_left);
   median_filter(disparity_right);
 //timer.check("unref-dispar ");
-//  refinement(disparity_left, disparity_right);
-//  median_filter(disparity_left);
-//  median_filter(disparity_right);
+  refinement(disparity_left, disparity_right);
+  median_filter(disparity_left);
+  median_filter(disparity_right);
 
 //timer.check("get disparity");
   save_image(file_name[2], disparity_left, scale);
   save_image(file_name[3], disparity_right, scale);
-  // save_image("lefttreeimage.pgm", left_tree_img);
-  // save_image("righttreeimage.pgm", right_tree_img);
-  // save_image("leftsupportmap.pgm", left_support_map);
-  // save_image("rightsupportmap.pgm", right_support_map);
 //timer.get_total_time();
   return 0;
 }
