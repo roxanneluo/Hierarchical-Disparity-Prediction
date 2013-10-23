@@ -20,7 +20,7 @@ public :
 	void reset(int H, int W) {
 		height = H; width = W;
 		grid = (type **) malloc(H * sizeof(type *));
-		for (int i = 0; i < H; ++i) 
+		for (int i = 0; i < H; ++i)
 			grid[i] = (type *) malloc(W * sizeof(type));
 	}
 */
@@ -31,7 +31,7 @@ public :
 		a = (type*) malloc(sizeof(type) * (height * width + PADDING));
         assert(a != NULL);
         /*if(a == NULL) {
-			printf("reset() fail, Memory is too huge, fail.\n"); 
+			printf("reset() fail, Memory is too huge, fail.\n");
 			getchar();
 			exit(0);
 		} */
@@ -47,7 +47,7 @@ public :
 	void copy(Grid<type> &other) {
 		if (other.height != height || other.width != width)
 			reset(other.height, other.width);
-		for (int i = 0; i < height; ++i) 
+		for (int i = 0; i < height; ++i)
 			memcpy(grid[i], other.grid[i], width * sizeof(type));
 	}
 	void zero() {
@@ -57,6 +57,12 @@ public :
 				grid[i][j] = 0;
 			}
 		}
+	}
+
+	void white() {
+        for (int i = 0; i < height; ++i)
+            for (int j = 0; j < width; ++j)
+                grid[i][j] = 255;
 	}
 	type * operator[] (int index) { return grid[index]; }
 };

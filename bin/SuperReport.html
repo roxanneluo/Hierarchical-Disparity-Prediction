@@ -4,41 +4,39 @@
 <h1>Algorithm Overview</h1>
 <table border="3">
 <tr> <th>Algorithm</th> <th> Correctness </th> </tr>
-<tr><td>Original</td><td> 0.771528 </td></tr>
-<tr><td>RandTree</td><td> 0.811618 </td></tr>
+<tr><td>Original</td><td> 0.735014 </td></tr>
+<tr><td>RandTree</td><td> 0.794447 </td></tr>
+<tr><td>MST_blind</td><td> 0.735014 </td></tr>
 </table>
 <h1>Dataset Overview</h1>
 <table border="3">
-<tr> <th>Algorithm</th> <th>Middlebury_4</th> <th>Middlebury_others</th> </tr>
-<tr><td>Original</td><td> 0.929649 </td><td> 0.724880 </td></tr>
-<tr><td>RandTree</td><td> 0.933361 </td><td> 0.771591 </td></tr>
+<tr> <th>Algorithm</th> <th>Middlebury_others</th> </tr>
+<tr><td>Original</td><td> 0.735014 </td></tr>
+<tr><td>RandTree</td><td> 0.794447 </td></tr>
+<tr><td>MST_blind</td><td> 0.735014 </td></tr>
 </table>
 <h1>Dataset Detail</h1>
 <table border="3">
-<tr><td>Test Data</td><td colspan="2">Original</td><td colspan="2">RandTree</td></tr>
-<tr><td>Middlebury_4.cones</td><td> 0.915281 </td><td> 0.914992 </td><td> 0.922941 </td><td> 0.919303 </td></tr>
-<tr><td>Middlebury_4.teddy</td><td> 0.884550 </td><td> 0.906310 </td><td> 0.888348 </td><td> 0.912411 </td></tr>
-<tr><td>Middlebury_4.tsukuba</td><td> 0.908114 </td><td>null</td><td> 0.880622 </td><td>null</td></tr>
-<tr><td>Middlebury_4.venus</td><td> 0.983178 </td><td> 0.985175 </td><td> 0.991589 </td><td> 0.995469 </td></tr>
-<tr><td>Middlebury_others.Aloe</td><td> 0.858709 </td><td> 0.855462 </td><td> 0.875934 </td><td> 0.865923 </td></tr>
-<tr><td>Middlebury_others.Baby1</td><td> 0.788427 </td><td> 0.792462 </td><td> 0.855980 </td><td> 0.844778 </td></tr>
-<tr><td>Middlebury_others.Baby2</td><td> 0.689627 </td><td> 0.706453 </td><td> 0.733719 </td><td> 0.742299 </td></tr>
-<tr><td>Middlebury_others.Baby3</td><td> 0.801095 </td><td> 0.830465 </td><td> 0.857921 </td><td> 0.885364 </td></tr>
-<tr><td>Middlebury_others.Bowling1</td><td> 0.560144 </td><td> 0.580156 </td><td> 0.588994 </td><td> 0.602379 </td></tr>
-<tr><td>Middlebury_others.Bowling2</td><td> 0.681848 </td><td> 0.710163 </td><td> 0.704969 </td><td> 0.732073 </td></tr>
-<tr><td>Middlebury_others.Cloth1</td><td> 0.930323 </td><td> 0.948946 </td><td> 0.949857 </td><td> 0.961187 </td></tr>
-<tr><td>Middlebury_others.Cloth2</td><td> 0.786232 </td><td> 0.797945 </td><td> 0.828465 </td><td> 0.837470 </td></tr>
-<tr><td>Middlebury_others.Cloth3</td><td> 0.911970 </td><td> 0.907750 </td><td> 0.934603 </td><td> 0.933460 </td></tr>
-<tr><td>Middlebury_others.Cloth4</td><td> 0.845313 </td><td> 0.839272 </td><td> 0.867699 </td><td> 0.857336 </td></tr>
-<tr><td>Middlebury_others.Flowerpots</td><td> 0.602847 </td><td> 0.563691 </td><td> 0.689577 </td><td> 0.656750 </td></tr>
-<tr><td>Middlebury_others.Lampshade1</td><td> 0.732661 </td><td> 0.769558 </td><td> 0.776463 </td><td> 0.791254 </td></tr>
-<tr><td>Middlebury_others.Lampshade2</td><td> 0.673676 </td><td> 0.699111 </td><td> 0.750999 </td><td> 0.741318 </td></tr>
-<tr><td>Middlebury_others.Midd1</td><td> 0.709164 </td><td> 0.737939 </td><td> 0.785291 </td><td> 0.796294 </td></tr>
-<tr><td>Middlebury_others.Midd2</td><td> 0.670721 </td><td> 0.617972 </td><td> 0.756704 </td><td> 0.820535 </td></tr>
-<tr><td>Middlebury_others.Monopoly</td><td> 0.527557 </td><td> 0.540352 </td><td> 0.710907 </td><td> 0.696012 </td></tr>
-<tr><td>Middlebury_others.Plastic</td><td> 0.508251 </td><td> 0.463334 </td><td> 0.564342 </td><td> 0.456813 </td></tr>
-<tr><td>Middlebury_others.Rocks1</td><td> 0.860990 </td><td> 0.864110 </td><td> 0.889306 </td><td> 0.887750 </td></tr>
-<tr><td>Middlebury_others.Rocks2</td><td> 0.891715 </td><td> 0.890463 </td><td> 0.922051 </td><td> 0.929432 </td></tr>
-<tr><td>Middlebury_others.Wood1</td><td> 0.749438 </td><td> 0.702116 </td><td> 0.770512 </td><td> 0.738551 </td></tr>
-<tr><td>Middlebury_others.Wood2</td><td> 0.855269 </td><td> 0.852276 </td><td> 0.824301 </td><td> 0.821618 </td></tr>
+<tr><td>Test Data</td><td colspan="2">Original</td><td colspan="2">RandTree</td><td colspan="2">MST_blind</td></tr>
+<tr><td>Middlebury_others.Aloe</td><td> 0.859928 </td><td> 0.858002 </td><td> 0.872627 </td><td> 0.864354 </td><td> 0.859928 </td><td> 0.858002 </td></tr>
+<tr><td>Middlebury_others.Baby1</td><td> 0.786277 </td><td> 0.792972 </td><td> 0.891115 </td><td> 0.903911 </td><td> 0.786277 </td><td> 0.792972 </td></tr>
+<tr><td>Middlebury_others.Baby2</td><td> 0.689931 </td><td> 0.703544 </td><td> 0.800503 </td><td> 0.811134 </td><td> 0.689931 </td><td> 0.703544 </td></tr>
+<tr><td>Middlebury_others.Baby3</td><td> 0.797730 </td><td> 0.832011 </td><td> 0.857465 </td><td> 0.891791 </td><td> 0.797730 </td><td> 0.832011 </td></tr>
+<tr><td>Middlebury_others.Bowling1</td><td> 0.563850 </td><td> 0.574220 </td><td> 0.658008 </td><td> 0.659854 </td><td> 0.563850 </td><td> 0.574220 </td></tr>
+<tr><td>Middlebury_others.Bowling2</td><td> 0.701234 </td><td> 0.696646 </td><td> 0.741219 </td><td> 0.777658 </td><td> 0.701234 </td><td> 0.696646 </td></tr>
+<tr><td>Middlebury_others.Cloth1</td><td> 0.930259 </td><td> 0.949306 </td><td> 0.954988 </td><td> 0.964203 </td><td> 0.930259 </td><td> 0.949306 </td></tr>
+<tr><td>Middlebury_others.Cloth2</td><td> 0.787012 </td><td> 0.793484 </td><td> 0.846474 </td><td> 0.849788 </td><td> 0.787012 </td><td> 0.793484 </td></tr>
+<tr><td>Middlebury_others.Cloth3</td><td> 0.909409 </td><td> 0.906803 </td><td> 0.932819 </td><td> 0.939983 </td><td> 0.909409 </td><td> 0.906803 </td></tr>
+<tr><td>Middlebury_others.Cloth4</td><td> 0.854208 </td><td> 0.842547 </td><td> 0.863485 </td><td> 0.880054 </td><td> 0.854208 </td><td> 0.842547 </td></tr>
+<tr><td>Middlebury_others.Flowerpots</td><td> 0.587819 </td><td> 0.566213 </td><td> 0.728540 </td><td> 0.681722 </td><td> 0.587819 </td><td> 0.566213 </td></tr>
+<tr><td>Middlebury_others.Lampshade1</td><td> 0.727164 </td><td> 0.763829 </td><td> 0.770152 </td><td> 0.799723 </td><td> 0.727164 </td><td> 0.763829 </td></tr>
+<tr><td>Middlebury_others.Lampshade2</td><td> 0.669636 </td><td> 0.708457 </td><td> 0.766184 </td><td> 0.749006 </td><td> 0.669636 </td><td> 0.708457 </td></tr>
+<tr><td>Middlebury_others.Midd1</td><td> 0.723700 </td><td> 0.762649 </td><td> 0.748547 </td><td> 0.746344 </td><td> 0.723700 </td><td> 0.762649 </td></tr>
+<tr><td>Middlebury_others.Midd2</td><td> 0.424517 </td><td> 0.421173 </td><td> 0.659657 </td><td> 0.637437 </td><td> 0.424517 </td><td> 0.421173 </td></tr>
+<tr><td>Middlebury_others.Monopoly</td><td> 0.534117 </td><td> 0.551326 </td><td> 0.639433 </td><td> 0.631588 </td><td> 0.534117 </td><td> 0.551326 </td></tr>
+<tr><td>Middlebury_others.Plastic</td><td> 0.500405 </td><td> 0.427317 </td><td> 0.555295 </td><td> 0.525434 </td><td> 0.500405 </td><td> 0.427317 </td></tr>
+<tr><td>Middlebury_others.Rocks1</td><td> 0.864997 </td><td> 0.863425 </td><td> 0.902029 </td><td> 0.904349 </td><td> 0.864997 </td><td> 0.863425 </td></tr>
+<tr><td>Middlebury_others.Rocks2</td><td> 0.892205 </td><td> 0.895123 </td><td> 0.918874 </td><td> 0.927058 </td><td> 0.892205 </td><td> 0.895123 </td></tr>
+<tr><td>Middlebury_others.Wood1</td><td> 0.756935 </td><td> 0.709548 </td><td> 0.771475 </td><td> 0.758128 </td><td> 0.756935 </td><td> 0.709548 </td></tr>
+<tr><td>Middlebury_others.Wood2</td><td> 0.851921 </td><td> 0.854439 </td><td> 0.825200 </td><td> 0.795987 </td><td> 0.851921 </td><td> 0.854439 </td></tr>
 </html>
