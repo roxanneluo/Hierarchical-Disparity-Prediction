@@ -4,7 +4,7 @@
 #include "gridcode.h"
 #include "iomanager.h"
 
-// box filter.
+// This is a box filter.
 
 template <class type> 
 type average (const type& a, const type& b) {
