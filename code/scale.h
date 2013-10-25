@@ -2,7 +2,6 @@
 #define SCALE_H_OCT_2013
 
 #include "gridcode.h"
-#include "iomanager.h"
 
 // This is a box filter.
 
