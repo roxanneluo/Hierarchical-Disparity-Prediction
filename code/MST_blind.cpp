@@ -10,7 +10,7 @@
 
 
 char file_name[4][300] =
-    {"left.ppm", "right.ppm", "silly_left.pgm", "silly_right.pgm"};
+    {"left.ppm", "right.ppm", "silly_MST_blind_left.pgm", "silly_MST_blind_right.pgm"};
 
 Array3<unsigned char> rgb_left, rgb_right; // int -> unsigned char
 Grid<unsigned char> disparity_left, disparity_right; // int -> unsigned char
@@ -37,7 +37,7 @@ Grid<unsigned char> left_tree_img, right_tree_img;
 template <class type>
 void refinement(Grid<type>& d_left, Grid<type>& d_right) {
   // find stable pixels by using left-right consisty check
-  find_stable_pixels(d_left, d_right, occlusion_left, occlusion_right);
+  find_seen_stable_pixels(d_left, d_right, occlusion_left, occlusion_right);
   update_matching_cost(cost_left, cost_right, d_left, d_right,
       occlusion_left, occlusion_right);
 
