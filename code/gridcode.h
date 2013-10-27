@@ -7,6 +7,7 @@
 
 #define PADDING 10
 
+
 template <class type>
 class Grid {
 public :
@@ -24,6 +25,9 @@ public :
 			grid[i] = (type *) malloc(W * sizeof(type));
 	}
 */
+	~Grid<type> () {
+	  freegrid();
+	}
 	void reset(int H, int W) {
 		height = H;
 		width = W;
@@ -40,6 +44,13 @@ public :
 			grid[i] = &a[i*width];
 	}
 
+	void freegrid() {
+	  if (grid != NULL) {
+		  free(grid[0]);
+			free(grid);
+			grid = NULL;
+		}
+	}
 	Grid<type> (Grid<type> & other) {
 		reset(other.height, other.width);
 		copy(other);
@@ -77,6 +88,9 @@ public :
 		reset(arr, H, W);
 	}
 
+	~Array3<type> () {
+	  freearray3();
+	}	
 	void reset(int arr, int H, int W) {
 		height = H, width = W, array = arr;
 		mat = (Grid<type> **) malloc(array * sizeof(Grid<type> *));
@@ -84,6 +98,14 @@ public :
 			mat[i] = new Grid<type>(H, W);
 	}
 
+	void freearray3() {
+	  if (mat != NULL) {
+		  mat[0][0].freegrid();
+			free(mat[0]);
+			free(mat);
+			mat = NULL;
+		}
+	}
 	Array3<type>(Array3<type> & other) {
 		reset(other.height, other.width, other.array);
 		copy(other);
