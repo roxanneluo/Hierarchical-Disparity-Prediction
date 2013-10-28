@@ -14,6 +14,7 @@ public :
 	type ** grid;
 	int height, width;
 	Grid<type> () {height = width = -1; }
+	Grid<type> (const Grid<type>& g) {} 
 	Grid<type> (int H, int W) {
 		reset(H, W);
 	}
@@ -84,6 +85,7 @@ public :
 	int height, width, array;
 	Grid<type> ** mat;
 	Array3<type> () { array=height=width=-1;  }
+	Array3<type> (const Array3<type>& a) {}
 	Array3<type> (int arr, int H, int W) {
 		reset(arr, H, W);
 	}

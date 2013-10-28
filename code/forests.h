@@ -62,6 +62,8 @@ class Graph {
     Edge* edges; // all candidate edges  1-based
 
 public :
+		Graph() {}
+		Graph(const Graph& g) {}
     Edge* trees; // collected tree edges 1-based
     int n, m; // number of nodes and edges
     int ts; // number of tree edges
@@ -137,6 +139,8 @@ class Forest {
 	Array3<double> backup; // used in calculate cost on tree
 	double table[256]; // weight table
 public :
+	  Forest() {}
+		Forest(const Forest& f) {}
     void init(Graph & g) {
         n = g.n;
 //        cout << "n=" << n << endl;
