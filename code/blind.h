@@ -1,5 +1,6 @@
 #ifndef __BLIND__
 #define __BLIND__
+#include "algorithm"
 #include "gridcode.h"
 class Point {
     public: int x, y;
