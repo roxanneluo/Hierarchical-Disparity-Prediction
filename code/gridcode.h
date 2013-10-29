@@ -27,7 +27,7 @@ public :
 	}
 */
 	~Grid<type> () {
-	  freegrid();
+	  // freegrid();
 	}
 	void reset(int H, int W) {
 		height = H;
@@ -91,7 +91,7 @@ public :
 	}
 
 	~Array3<type> () {
-	  freearray3();
+	  // freearray3();
 	}	
 	void reset(int arr, int H, int W) {
 		height = H, width = W, array = arr;
