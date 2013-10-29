@@ -5,13 +5,14 @@ from subprocess import CalledProcessError
 
 DATASETS = ( 
 #    'Middlebury_1',
-#    'Middlebury_4',
+    'Middlebury_4',
     'Middlebury_others',
 )
 ALGORITHMS = (
     'Original',
     'RandTree',
     'MST_blind',
+		'MSF'
 #    'silly',
 )
 
