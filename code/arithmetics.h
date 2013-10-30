@@ -40,6 +40,7 @@ void copy_left_cost_to_right (Array3<double>& cost_left, Array3<double>& cost_ri
        } 
 }
 
+// Compute first cost only for the highest layer.
 template <class type>
 void compute_first_cost (Array3<double> &cost_left, Array3<double> &cost_right, 
     Array3<type> & rgb_left, Array3<type> &rgb_right, 
@@ -65,6 +66,7 @@ void compute_first_cost (Array3<double> &cost_left, Array3<double> &cost_right,
 
 }
 
+// Compute first cost for other layers by using the initial disparity from previous layer.
 template <class type>
 void compute_first_cost (Array3<double>& cost_left, Array3<double>& cost_right, 
     Array3<type>& rgb_left, Array3<type>& rgb_right, 

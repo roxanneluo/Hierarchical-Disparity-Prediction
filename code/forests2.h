@@ -160,8 +160,8 @@ public :
       int boundary_k = m + 1;
       std::vector<Edge> tmp_edge;
               
-      for (int i = H - 1; i >= 0; --i)
-        for (int j = W - 1 - i % 2; j >= 0; j-=2) {
+      for (int i = 0; i < H; ++i)
+        for (int j = i % 2; j < W; j+=2) {
           tmp_edge.clear();
           for (int p = -1; p < 2; ++p)
             for (int q = -1; q < 2; ++q) if (abs(p) + abs(q) == 1)
@@ -198,7 +198,6 @@ public :
     }
 
     void build_RandTree(bool boundary = false) {
-        //std::sort(edges + 1, edges + m + 1, smaller_edge); // this is not good.. a bit lazy
         srand(time(NULL));
         if (!boundary) {
           std::random_shuffle(edges + 1, edges + m + 1);
