@@ -15,7 +15,7 @@ public :
 	type ** grid;
 	int height, width;
 	Grid<type> () {height = width = -1; grid = NULL;}
-	Grid<type> (const Grid<type>& g) {}
+	Grid<type> (const Grid<type>& g) {grid = NULL;}
 	Grid<type> (int H, int W) {
 		reset(H, W);
 	}
@@ -29,7 +29,7 @@ public :
 */
 
 	~Grid<type> () {
-        freegrid();
+		freegrid();
 	}
 	void reset(int H, int W) {
 		height = H;
@@ -48,11 +48,11 @@ public :
 	}
 
 	void freegrid() {
-        if (grid != NULL) {
-            free(grid[0]);
-            free(grid);
-            grid = NULL;
-        }
+		if (grid != NULL) {
+			free(grid[0]);
+			free(grid);
+			grid = NULL;
+    }
 	}
 	Grid<type> (Grid<type> & other) {
 		reset(other.height, other.width);
@@ -86,19 +86,22 @@ class Array3 {
 public :
 	int height, width, array;
 	Grid<type> ** mat;
-	Array3<type> () { array=height=width=-1;  mat = NULL;}
-	Array3<type> (const Array3<type>& a) {}
+	Array3<type> () {
+		array = height = width = -1;
+		mat = NULL;
+	}
+	Array3<type> (const Array3<type>& a) {mat = NULL;}
 	Array3<type> (int arr, int H, int W) {
 		reset(arr, H, W);
 	}
 
 	~Array3<type> () {
-        if (mat != NULL) {
-            for (int i = 0; i < array; ++i)
-                delete mat[i];
-            free(mat);
-            mat = NULL;
-        }
+		if (mat != NULL) {
+			for (int i = 0; i < array; ++i)
+				delete mat[i];
+			free(mat);
+		 	mat = NULL;
+    }
 	}
 	void reset(int arr, int H, int W) {
 		height = H, width = W, array = arr;
