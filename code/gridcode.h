@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cassert>
+#include <cstdio>
 // this code is meant for memory management
 
 #define PADDING 10
@@ -13,8 +14,8 @@ class Grid {
 public :
 	type ** grid;
 	int height, width;
-	Grid<type> () {height = width = -1; }
-	Grid<type> (const Grid<type>& g) {} 
+	Grid<type> () {height = width = -1; grid = NULL;}
+	Grid<type> (const Grid<type>& g) {}
 	Grid<type> (int H, int W) {
 		reset(H, W);
 	}
@@ -26,8 +27,15 @@ public :
 			grid[i] = (type *) malloc(W * sizeof(type));
 	}
 */
+
 	~Grid<type> () {
-	  // freegrid();
+        freegrid();
+        /*if (grid != NULL) {
+            for (int i = 0; i < height; ++i)
+                delete [] grid[i];
+            delete [] grid;
+            grid = NULL;
+        }*/
 	}
 	void reset(int H, int W) {
 		height = H;
@@ -43,12 +51,17 @@ public :
 		grid = (type**) malloc(sizeof(type*) * height);
 		for(int i = 0; i < height; i++)
 			grid[i] = &a[i*width];
+       /* grid = new type* [height];
+        for (int i = 0; i < height; ++i)
+            grid[i] = new type[width];*/
 	}
 
 	void freegrid() {
 	  if (grid != NULL) {
 		  free(grid[0]);
+            //type *p = grid[0];
 			free(grid);
+			//printf("%d\n", p == NULL);
 			grid = NULL;
 		}
 	}
@@ -84,7 +97,7 @@ class Array3 {
 public :
 	int height, width, array;
 	Grid<type> ** mat;
-	Array3<type> () { array=height=width=-1;  }
+	Array3<type> () { array=height=width=-1;  mat = NULL;}
 	Array3<type> (const Array3<type>& a) {}
 	Array3<type> (int arr, int H, int W) {
 		reset(arr, H, W);
@@ -92,7 +105,13 @@ public :
 
 	~Array3<type> () {
 	  // freearray3();
-	}	
+        if (mat != NULL) {
+            for (int i = 0; i < array; ++i)
+                delete mat[i];
+            //free(mat);
+            mat = NULL;
+        }
+	}
 	void reset(int arr, int H, int W) {
 		height = H, width = W, array = arr;
 		mat = (Grid<type> **) malloc(array * sizeof(Grid<type> *));

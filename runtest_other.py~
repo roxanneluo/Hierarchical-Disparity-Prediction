@@ -18,7 +18,7 @@ def run_test_with_path(path) :
     with open(path + 'spec.txt','r') as f :
         para = f.read().split()
     what = subprocess.check_output([
-        'bin/MSF.out', 
+        'bin/silly.out', 
         path + 'left.ppm', path + 'right.ppm', 
         para[0], para[1],
         left_result,
