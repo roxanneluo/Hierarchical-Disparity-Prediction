@@ -7,6 +7,8 @@
 
 #include "filter.h"
 
+
+// Compute matching cost only for the highest layer.
 template<class type>
 void compute_first_matching_cost(Array3<type>& left, 
 		                             Array3<type>& right,
@@ -21,6 +23,7 @@ void compute_first_matching_cost(Array3<type>& left,
 										 left_gradient, right_gradient, max_disparity);
 }
 
+// Compute matching cost for other layers.
 template<class type>
 void compute_first_matching_cost(Array3<type>& left, 
 		                             Array3<type>& right,
@@ -38,6 +41,7 @@ void compute_first_matching_cost(Array3<type>& left,
 										 max_disparity);
 }
 
+// Build trees only for the highest layer.
 template<class type>
 void build_tree(Array3<type>& left,
 		            Array3<type>& right,
@@ -55,8 +59,8 @@ void build_tree(Array3<type>& left,
 	right_graph.collect_edges(right);
 	// left_graph.build_MST();
 	// right_graph.build_MST();
-	left_graph.build_RandTree(true);
-	right_graph.build_RandTree(true);
+	left_graph.build_RandTree();
+	right_graph.build_RandTree();
 
 	// Build forests.
   forest_left.init(left_graph);
@@ -65,6 +69,7 @@ void build_tree(Array3<type>& left,
 	forest_right.order_of_visit();
 }
 
+// Build forests for other layers.
 template<class type>
 void build_tree(Array3<type>& left,
 		            Array3<type>& right,
