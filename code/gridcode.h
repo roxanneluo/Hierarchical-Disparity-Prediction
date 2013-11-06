@@ -30,12 +30,6 @@ public :
 
 	~Grid<type> () {
         freegrid();
-        /*if (grid != NULL) {
-            for (int i = 0; i < height; ++i)
-                delete [] grid[i];
-            delete [] grid;
-            grid = NULL;
-        }*/
 	}
 	void reset(int H, int W) {
 		height = H;
@@ -51,19 +45,14 @@ public :
 		grid = (type**) malloc(sizeof(type*) * height);
 		for(int i = 0; i < height; i++)
 			grid[i] = &a[i*width];
-       /* grid = new type* [height];
-        for (int i = 0; i < height; ++i)
-            grid[i] = new type[width];*/
 	}
 
 	void freegrid() {
-	  if (grid != NULL) {
-		  free(grid[0]);
-            //type *p = grid[0];
-			free(grid);
-			//printf("%d\n", p == NULL);
-			grid = NULL;
-		}
+        if (grid != NULL) {
+            free(grid[0]);
+            free(grid);
+            grid = NULL;
+        }
 	}
 	Grid<type> (Grid<type> & other) {
 		reset(other.height, other.width);
@@ -104,11 +93,10 @@ public :
 	}
 
 	~Array3<type> () {
-	  // freearray3();
         if (mat != NULL) {
             for (int i = 0; i < array; ++i)
                 delete mat[i];
-            //free(mat);
+            free(mat);
             mat = NULL;
         }
 	}

@@ -1,3 +1,5 @@
+#include <vector>
+#include <cstdlib>
 #include "gridcode.h"
 #include "arithmetics.h"
 #include "scale.h"
@@ -8,7 +10,6 @@
 #include "MSF.h"
 #include "filter.h"
 #include "algorithm"
-#include <vector>
 
 using namespace std;
 
@@ -17,7 +18,7 @@ char file_name[4][300] =
 
 int max_disparity = 16;
 int scale = 16;
-int level = 3;
+const int level = 3;
 
 // typedef Array3<unsigned char> ARRAY3;
 // typedef Grid<unsigned char> GRID;
@@ -33,7 +34,7 @@ vector< Grid<unsigned char> > occlusion_left(level), occlusion_right(level);
 
 // for image result
 Forest left_support_forest, right_support_forest;
-Grid<unsigned char> left_support_map, right_support_map;
+Grid<unsigned char> left_support_map[level], right_support_map[level];
 Grid<unsigned char> left_tree_img, right_tree_img;
 /*
 void draw_tree() {
@@ -66,7 +67,7 @@ void refinement(Grid<type>& d_left, Grid<type>& d_right,
   // forest_right.init(right_graph);
   // forest_left.order_of_visit();
   // forest_right.order_of_visit();
- 
+
 	Array3<double> cost_left, cost_right;
   cost_left.reset(max_disparity, d_left.height, d_left.width);
 	cost_right.reset(max_disparity, d_right.height, d_right.width);
@@ -81,8 +82,30 @@ void refinement(Grid<type>& d_left, Grid<type>& d_right,
   save_image("lefterror.pgm", occ_left);
   save_image("righterror.pgm", occ_right);
 }
+char *get_file_name(char *filename, const char * prefix, int para, const char * suffix) {
+    strcpy(filename, prefix);
+    strcat(filename, "_");
+    char num[10] = {para-'0','\0'};
+    //itoa(para, num, 10);
+    strcat(filename, num);
+    strcat(filename, "_");
+    strcat(filename, suffix);
+    return filename;
+}
+void draw_tree(int level_index) {
+    int times = 3;
+    int x = 100, y = 80;
+    left_support_forest.init(graph_left[level_index]);
+    right_support_forest.init(graph_right[level_index]);
+    draw_support_map(left_support_map[level_index], left_support_forest,
+      graph_left[level_index], x, y, times);
+    draw_support_map(right_support_map[level_index], right_support_forest,
+      graph_right[level], x, y, times);
 
-
+    char filename[50];
+    save_image(get_file_name(filename,"MSF_left_supportmap",level_index,".pgm"), left_support_map[level_index]);
+    save_image(get_file_name(filename,"MSF_right_supportmap",level_index,".pgm"), right_support_map[level_index]);
+}
 int main(int args, char ** argv) {
 
 	if (args > 2) {
@@ -142,11 +165,14 @@ int main(int args, char ** argv) {
 	  find_stable_pixels(disparity_left[i], disparity_right[i],
 		  	 occlusion_left[i], occlusion_right[i]);
 	}
-  refinement(disparity_left[0], disparity_right[0], occlusion_left[0], occlusion_right[0]);
-  median_filter(disparity_left[0]);
-  median_filter(disparity_right[0]);
+    refinement(disparity_left[0], disparity_right[0], occlusion_left[0], occlusion_right[0]);
+    median_filter(disparity_left[0]);
+    median_filter(disparity_right[0]);
 
-  save_image(file_name[2], disparity_left[0], scale);
-  save_image(file_name[3], disparity_right[0], scale);
+    save_image(file_name[2], disparity_left[0], scale);
+    save_image(file_name[3], disparity_right[0], scale);
+
+    //for (int i = 0; i < level; ++i)
+       // draw_tree(0);
 	return 0;
 }
