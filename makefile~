@@ -13,4 +13,4 @@ MST_blind :
 silly_MSF :
 	g++ code/silly_MSF.cpp -o bin/MSF.out -O2 -Wall
 Prob_Gen :
-	g++ code/code-probability/prob_data_generator.cpp -o bin/Prob_Gen.out -O2 -Wall
+	g++ code/code-probability/prob_data_generator.cpp -o bin/ProbGen.out -O2 -Wall
