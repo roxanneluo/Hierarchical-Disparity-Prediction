@@ -1,5 +1,6 @@
 //the uncovered ratio of Odd Even Avg probability Model.
 //test Middle4, 1=>'cones';2=>'teddy';3=>'tsukuba';4=>'venus';
+//definition of values of wrongCover. if prob in truth > 0 is calculated zero, it's of minus sign. otherwise, it's the abs of the difference between the trueSmallGivenLarge and the calculated SmallGivenLarge.
 //ratio(smallLayer, largeLayer, range, testDataIndex)
 //large is the layer index of the large image while small is the opposite
 //if d_large is even, then d_small is in [d_large/2-range, d_large/2+range] intersects [0, maxDisparity in layer small]
