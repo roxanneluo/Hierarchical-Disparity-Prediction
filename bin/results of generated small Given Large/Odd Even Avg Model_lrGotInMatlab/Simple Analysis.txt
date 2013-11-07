@@ -1,0 +1,9 @@
+WHEN RANGE = 4, THE UNCOVERED RATIO IS ALWAYS 0!
+Note: I set all largeGivenSmall prob that is larger than 1 to 1.
+PLEASE read uncovered ratio first to know the definition of range and uncovered ratio.
+
+the larger the range, the smaller the uncovered ratio, but the bigger the error of largeGivenSmall.
+In the extreme case, the probability distribution is not at all similar to the truth, but the uncovered ratio is 0.
+largeGivenSmall, whatever the range, always have much smaller error along the diagonal. Is it true the probability is always more accurate if the corresponding frequency is large(in division, it's less abnormal).
+How could the range correlate with the maxDisparity?
+

@@ -4,6 +4,6 @@ function run_all_4
     level = 2;
     contract = 2;
     for i = 1:4
-        drawMultiLayer(['Prob_Gen_',name{i},'__'], maxDisp(i), level, contract);
+        drawMultiLayer(['data/Prob_Gen_',name{i},'__'], maxDisp(i), level, contract);
     end
 end
