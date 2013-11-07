@@ -3,9 +3,9 @@ function drawGeneratedMultiLayer
     maxDisp = [60, 60, 16, 20];
     level = 3;
     contract = 2;
-    maxRange = 3;
-    ratio = zeros(level, level,1, maxRange);
-    for i = 1:1
+    maxRange = 10;
+    ratio = zeros(level, level,maxRange, 4);
+    for i = 1:4
         for range = 1:maxRange
             ratio(:, :, range,i) = generateMultiLayer(['data/Prob_Gen_',name{i},'__'], maxDisp(i), level, contract, range);
         end
@@ -25,10 +25,7 @@ function ratio = generateMultiLayer(dataset, maxDisp, level, contract, range)
             A(1:m(j), 1:m(i),j,i) = read([dataset,'MST_cnt_',int2str(j-1),'_',int2str(i-1),'.txt'], m(j), m(i));
         end
     end
-    
-    l = getL(m, level, dataset, A);
 
-    
     smallGivenLarge = zeros(m(2), m(1), level, level);
    	trueLargeGivenSmall = zeros(m(2), m(1), level, level);
     for large = 1:level
@@ -37,12 +34,16 @@ function ratio = generateMultiLayer(dataset, maxDisp, level, contract, range)
             trueLargeGivenSmall(1:m(small), 1:m(large), small, large) = findTrueLargeGivenSmall(A(1:m(small), 1:m(large), small, large));
         end
     end
+
+   
+    l = getL(m, level, A);
+    r = getR(m, level, dataset, smallGivenLarge);
     
     ratio = zeros(level, level);
     for large = 1:level
         for small = large+1:level
             if (small == large+1)
-                base = rMul(smallGivenLarge(1:m(small), 1:m(large), small, large),l(1:m(large),large));
+                base = rMul(smallGivenLarge(1:m(small), 1:m(large), small, large),r(1:m(large),large));
             else
                 base = smallGivenLarge(1:m(small), 1:m(small-1), small, small-1)*base;
             end
@@ -51,15 +52,34 @@ function ratio = generateMultiLayer(dataset, maxDisp, level, contract, range)
             ratio(small,large) = getWrongCoverRatio(largeGivenSmall,...
                                     trueLargeGivenSmall(1:m(small), 1:m(large), small, large), ...
                                     A(1:m(small), 1:m(large), small, large));
-            drawAll(A(1:m(small), 1:m(large), small, large),...
-                largeGivenSmall,...
-                trueLargeGivenSmall(1:m(small), 1:m(large), small, large),...
-                smallGivenLarge(1:m(small), 1:m(large), small, large),...
-                small, large, dataset, range);
+%             drawAll(A(1:m(small), 1:m(large), small, large),...
+%                 largeGivenSmall,...
+%                 trueLargeGivenSmall(1:m(small), 1:m(large), small, large),...
+%                 smallGivenLarge(1:m(small), 1:m(large), small, large),...
+%                 small, large, dataset, range);
         end
     end
 end
-
+function r = getR(m, level, dataset, smallGivenLarge)
+    r = zeros(m(1), level);
+    r(1:m(1),1) = readSupport([dataset,'support_disp_cnt.txt']);
+    for i = 2:level-1
+        r(1:m(i),i) = smallGivenLarge(1:m(i),1:m(i-1), i,i-1)*r(1:m(i-1),i-1);
+    end
+end
+function l = getL(m ,level, A)
+    l = zeros(m(1), level);
+%     for i = 1: level
+%         l(1:m(i),i) = readPd([dataset, 'MST__pd_',int2str(i-1),'.txt']);
+%     end  
+%     l(1:m(1),1) = genR(A(1:m(2), 1:m(1), 2,1));
+     for i = 2: level
+        l(1:m(i),i) = genL(A(1:m(i), 1:m(i-1), i,i-1));
+%         draw2d(trueL, ['trueL', int2str(i)]);
+%         draw2d(l(1:m(i),i), ['genL', int2str(i)]);
+%         draw2d(l(1:m(i),i)-trueL, ['errL', int2str(i)]);
+    end
+end
 function ratio = getWrongCoverRatio(largeGivenSmall, trueLargeGivenSmall, A)
     totalPoints = sum(sum(A));
     wrongPoints = A((largeGivenSmall==0) & (trueLargeGivenSmall ~= 0));
@@ -83,20 +103,7 @@ function SL = genSmallGivenLarge(smallDisp, largeDisp, range)
         end
     end
 end
-function l = getL(m ,level, dataset, A)
-    l = zeros(m(1), level);
-    l(1:m(1),1) = readSupport([dataset,'support_disp_cnt.txt']);
-%     for i = 1: level
-%         l(1:m(i),i) = readPd([dataset, 'MST__pd_',int2str(i-1),'.txt']);
-%     end  
-%     l(1:m(1),1) = genR(A(1:m(2), 1:m(1), 2,1));
-     for i = 2: level
-        l(1:m(i),i) = genL(A(1:m(i), 1:m(i-1), i,i-1));
-%         draw2d(trueL, ['trueL', int2str(i)]);
-%         draw2d(l(1:m(i),i), ['genL', int2str(i)]);
-%         draw2d(l(1:m(i),i)-trueL, ['errL', int2str(i)]);
-    end
-end
+
 
 function r = genR(A)
     r = sum(A);

@@ -1,13 +1,13 @@
 function drawGeneratedMultiLayer
     name = {'cones';'teddy';'tsukuba';'venus'};
     maxDisp = [60, 60, 16, 20];
-    level = 2;
+    level = 3;
     contract = 2;
     maxRange = 3;
-    ratio = zeros(level, level,4, maxRange,);
+    ratio = zeros(level, level,1, maxRange);
     for i = 1:1
         for range = 1:maxRange
-            ratio(i,range, :, :) = generateMultiLayer(['Prob_Gen_',name{i},'__'], maxDisp(i), level, contract, range);
+            ratio(:, :, range,i) = generateMultiLayer(['data/Prob_Gen_',name{i},'__'], maxDisp(i), level, contract, range);
         end
     end
     ratio
@@ -25,10 +25,7 @@ function ratio = generateMultiLayer(dataset, maxDisp, level, contract, range)
             A(1:m(j), 1:m(i),j,i) = read([dataset,'MST_cnt_',int2str(j-1),'_',int2str(i-1),'.txt'], m(j), m(i));
         end
     end
-    
-    l = getL(m, level, dataset, A);
 
-    
     smallGivenLarge = zeros(m(2), m(1), level, level);
    	trueLargeGivenSmall = zeros(m(2), m(1), level, level);
     for large = 1:level
@@ -37,12 +34,16 @@ function ratio = generateMultiLayer(dataset, maxDisp, level, contract, range)
             trueLargeGivenSmall(1:m(small), 1:m(large), small, large) = findTrueLargeGivenSmall(A(1:m(small), 1:m(large), small, large));
         end
     end
+
+   
+    l = getL(m, level, A);
+    r = getR(m, level, dataset, smallGivenLarge);
     
     ratio = zeros(level, level);
     for large = 1:level
         for small = large+1:level
             if (small == large+1)
-                base = rMul(smallGivenLarge(1:m(small), 1:m(large), small, large),l(1:m(large),large));
+                base = rMul(smallGivenLarge(1:m(small), 1:m(large), small, large),r(1:m(large),large));
             else
                 base = smallGivenLarge(1:m(small), 1:m(small-1), small, small-1)*base;
             end
@@ -55,36 +56,19 @@ function ratio = generateMultiLayer(dataset, maxDisp, level, contract, range)
                 largeGivenSmall,...
                 trueLargeGivenSmall(1:m(small), 1:m(large), small, large),...
                 smallGivenLarge(1:m(small), 1:m(large), small, large),...
-                small, large, dataset);
+                small, large, dataset, range);
         end
     end
 end
-
-function ratio = getWrongCoverRatio(largeGivenSmall, trueLargeGivenSmall, A)
-    totalPoints = sum(sum(A));
-    wrongPoints = A((largeGivenSmall==0) & (trueLargeGivenSmall ~= 0));
-    ratio = sum(wrongPoints)/totalPoints;
-end
-function SL = genSmallGivenLarge(smallDisp, largeDisp, range)
-    SL = zeros(smallDisp+1, largeDisp+1);
-    for j = 0:largeDisp
-        if (rem(j,2)==0)
-            b = max(0,j/2-range);
-            t = min(smallDisp, j/2+range);
-            cnt = t-b+1;
-        else
-            b = max(0, (j-1)/2-range);
-            t = min(smallDisp, (j+1)/2+range);
-            cnt = t-b+1;
-        end
-        for i = b:t
-            SL(i+1,j+1) = 1/cnt;
-        end
+function r = getR(m, level, dataset, smallGivenLarge)
+    r = zeros(m(1), level);
+    r(1:m(1),1) = readSupport([dataset,'support_disp_cnt.txt']);
+    for i = 2:level-1
+        r(1:m(i),i) = 
     end
 end
-function l = getL(m ,level, dataset, A)
+function l = getL(m ,level, A)
     l = zeros(m(1), level);
-    l(1:m(1),1) = readSupport([dataset,'support_disp_cnt.txt']);
 %     for i = 1: level
 %         l(1:m(i),i) = readPd([dataset, 'MST__pd_',int2str(i-1),'.txt']);
 %     end  
@@ -96,6 +80,30 @@ function l = getL(m ,level, dataset, A)
 %         draw2d(l(1:m(i),i)-trueL, ['errL', int2str(i)]);
     end
 end
+function ratio = getWrongCoverRatio(largeGivenSmall, trueLargeGivenSmall, A)
+    totalPoints = sum(sum(A));
+    wrongPoints = A((largeGivenSmall==0) & (trueLargeGivenSmall ~= 0));
+    ratio = sum(wrongPoints)/totalPoints;
+end
+function SL = genSmallGivenLarge(smallDisp, largeDisp, range)
+    SL = zeros(smallDisp+1, largeDisp+1);
+    contract = largeDisp/smallDisp;
+    for j = 0:largeDisp
+        if (rem(j,contract)==0)
+            b = max(0,j/contract-range);
+            t = min(smallDisp, j/contract+range);
+            cnt = t-b+1;
+        else
+            b = max(0, floor(j/contract)-range);
+            t = min(smallDisp, ceil(j/contract)+range);
+            cnt = t-b+1;
+        end
+        for i = b:t
+            SL(i+1,j+1) = 1/cnt;
+        end
+    end
+end
+
 
 function r = genR(A)
     r = sum(A);
@@ -109,7 +117,7 @@ function l = genL(A)
     l = l/s;
 end
 
-function drawAll(A, largeGivenSmall, trueLargeGivenSmall, smallGivenLarge, small, large, dataset)
+function drawAll(A, largeGivenSmall, trueLargeGivenSmall, smallGivenLarge, small, large, dataset, range)
     small = small-1; large = large-1;
     err = largeGivenSmall-trueLargeGivenSmall;
     
@@ -122,16 +130,16 @@ function drawAll(A, largeGivenSmall, trueLargeGivenSmall, smallGivenLarge, small
     [dataset, int2str(f)]
 %     draw(A, 1,1,1, ['cnt', int2str(small),int2str(large)], false);
 %     figure();
-    draw(smallGivenLarge, 4,2,1, [dataset,'smallGivenLarge',int2str(small),int2str(large)], false);
-    draw(smallGivenLarge, 4,2,2, [dataset,'smallGivenLarge',int2str(small),int2str(large)],false);
-    draw(trueLargeGivenSmall, 4,2,3, [dataset,'largeGivenSmall',int2str(small),int2str(large)],false);
-    draw(trueLargeGivenSmall, 4,2,4, [dataset,'largeGivenSmall',int2str(small),int2str(large)],false);
-    draw(largeGivenSmall, 4,2,5, [dataset,'calculatedLargeGivenSmall',int2str(small),int2str(large)],false);
-    draw(largeGivenSmall, 4,2,6, [dataset,'calculatedLargeGivenSmall',int2str(small),int2str(large)],false);
-    draw(err, 4,2,7, [dataset,'error',int2str(small),int2str(large)],false);
-    draw(err, 4,2,8, [dataset,'error',int2str(small),int2str(large)],false);
-    figure();
-    draw(wrongCover, 1,1,1, [dataset, 'wrongCover',int2str(small),int2str(large)], false);
+    draw(smallGivenLarge, 4,2,1, [dataset,'smallGivenLarge',int2str(small),int2str(large), 'Range',int2str(range)], false);
+    draw(smallGivenLarge, 4,2,2, [dataset,'smallGivenLarge',int2str(small),int2str(large), 'Range',int2str(range)],false);
+    draw(trueLargeGivenSmall, 4,2,3, [dataset,'largeGivenSmall',int2str(small),int2str(large), 'Range',int2str(range)],false);
+    draw(trueLargeGivenSmall, 4,2,4, [dataset,'largeGivenSmall',int2str(small),int2str(large), 'Range',int2str(range)],false);
+    draw(largeGivenSmall, 4,2,5, [dataset,'calculatedLargeGivenSmall',int2str(small),int2str(large), 'Range',int2str(range)],false);
+    draw(largeGivenSmall, 4,2,6, [dataset,'calculatedLargeGivenSmall',int2str(small),int2str(large), 'Range',int2str(range)],false);
+    draw(err, 4,2,7, [dataset,'error',int2str(small),int2str(large), 'Range', int2str(range)],false);
+    draw(err, 4,2,8, [dataset,'error',int2str(small),int2str(large), 'Range',int2str(range)], false);
+    figure(); 
+    draw(wrongCover, 1,1,1, [dataset, 'wrongCover',int2str(small),int2str(large), 'Range', int2str(range)], false);
 %     figure();
 %     draw(smallGivenLarge,1,1,1,[dataset,'smallGivenLarge', int2str(small), int2str(large)], true);
 end
