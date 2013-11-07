@@ -24,21 +24,24 @@ function drawMultiLayer(dataset, maxDisp, level, contract)
         end
     end
     
-    for large = 1:level
-        for small = large+1:level
-            if (small == large+1)
-                base = rMul(smallGivenLarge(1:m(small), 1:m(large), small, large),l(1:m(large),large));
-            else
-                base = smallGivenLarge(1:m(small), 1:m(small-1), small, small-1)*base;
-            end
-            largeGivenSmall = lMul(getInverse(l(1:m(small),small)), base);
-            drawAll(A(1:m(small), 1:m(large), small, large),...
-                largeGivenSmall,...
-                trueLargeGivenSmall(1:m(small), 1:m(large), small, large),...
-                smallGivenLarge(1:m(small), 1:m(large), small, large),...
-                small, large, dataset);
-        end
-    end
+    avg = avgSmallGivenLarge(smallGivenLarge(1:m(2),1:m(1),2,1), level, maxDisp, dataset)
+    draw2dMid(avg, maxDisp, [dataset,'avgSmallGivenLarge10']);
+    
+%     for large = 1:level
+%         for small = large+1:level
+%             if (small == large+1)
+%                 base = rMul(smallGivenLarge(1:m(small), 1:m(large), small, large),l(1:m(large),large));
+%             else
+%                 base = smallGivenLarge(1:m(small), 1:m(small-1), small, small-1)*base;
+%             end
+%             largeGivenSmall = lMul(getInverse(l(1:m(small),small)), base);
+%             drawAll(A(1:m(small), 1:m(large), small, large),...
+%                 largeGivenSmall,...
+%                 trueLargeGivenSmall(1:m(small), 1:m(large), small, large),...
+%                 smallGivenLarge(1:m(small), 1:m(large), small, large),...
+%                 small, large, dataset);
+%         end
+%     end
 end
 
 function l = getL(m ,level, dataset, A)
@@ -55,7 +58,34 @@ function l = getL(m ,level, dataset, A)
 %         draw2d(l(1:m(i),i)-trueL, ['errL', int2str(i)]);
     end
 end
+function draw2dMid(avg, maxDisp, string)
+    figure();
+    x = -maxDisp:maxDisp;
+    plot(x,avg); title(string);
+end
+function avg = avgSmallGivenLarge(smallGivenLarge, level, maxDisp, dataset)
+%     level 10
+%   from -maxDisp to maxDisp, offset maxDisp+1
+avg = zeros(2*maxDisp+1,1);
+cnt = zeros(2*maxDisp+1, 1);
+for i = 0:maxDisp/2
+    mid = 2*i;
+    if (smallGivenLarge(i+1, mid+1)<0.15)
+        continue;
+    end
+    for j = 0:maxDisp
+        dis = j-mid;
+        index = dis+maxDisp+1;
+        avg(index) = avg(index)+smallGivenLarge(i+1,j+1);
+        cnt(index) = cnt(index+1);
+    end
+    cnt = getInverse(cnt);
+    avg
+    avg = avg.*cnt;
+  
+end
 
+end
 function r = genR(A)
     r = sum(A);
     s = sum(r);
