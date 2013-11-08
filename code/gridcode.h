@@ -134,6 +134,19 @@ public :
 			mat[a]->zero();
 		}
 	}
+	
+	void rgb_2_gray(Grid<type>& gray) {
+	  float co[3] = {0.299, 0.587, 0.114};
+		for (int i = 0; i < height; ++i) {
+		  for (int j = 0; j < width; ++j) {
+				gray[i][j] = (type)(co[0] * mat[0][i][j] +
+						                co[1] * mat[1][i][j] +
+														co[2] * mat[2][i][j] +
+														0.5);
+			}
+		}
+	}
+
 	Grid<type> & operator[] (int index) { return *mat[index]; }
 };
 
