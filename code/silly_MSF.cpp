@@ -10,6 +10,7 @@
 #include "MSF.h"
 #include "filter.h"
 #include "algorithm"
+#include "support_match.h"
 
 using namespace std;
 
@@ -85,7 +86,7 @@ void refinement(Grid<type>& d_left, Grid<type>& d_right,
 char *get_file_name(char *filename, const char * prefix, int para, const char * suffix) {
     strcpy(filename, prefix);
     strcat(filename, "_");
-    char num[10] = {para-'0','\0'};
+    char num[10] = {char(para),'\0'};
     //itoa(para, num, 10);
     strcat(filename, num);
     strcat(filename, "_");
@@ -132,6 +133,21 @@ int main(int args, char ** argv) {
     return 0;
   }
 
+  // Get support image.
+	SupportMatch sm(rgb_left[0], rgb_right[0],
+			rgb_left[0].width, rgb_left[0].height);
+	// Find support match for left and right image respectively.
+  sm.FindSupportMatch();
+
+  // Check the reliable points for left and right image.
+  // NOTICE(xuejiaobai): variable scale is used in the output maps.	
+	save_image(strcat(file_name[0], "_left_initial_reliable_points.pgm"),
+			       sm.support_left_map, scale);
+	save_image(strcat(file_name[1], "_right_initial_reliable_points.pgm"),
+			       sm.support_right_map, scale);
+
+
+	// Get scaled image.
   for (int i = 0; i < level - 1; ++i) {
 	  scale_image(rgb_left[i], rgb_left[i + 1]);
 		scale_image(rgb_right[i], rgb_right[i + 1]);
@@ -157,7 +173,8 @@ int main(int args, char ** argv) {
 			compute_first_matching_cost(rgb_left[i], rgb_right[i],
 					cost_left, cost_right, disparity_left[i + 1], max_disparity / pi[i]);
 		  build_tree(rgb_left[i], rgb_right[i], graph_left[i], graph_right[i],
-				  forest_left[i], forest_right[i], occlusion_left[i + 1], occlusion_right[i + 1]);
+				  forest_left[i], forest_right[i],
+					occlusion_left[i + 1], occlusion_right[i + 1]);
 		}
 		disparity_computation(forest_left[i], forest_right[i],
 				cost_left, cost_right, disparity_left[i], disparity_right[i]);
@@ -165,7 +182,8 @@ int main(int args, char ** argv) {
 	  find_stable_pixels(disparity_left[i], disparity_right[i],
 		  	 occlusion_left[i], occlusion_right[i]);
 	}
-    refinement(disparity_left[0], disparity_right[0], occlusion_left[0], occlusion_right[0]);
+    refinement(disparity_left[0], disparity_right[0],
+				occlusion_left[0], occlusion_right[0]);
     median_filter(disparity_left[0]);
     median_filter(disparity_right[0]);
 

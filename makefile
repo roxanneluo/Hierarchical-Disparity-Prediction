@@ -11,6 +11,6 @@ checke1 :
 MST_blind :
 	g++ code/MST_blind.cpp -o bin/MST_blind.out -O2 -Wall
 silly_MSF :
-	g++ code/silly_MSF.cpp -o bin/MSF.out -O2 -Wall
+	g++ code/silly_MSF.cpp -o bin/MSF.out -O2 -Wall -std=c++0x -msse3
 Prob_Gen :
 	g++ code/code-probability/prob_data_generator.cpp -o bin/Prob_Gen.out -O2 -Wall
