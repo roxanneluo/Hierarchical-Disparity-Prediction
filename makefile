@@ -1,4 +1,4 @@
-all : silly0 silly1 checke0 checke1 MST_blind silly_MSF Prob_Gen
+all : silly0 silly1 checke0 checke1 MST_blind silly_MSF Prob_Gen cnt_Gen
 
 silly0:
 	g++ code/silly.cpp -o bin/Original.out -O2 -Wall
@@ -13,4 +13,6 @@ MST_blind :
 silly_MSF :
 	g++ code/silly_MSF.cpp -o bin/MSF.out -O2 -Wall -std=c++0x -msse3
 Prob_Gen :
-	g++ code/code-probability/prob_data_generator.cpp -o bin/Prob_Gen.out -O2 -Wall
+	g++ code/code-probability/prob_data_generator.cpp -o bin/Prob_Gen.out -O2 -Wall -std=c++0x -msse3
+cnt_Gen:
+	g++ code/gen_support_cnt.cpp -o bin/cnt_Gen.out -O2 -Wall -std=c++0x -msse3
