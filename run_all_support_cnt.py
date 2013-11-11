@@ -33,9 +33,5 @@ for dataset in DATASETS :
 	for picture in pic_names :
 		print picture
 		run_gen_support_cnt('testdata/' + dataset + '/' + picture + '/', picture)
-#		thepath = 'testdata/' + dataset + '/' + picture + '/'
-#		print thepath + '\n'
-#		print thepath + 'left.pgm\n'
-#		print thepath + 'right.pgm\n'
 
 print '\nDone.'	 
