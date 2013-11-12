@@ -5,7 +5,6 @@ from subprocess import CalledProcessError
 
 DATASETS = (
 	'Middlebury_4',	
-	'Middlebury_others'
 )
 
 cnt_path = 'code/code-probability/matlab/data/Prob_Gen_'

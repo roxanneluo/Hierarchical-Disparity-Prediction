@@ -21,7 +21,7 @@ int small_disparity, large_disparity;
 
 template <class type>
 void save_matrix(Grid<type>& matrix, char* filename) {
-  char path[300] = "testdata/Prob_Gen_";
+  char path[300] = "testdata/";
 	strcat(path, picture_name);
 	strcat(path, filename);
 	FILE *file = fopen(path, "w");
