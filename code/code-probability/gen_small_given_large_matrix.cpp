@@ -41,7 +41,7 @@ void compute_avg_prob(Grid<type>& matrix, Grid<type>& avg_prob,
 	if (is_small_base) {
 	  for (int i = 0; i < matrix.height; ++i) {
 			for (int j = 0; j < matrix.width; ++j) {
-		    avg_prob[0][i - j / 2 + matrix.height] += matrix[i][j];	
+		    avg_prob[0][i - j / 2 + matrix.height - 1] += matrix[i][j];	
 			}
 		}
 		double tmp = 0.0;
@@ -53,12 +53,16 @@ void compute_avg_prob(Grid<type>& matrix, Grid<type>& avg_prob,
 		printf("\n%.5lf\n", tmp);
 	} else {
     for (int j = 0; j < matrix.width; ++j) {
-		  for (int i = 0; i < matrix.height; ++i) {
-			  avg_prob[0][j - i * 2 + matrix.width] += matrix[i][j];
+			for (int i = 0; i < matrix.height; ++i) {
+			  avg_prob[0][j - i * 2 + matrix.width - 1] += matrix[i][j];
 			}
 		}
-	  for (int i = 0; i < 2 * matrix.width - 1; ++i)
+		double tmp = 0.0;
+	  for (int i = 0; i < 2 * matrix.width - 1; ++i) {
 		  avg_prob[0][i] /= matrix.height;
+		  tmp += avg_prob[0][i];
+		}
+		printf("%.5lf\n", tmp);
 	}
 }
 
@@ -96,11 +100,8 @@ int main(int args, char** argv) {
 		    prob += prob_small_large[i][j];
 			}
 		}
-		// cout << prob << endl;
 	}
   
-	// save prob_small_large.
-
   avg_prob_large_base.reset(1, 2 * large_disparity + 1);
 	avg_prob_small_base.reset(1, 2 * small_disparity + 1);
 
