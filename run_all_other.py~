@@ -65,7 +65,7 @@ for who in pic_names :
     left_result= 'bin/' + alg_name + '_' + who + '_left.pgm'
     right_result='bin/' + alg_name + '_' + who + '_right.pgm'
     run_test_with_path(thepath)
-    #check_results(thepath)
+    check_results(thepath)
 
 print "----- Final result -----"
 print "Total = {}\nCorrect = {}\n".format(total, correct)

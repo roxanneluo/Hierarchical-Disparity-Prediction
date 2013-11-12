@@ -39,7 +39,7 @@ void compute_avg_prob(Grid<type>& matrix, double*& avg_prob,
 	if (is_small_base) {
 	  for (int i = 0; i < matrix.height; ++i) {
 			for (int j = 0; j < matrix.width; ++j) {
-		    avg_prob[i - j / 2 + matrix.height] += matrix[i][j];	
+		    avg_prob[i - j / 2 + matrix.height] += matrix[i][j];
 			}
 		}
 		double tmp = 0.0;
@@ -77,8 +77,8 @@ int main(int args, char** argv) {
 		  cin >> cnt_small_large[i][j];
 		}
 	}
-	
-  // compute probability of small given large 
+
+  // compute probability of small given large
 	for (int j = 0; j <= large_disparity; ++j) {
 		int cnt_line = 0;
 	  for (int i = 0; i <= small_disparity; ++i) {
@@ -95,7 +95,7 @@ int main(int args, char** argv) {
 		}
 		// cout << prob << endl;
 	}
-  
+
 	// save prob_small_large.
   save_matrix(prob_small_large, "__prob_small_given_large_10.txt");
 
@@ -118,7 +118,7 @@ int main(int args, char** argv) {
 	}
   save_matrix(gen_small_given_large,
 			        "__small_base_small_given_large_matrix_10.txt");
-  
+
 	for (int i = 0; i <= small_disparity; ++i) {
 	  for (int j = 0; j <= large_disparity; ++j) {
 		  gen_small_given_large[i][j] =
@@ -127,7 +127,7 @@ int main(int args, char** argv) {
 	}
 
   save_matrix(gen_small_given_large,
-			        "__large_base_small_given_large_matrix_10.txt");	
+			        "__large_base_small_given_large_matrix_10.txt");
 
 	delete [] avg_prob_large_base;
   delete [] avg_prob_small_base;
