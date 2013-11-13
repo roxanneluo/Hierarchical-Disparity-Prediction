@@ -19,7 +19,7 @@ int scale = 16;
 char file_names[5][300] =
     {"tsukuba", "left.ppm", "right.ppm",
 			"left_supportmap.pgm", "right_supportmap.pgm"};
-char path[300] = "testdata/";
+char path[300] = "all_support_cnt/";
 
 void get_disp(Grid<unsigned char>& support) {
     for (int i = 0; i <= max_disparity; ++i)
