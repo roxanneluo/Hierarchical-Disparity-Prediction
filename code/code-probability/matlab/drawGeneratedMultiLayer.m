@@ -11,7 +11,7 @@ function drawGeneratedMultiLayer
             ratio(:, :, range,i) = generateMultiLayer(['data/Prob_Gen_',name{i},'__'], name{i}, maxDisp(i), level, contract, range);
         end
     end
-    genRatioHTMLReport(ratio, name, maxDisp, level, 1:maxRange, 'large base 0.5');
+    genRatioHTMLReport(ratio, name, maxDisp, level, 1:maxRange, 'small base 0.5');
     
 % 
 %     for d = 1:dataSetSize
@@ -22,11 +22,10 @@ end
 
 function ratio = generateMultiLayer(dataset, dataSetName, maxDisp, level, contract, range)
     %     m is the range of disp+1 in layer i
-    m = zeros(level);
+    m = zeros(1,level);
     for i = 1:level
-       m(i) = maxDisp/contract^(i-1)+1;
+       m(i) = floor(maxDisp/contract^(i-1)+1);
     end
-    
     A = zeros(m(2), m(1),level, level);
     for i = 1:level
         for j = i+1:level
@@ -38,7 +37,7 @@ function ratio = generateMultiLayer(dataset, dataSetName, maxDisp, level, contra
    	trueLargeGivenSmall = zeros(m(2), m(1), level, level);
     for large = 1:level
         for small = large+1:level
-            smallGivenLarge(1:m(small), 1:m(large), small, large) = genLargeBaseSmallGivenLarge(small, large, m(small)-1, m(large)-1, dataSetName);
+            smallGivenLarge(1:m(small), 1:m(large), small, large) = genSmallBaseSmallGivenLarge(small, large, m(small)-1, m(large)-1, dataSetName);
             trueLargeGivenSmall(1:m(small), 1:m(large), small, large) = findTrueLargeGivenSmall(A(1:m(small), 1:m(large), small, large));
         end
     end
@@ -66,10 +65,10 @@ function ratio = generateMultiLayer(dataset, dataSetName, maxDisp, level, contra
                 smallGivenLarge(1:m(small), 1:m(large), small, large),...
                 small, large, dataset, range);
             
-%             smallBase = genSmallBase(dataSetName, 2,1);
-            largeBase = genLargeBase(dataSetName,2,1);
-%             draw2d(-m(small)+1:m(small)-1,smallBase, [dataSetName,'small base']);
-            draw2d(-m(large)+1:m(large)-1,largeBase, [dataSetName, ' large base']);
+            smallBase = genSmallBase(dataSetName, 2,1);
+%             largeBase = genLargeBase(dataSetName,2,1);
+            draw2d(-m(small)+1:m(small)-1,smallBase, [dataSetName,'small base']);
+%             draw2d(-m(large)+1:m(large)-1,largeBase, [dataSetName, ' large base']);
         end
     end
 end
@@ -303,16 +302,16 @@ end
 %-------------------------------data set-----------------------------------
 function name = getNames()
 % name = {'tsukuba'}
-    name = {'cones';'teddy';'tsukuba';'venus'}%;...
-%             'Aloe';'Baby1';'Baby2';'Baby3';'Bowling1';'Bowling2';'Cloth1';...
-%             'Cloth2';'Cloth3';'Cloth4';'Flowerpots';'Lampshade1';...
-%             'Lampshade2';'Midd1';'Midd2';'Monopoly';'Plastic';'Rocks1';...
-%             'Rocks2';'Wood1';'Wood2'};
+    name = {'cones';'teddy';'tsukuba';'venus';...
+            'Aloe';'Baby1';'Baby2';'Baby3';'Bowling1';'Bowling2';'Cloth1';...
+            'Cloth2';'Cloth3';'Cloth4';'Flowerpots';'Lampshade1';...
+            'Lampshade2';'Midd1';'Midd2';'Monopoly';'Plastic';'Rocks1';...
+            'Rocks2';'Wood1';'Wood2'};
 end
 
 function disp = getMaxDisp()
 % disp = [16]
-    disp = [60,60,16,20]%,...
-%             90,100,100,83,96,80,96,86,96,86,...
-%             83,86,86,65,71,79,93,91,91,70,84];
+    disp = [60,60,16,20,...
+            90,100,100,83,96,80,96,86,96,86,...
+            83,86,86,65,71,79,93,91,91,70,84];
 end
