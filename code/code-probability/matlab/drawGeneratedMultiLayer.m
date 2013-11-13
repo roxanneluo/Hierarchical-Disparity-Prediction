@@ -11,20 +11,12 @@ function drawGeneratedMultiLayer
             ratio(:, :, range,i) = generateMultiLayer(['data/Prob_Gen_',name{i},'__'], name{i}, maxDisp(i), level, contract, range);
         end
     end
-    genRatioHTMLReport(ratio, name, maxDisp, level, 1:maxRange, 'large base');
+    genRatioHTMLReport(ratio, name, maxDisp, level, 1:maxRange, 'large base 0.5');
     
-%     m = zeros(level);
-%     for i = 1:level
-%        m(i) = maxDisp/contract^(i-1)+1;
-%     end
-    for d = 1:dataSetSize
+% 
+%     for d = 1:dataSetSize
 %         drawRatio_Para(ratio, 1:maxRange, 2,1,d,name);
-%         smallBase = genSmallBase(name{d}, 2,1);
-%         largeBase = genLargeBase(name{i},2,1);
-%         draw2d(-m(2):m(2),smallBase(:,1), [name{i},'small base even']);
-%         draw2d(-m(2):m(2),smallBase(:,2), [name{i},'small base odd']);
-%         draw2d(-m(1):m(1),largeBase(:,1), [name{i}, 'large base']);
-    end
+%     end
 end
 
 
@@ -73,6 +65,11 @@ function ratio = generateMultiLayer(dataset, dataSetName, maxDisp, level, contra
                 trueLargeGivenSmall(1:m(small), 1:m(large), small, large),...
                 smallGivenLarge(1:m(small), 1:m(large), small, large),...
                 small, large, dataset, range);
+            
+%             smallBase = genSmallBase(dataSetName, 2,1);
+            largeBase = genLargeBase(dataSetName,2,1);
+%             draw2d(-m(small)+1:m(small)-1,smallBase, [dataSetName,'small base']);
+            draw2d(-m(large)+1:m(large)-1,largeBase, [dataSetName, ' large base']);
         end
     end
 end
@@ -99,18 +96,20 @@ end
 
 % ------------------------for generation-----------------------------------
 function smallGivenLarge = genLargeBaseSmallGivenLarge(small, large, maxSmallDisp, maxLargeDisp, dataSetName)
-    smallGivenLarge = readf(['data/',dataSetName,'__small_given_large_matrix_',int2str(small-1),int2str(large-1),'_large_base.txt'],maxSmallDisp+1, maxLargeDisp+1);
+    smallGivenLarge = readf(['data/gen 0.5/',dataSetName,'__small_given_large_matrix_',int2str(small-1),int2str(large-1),'_large_base.txt'],maxSmallDisp+1, maxLargeDisp+1);
 end
 function smallGivenLarge = genSmallBaseSmallGivenLarge(small, large, maxSmallDisp, maxLargeDisp, dataSetName)
-    smallGivenLarge = readf(['data/',dataSetName,'__small_given_large_matrix_',int2str(small-1),int2str(large-1),'_small_base.txt'],maxSmallDisp+1, maxLargeDisp+1);
+    smallGivenLarge = readf(['data/gen 0.5/',dataSetName,'__small_given_large_matrix_',int2str(small-1),int2str(large-1),'_small_base.txt'],maxSmallDisp+1, maxLargeDisp+1);
 end
 function base = genLargeBase(dataSetName, small, large)
-    base = readPd(['data/',dataSetName,'__avg_prob_large_base',int2str(small-1), int2str(large-1),'.txt']);
+%     base = readPd(['data/',dataSetName,'__avg_prob_large_base.txt']);
+    base = readPd(['data/gen 0.5/',dataSetName,'__avg_prob_',int2str(small-1), int2str(large-1),'_large_base.txt']);
 end
 function base = genSmallBase(dataSetName, small, large)
-    base0 = readPd(['data/',dataSetName,'__avg_prob_small_base_even',int2str(small-1), int2str(large-1),'.txt']);
-    base1 = readPd(['data/',dataSetName,'__avg_prob_small_base_odd',int2str(small-1), int2str(large-1),'.txt']);
-    base = [base0,base1];
+%     base0 = readPd(['data/',dataSetName,'__avg_prob_small_base_even',int2str(small-1), int2str(large-1),'.txt']);
+%     base1 = readPd(['data/',dataSetName,'__avg_prob_small_base_odd',int2str(small-1), int2str(large-1),'.txt']);
+%     base = [base0,base1];
+    base = readPd(['data/gen 0.5/',dataSetName,'__avg_prob_',int2str(small-1), int2str(large-1),'_small_base.txt']);
 end
 % ------------------------for file read------------------------------------
 function l = readPd(filename) 
@@ -266,7 +265,7 @@ end
 % -------------------------for HTML----------------------------------------
 function genRatioHTMLReport(ratio, name, maxDisp, level, para, nameSpec) 
     paraLen = size(para,2);
-    dataSetSize = size(ratio,4);
+    dataSetSize = size(name,1);
     f = fopen(['Uncover Ratio Report ',nameSpec,'.html'],'w');
     fprintf(f,'<!DOCTYPE html>\n<html>\n<body>\n');
     fprintf(f,['<h1>Uncover Ratio Report ',nameSpec,'</h1>\n']);
@@ -303,6 +302,7 @@ function genRatioHTMLReport(ratio, name, maxDisp, level, para, nameSpec)
 end
 %-------------------------------data set-----------------------------------
 function name = getNames()
+% name = {'tsukuba'}
     name = {'cones';'teddy';'tsukuba';'venus'}%;...
 %             'Aloe';'Baby1';'Baby2';'Baby3';'Bowling1';'Bowling2';'Cloth1';...
 %             'Cloth2';'Cloth3';'Cloth4';'Flowerpots';'Lampshade1';...
@@ -311,6 +311,7 @@ function name = getNames()
 end
 
 function disp = getMaxDisp()
+% disp = [16]
     disp = [60,60,16,20]%,...
 %             90,100,100,83,96,80,96,86,96,86,...
 %             83,86,86,65,71,79,93,91,91,70,84];
