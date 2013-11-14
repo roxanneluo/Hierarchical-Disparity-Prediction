@@ -2,16 +2,19 @@ function drawGeneratedMultiLayer
     name = getNames();
     dataSetSize = size(name, 1);
     maxDisp = getMaxDisp();
+    [maxDisp,IX] = sort(maxDisp);
+%     maxDisp
+    name = name(IX);
     level = 2;
     contract = 2;
     maxRange = 1;
     ratio = zeros(level, level,maxRange, 4);
     for i = 1:dataSetSize
-        for range = 1:maxRange
-            ratio(:, :, range,i) = generateMultiLayer(['data/Prob_Gen_',name{i},'__'], name{i}, maxDisp(i), level, contract, range);
+        for range = 1:1
+            ratio(:, :, range,i) = generateMultiLayer(['data/Prob_Gen_',name{i},'__'], name{i}, maxDisp(i), level, contract, range, 1);
         end
     end
-    genRatioHTMLReport(ratio, name, maxDisp, level, 1:maxRange, 'small base 0.5');
+    genRatioHTMLReport(ratio, name, maxDisp, level, 0.01:0.01:0.1, ' small base 0.5, large base with no threshold, normrnd(0,sigma)','sigma');
     
 % 
 %     for d = 1:dataSetSize
@@ -20,7 +23,7 @@ function drawGeneratedMultiLayer
 end
 
 
-function ratio = generateMultiLayer(dataset, dataSetName, maxDisp, level, contract, range)
+function ratio = generateMultiLayer(dataset, dataSetName, maxDisp, level, contract, range, smallBase)
     %     m is the range of disp+1 in layer i
     m = zeros(1,level);
     for i = 1:level
@@ -37,14 +40,18 @@ function ratio = generateMultiLayer(dataset, dataSetName, maxDisp, level, contra
    	trueLargeGivenSmall = zeros(m(2), m(1), level, level);
     for large = 1:level
         for small = large+1:level
-            smallGivenLarge(1:m(small), 1:m(large), small, large) = genSmallBaseSmallGivenLarge(small, large, m(small)-1, m(large)-1, dataSetName);
+            if smallBase
+                smallGivenLarge(1:m(small), 1:m(large), small, large) = genSmallBaseSmallGivenLarge(small, large, m(small)-1, m(large)-1, dataSetName);
+            else 
+                smallGivenLarge(1:m(small), 1:m(large), small, large) = genLargeBaseSmallGivenLarge(small, large, m(small)-1, m(large)-1, dataSetName);
+            end
             trueLargeGivenSmall(1:m(small), 1:m(large), small, large) = findTrueLargeGivenSmall(A(1:m(small), 1:m(large), small, large));
         end
     end
 
    
     l = getL(m, level, A);
-    r = getR(m, level, dataset, smallGivenLarge);
+    r = getR(m, level, dataset, smallGivenLarge, range);
     
     ratio = zeros(level, level);
     for large = 1:level
@@ -55,7 +62,8 @@ function ratio = generateMultiLayer(dataset, dataSetName, maxDisp, level, contra
                 base = smallGivenLarge(1:m(small), 1:m(small-1), small, small-1)*base;
             end
             largeGivenSmall = lMul(getInverse(l(1:m(small),small)), base);
-            largeGivenSmall(largeGivenSmall>1) = 1;
+            largeGivenSmall = normalize(largeGivenSmall);
+%             largeGivenSmall(largeGivenSmall>1) = 1;
             ratio(small,large) = getWrongCoverRatio(largeGivenSmall,...
                                     trueLargeGivenSmall(1:m(small), 1:m(large), small, large), ...
                                     A(1:m(small), 1:m(large), small, large));
@@ -65,10 +73,13 @@ function ratio = generateMultiLayer(dataset, dataSetName, maxDisp, level, contra
                 smallGivenLarge(1:m(small), 1:m(large), small, large),...
                 small, large, dataset, range);
             
-            smallBase = genSmallBase(dataSetName, 2,1);
-%             largeBase = genLargeBase(dataSetName,2,1);
-            draw2d(-m(small)+1:m(small)-1,smallBase, [dataSetName,'small base']);
-%             draw2d(-m(large)+1:m(large)-1,largeBase, [dataSetName, ' large base']);
+            if smallBase
+                smallBase = genSmallBase(dataSetName, 2,1);
+                draw2d(-m(small)+1:m(small)-1,smallBase, [dataSetName,'(',int2str(m(2)),')small base']);
+            else
+                largeBase = genLargeBase(dataSetName,2,1);
+                draw2d(-m(large)+1:m(large)-1,largeBase, [dataSetName, '(',int2str(m(1)),') large base']);
+            end
         end
     end
 end
@@ -117,11 +128,21 @@ function l = readPd(filename)
     fclose(file);
     l = l'; 
 end
-function l = readSupport(filename) 
+function l = readSupport(filename, sigma) 
     file = fopen(filename,'r');
     l = fscanf(file, '%d\n',[1,inf]);
     fclose(file);
     l = l'; l = l/sum(l);
+    len = size(l,1);
+    for i=1:len
+        if l(i)==0
+            noise = normrnd(0,sigma);
+            if (noise > 0)
+                l(i) = l(i)+noise;
+            end
+        end
+    end
+    l = l/sum(l);
 end
 
 function A = read(filename, m, n)
@@ -143,14 +164,20 @@ function A = readf(filename, m, n)
     fclose(file);
 end
 % ----------------------------for calculation------------------------------
+function normalized = normalize(A)
+    n = size(A,2);
+    l = sum(A,2);
+    l = getInverse(l);
+    normalized = A.*(l*ones(1,n));
+end
 function ratio = getWrongCoverRatio(largeGivenSmall, trueLargeGivenSmall, A)
     totalPoints = sum(sum(A));
     wrongPoints = A((largeGivenSmall==0) & (trueLargeGivenSmall ~= 0));
     ratio = sum(wrongPoints)/totalPoints;
 end
-function r = getR(m, level, dataset, smallGivenLarge)
+function r = getR(m, level, dataset, smallGivenLarge, sigma)
     r = zeros(m(1), level);
-    r(1:m(1),1) = readSupport([dataset,'support_disp_cnt.txt']);
+    r(1:m(1),1) = readSupport([dataset,'support_disp_cnt.txt'], sigma);
     for i = 2:level-1
         r(1:m(i),i) = smallGivenLarge(1:m(i),1:m(i-1), i,i-1)*r(1:m(i-1),i-1);
     end
@@ -186,7 +213,7 @@ function Y = getInverse(L)
         n = m;
     end
     for i = 1:n
-        if L(i) >= 0.00001
+        if L(i) >= 0.0000001
             Y(i) = 1/L(i);
         else Y(i) = 0;
         end
@@ -228,7 +255,7 @@ function draw(A, m,n, index, string, equal)
     if ~equal
         surf(X,Y, A), shading interp; colorbar; title(string); 
     else
-         surf(X,Y, A), shading interp; colorbar; title(string); axis equal;
+         surf(X,Y, A), shading interp; colorbar; title(string); 
     end
 end
 function drawAll(A, largeGivenSmall, trueLargeGivenSmall, smallGivenLarge, small, large, dataset, range)
@@ -242,8 +269,8 @@ function drawAll(A, largeGivenSmall, trueLargeGivenSmall, smallGivenLarge, small
         
     f = figure();
     [dataset, int2str(f)]
-%     draw(A, 1,1,1, ['cnt', int2str(small),int2str(large)], false);
-%     figure();
+    draw(A, 1,1,1, ['cnt', int2str(small),int2str(large)], false);
+    figure();
     draw(smallGivenLarge, 4,2,1, [dataset,'smallGivenLarge',int2str(small),int2str(large), 'Range',int2str(range)], false);
     draw(smallGivenLarge, 4,2,2, [dataset,'smallGivenLarge',int2str(small),int2str(large), 'Range',int2str(range)],false);
     draw(trueLargeGivenSmall, 4,2,3, [dataset,'largeGivenSmall',int2str(small),int2str(large), 'Range',int2str(range)],false);
@@ -262,7 +289,7 @@ function drawRatio_Para(ratio, para, small, large, data, name)
 end
 
 % -------------------------for HTML----------------------------------------
-function genRatioHTMLReport(ratio, name, maxDisp, level, para, nameSpec) 
+function genRatioHTMLReport(ratio, name, maxDisp, level, para, nameSpec, paraName) 
     paraLen = size(para,2);
     dataSetSize = size(name,1);
     f = fopen(['Uncover Ratio Report ',nameSpec,'.html'],'w');
@@ -270,7 +297,7 @@ function genRatioHTMLReport(ratio, name, maxDisp, level, para, nameSpec)
     fprintf(f,['<h1>Uncover Ratio Report ',nameSpec,'</h1>\n']);
     fprintf(f,'<table border = "3">\n');
     fprintf(f,'<thead>\n<tr>\n');
-    fprintf(f,'<td>parameter</td>\n');
+    fprintf(f,['<td>',paraName,'</td>\n']);
     for i=1:paraLen
         fprintf(f, '<td colspan="%d">%f</td>\n',level-1, para(i));
     end
@@ -301,17 +328,23 @@ function genRatioHTMLReport(ratio, name, maxDisp, level, para, nameSpec)
 end
 %-------------------------------data set-----------------------------------
 function name = getNames()
-% name = {'tsukuba'}
-    name = {'cones';'teddy';'tsukuba';'venus';...
-            'Aloe';'Baby1';'Baby2';'Baby3';'Bowling1';'Bowling2';'Cloth1';...
-            'Cloth2';'Cloth3';'Cloth4';'Flowerpots';'Lampshade1';...
-            'Lampshade2';'Midd1';'Midd2';'Monopoly';'Plastic';'Rocks1';...
-            'Rocks2';'Wood1';'Wood2'};
+    name = {'Midd1';'Midd2';'Monopoly'};
+%     name = {'Baby1';'Cloth1'; 'Cloth2'; 'Rocks2';'Midd1';'Midd2';'Monopoly'};
+%     name = {'Plastic'};
+%     name = {'cones';'teddy';'tsukuba';'venus';...
+%             'Aloe';'Baby1';'Baby2';'Baby3';'Bowling1';'Bowling2';'Cloth1';...
+%             'Cloth2';'Cloth3';'Cloth4';'Flowerpots';'Lampshade1';...
+%             'Lampshade2';'Midd1';'Midd2';'Monopoly';'Plastic';'Rocks1';...
+%             'Rocks2';'Wood1';'Wood2'};
 end
 
 function disp = getMaxDisp()
-% disp = [16]
-    disp = [60,60,16,20,...
-            90,100,100,83,96,80,96,86,96,86,...
-            83,86,86,65,71,79,93,91,91,70,84];
+disp = [65, 71, 79];
+%     disp = 93;
+%     disp = [100, 96, 86, 91, 65, 71, 79];
+%     disp = [60,60,16,20,...
+%             90,100,100,83,96,80,96,...
+%             86,96,86,83,86,...
+%             86,65,71,79,93,91,...
+%             91,70,84];
 end
