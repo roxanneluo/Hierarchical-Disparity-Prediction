@@ -21,7 +21,7 @@ int small_disparity, large_disparity;
 double threshold = 0.05;
 template <class type>
 void save_matrix(Grid<type>& matrix, char* filename) {
-  char path[300] = "testdata/";
+  char path[300] = "all_small_given_large/";
 	strcat(path, picture_name);
 	strcat(path, filename);
 	FILE *file = fopen(path, "w");
@@ -125,11 +125,12 @@ int main(int args, char** argv) {
 	compute_avg_prob(prob_small_large, avg_prob_large_base, false);
 	compute_avg_prob(prob_small_large, avg_prob_small_base, true);
   // construct small_givn_large matrix.
-  //save_matrix(avg_prob_small_base, "__avg_prob_10_small_base.txt");
-	save_matrix(avg_prob_large_base, "__avg_prob_10_large_base.txt");
+  
+	save_matrix(avg_prob_small_base, "__avg_prob_10_small_base.txt");
+	// save_matrix(avg_prob_large_base, "__avg_prob_10_large_base.txt");
 
 
-	/*for (int j = 0; j <= large_disparity; ++j) {
+	for (int j = 0; j <= large_disparity; ++j) {
 	  for (int i = 0; i <= small_disparity; ++i) {
 		  gen_small_given_large[i][j] =
 				  avg_prob_small_base[0][i - j / 2 + small_disparity];
@@ -138,6 +139,7 @@ int main(int args, char** argv) {
   save_matrix(gen_small_given_large,
 			        "__small_given_large_matrix_10_small_base.txt");
 
+	/*
 	for (int i = 0; i <= small_disparity; ++i) {
 	  for (int j = 0; j <= large_disparity; ++j) {
 		  gen_small_given_large[i][j] =
@@ -147,6 +149,6 @@ int main(int args, char** argv) {
 
   save_matrix(gen_small_given_large,
 			        "__small_given_large_matrix_10_large_base.txt");
-*/
-	return 0;
+	*/
+  return 0;
 }
