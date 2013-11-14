@@ -29,3 +29,11 @@ testdata*
 *.zip
 *.ppm
 *.pgm
+
+# image result
+*.PNG
+bin/prob_image*
+/bin/results of generated small Given Large*
+
+# statistical results
+/code/code-probability/matlab/data*
