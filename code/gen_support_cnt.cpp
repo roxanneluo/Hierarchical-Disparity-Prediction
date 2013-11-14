@@ -40,7 +40,7 @@ void save_disp(char* path, char* dataset) {
     //"support_disp_cnt.txt"
     strcat(path, "Prob_Gen_");
 	  strcat(path, dataset);
-	  strcat(path, "__support_disp_cnt.txt");	
+	  strcat(path, "__support_disp_cnt.txt");
 	  FILE *file = fopen(path, "w");
 	  for (int i = 0; i < max_disparity+1; ++i)
         fprintf(file, "%d\n", disp[i]);
@@ -63,7 +63,7 @@ int main(int args, char ** argv) {
 		  max_disparity = atoi(argv[6]);
 			scale = 256 / max_disparity;
 		}
-		
+
 		if (args > 7) {
 		  scale = atoi(argv[7]);
 		}
@@ -71,24 +71,27 @@ int main(int args, char ** argv) {
 		Array3<unsigned char> rgb_left, rgb_right;
 		try {
 	    load_image(file_names[1], rgb_left);
-	    load_image(file_names[2], rgb_right);	
+	    load_image(file_names[2], rgb_right);
 		} catch (...) {
 		  puts("Errpr loading file.");
 			return 0;
 		}
 
-
+        printf("after read files\n");
 		// Compute support maps.
 	  SupportMatch sm (rgb_left, rgb_right, rgb_left.width, rgb_left.height);
+        printf("after find construct\n");
 		sm.FindSupportMatch();
+		printf("after gen support map\n");
     save_image(file_names[3], sm.support_left_map, scale);
     save_image(file_names[4], sm.support_right_map, scale);
-
+        printf("after save support map\n");
     disp = new int [max_disparity+1];
 		// get disp from the left support map.
     get_disp(sm.support_left_map);
+        printf("after get_dips\n");
     save_disp(path, file_names[0]);
-
+    printf("after save disp\n");
     delete [] disp;
   return 0;
 }

@@ -18,7 +18,7 @@ Grid<double> gen_small_given_large;
 
 char picture_name[300] = "";
 int small_disparity, large_disparity;
-
+double threshold = 0.05;
 template <class type>
 void save_matrix(Grid<type>& matrix, char* filename) {
   char path[300] = "testdata/";
@@ -41,22 +41,32 @@ void compute_avg_prob(Grid<type>& matrix, Grid<type>& avg_prob,
 	if (is_small_base) {
 	  for (int i = 0; i < matrix.height; ++i) {
 			for (int j = 0; j < matrix.width; ++j) {
-		    avg_prob[0][i - j / 2 + matrix.height - 1] += matrix[i][j];
+                if (matrix[j/2][j] < threshold) continue;
+                avg_prob[0][i - j / 2 + matrix.height - 1] += matrix[i][j];
 			}
 		}
 		double tmp = 0.0;
-    for (int i = 0; i < 2 * matrix.height - 1; ++i) {
-			avg_prob[0][i] /= matrix.width;
+		int cnt = 0;
+		for (int j = 0; j < matrix.width; ++j)
+            if (matrix[j/2][j] > threshold) ++cnt;
+        for (int i = 0; i < 2 * matrix.height - 1; ++i) {
+			avg_prob[0][i] /= cnt;
 			tmp += avg_prob[0][i];
 		}
 		// TODO(xuejiaobai): why tmp != 1 ?
 		printf("\n%.5lf\n", tmp);
 	} else {
+	int index = 0;
     for (int j = 0; j < matrix.width; ++j) {
 			for (int i = 0; i < matrix.height; ++i) {
-			  avg_prob[0][j - i * 2 + matrix.width - 1] += matrix[i][j];
+                //if (matrix[i][2*i] < threshold) continue;
+ 			  avg_prob[0][j - i * 2 + matrix.width - 1] += matrix[i][j];
 			}
 		}
+		//int cnt = 0;
+		/*for (int i = 0; i < matrix.height; ++i)
+            if (matrix[i][2*i]>=threshold) ++cnt;*/
+
 		double tmp = 0.0;
 	  for (int i = 0; i < 2 * matrix.width - 1; ++i) {
 		  avg_prob[0][i] /= matrix.height;
@@ -88,18 +98,20 @@ int main(int args, char** argv) {
   // compute probability of small given large
 	for (int j = 0; j <= large_disparity; ++j) {
 		int cnt_line = 0;
-	  for (int i = 0; i <= small_disparity; ++i) {
-		  cnt_line += cnt_small_large[i][j];
-		}
-		double prob = 0.0;
-		for (int i = 0; i <= small_disparity; ++i) {
-		  if (cnt_line == 0) {
-					prob_small_large[i][j] = 0.0; // 1.0 / small_disparity;
-			} else {
-			  prob_small_large[i][j] = cnt_small_large[i][j] * 1.0 / cnt_line;
-		    prob += prob_small_large[i][j];
-			}
-		}
+        for (int i = 0; i <= small_disparity; ++i) {
+            cnt_line += cnt_small_large[i][j];
+        }
+        double prob = 0.0;
+
+        for (int i = 0; i <= small_disparity; ++i) {
+            if (cnt_line == 0) {
+                    prob_small_large[i][j] = 0.0; // 1.0 / small_disparity;
+            } else {
+                prob_small_large[i][j] = cnt_small_large[i][j] * 1.0 / cnt_line;
+                prob += prob_small_large[i][j];
+            }
+        }
+        //printf("prob[%d] = %f\n",j, cnt_line==0?0:prob);
 	}
 
   avg_prob_large_base.reset(1, 2 * large_disparity + 1);
@@ -113,11 +125,11 @@ int main(int args, char** argv) {
 	compute_avg_prob(prob_small_large, avg_prob_large_base, false);
 	compute_avg_prob(prob_small_large, avg_prob_small_base, true);
   // construct small_givn_large matrix.
-  save_matrix(avg_prob_small_base, "__avg_prob_small_base.txt");
-	save_matrix(avg_prob_large_base, "__avg_prob_large_base.txt");
+  //save_matrix(avg_prob_small_base, "__avg_prob_10_small_base.txt");
+	save_matrix(avg_prob_large_base, "__avg_prob_10_large_base.txt");
 
 
-	for (int j = 0; j <= large_disparity; ++j) {
+	/*for (int j = 0; j <= large_disparity; ++j) {
 	  for (int i = 0; i <= small_disparity; ++i) {
 		  gen_small_given_large[i][j] =
 				  avg_prob_small_base[0][i - j / 2 + small_disparity];
@@ -135,6 +147,6 @@ int main(int args, char** argv) {
 
   save_matrix(gen_small_given_large,
 			        "__small_given_large_matrix_10_large_base.txt");
-
+*/
 	return 0;
 }
