@@ -33,7 +33,7 @@ testdata*
 # image result
 *.PNG
 bin/prob_image*
-bin/results of generated small Given Large*
+/bin/results of generated small Given Large*
 
 # statistical results
-code/code-probability/matlab/data*
+/code/code-probability/matlab/data*
