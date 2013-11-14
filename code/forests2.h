@@ -106,7 +106,7 @@ public :
     }
 */
     template <class type>
-    void collect_edges(Array3<type>& rgb) {
+    void collect_edges_edgeaware(Array3<type>& rgb) {
       H = rgb.height; W = rgb.width;
       n = H * W;
       m = 2 * H * W - H - W;
@@ -150,7 +150,7 @@ public :
     }
 
     template <class type>
-    void collect_edges(Array3<type>& rgb, Grid<type> occ) {
+    void collect_edges_edgeaware(Array3<type>& rgb, Grid<type> occ) {
       H = rgb.height; W = rgb.width;
       n = H * W;
       m = 2 * H * W - H - W;
@@ -201,11 +201,12 @@ public :
         srand(time(NULL));
         if (!boundary) {
           std::random_shuffle(edges + 1, edges + m + 1);
-        } else {
+				} else {
           std::random_shuffle(edges + 1, edges + boundary_m - 1);
           std::sort(edges + boundary_m, edges + m + 1, smaller_edge);
           // std::random_shuffle(edges + boundary_m, edges + m + 1);
-        }
+          // std::sort(edges + 1, edges + m + 1, smaller_edge);
+				}
         mset.init(n); ts = 0;
         for (int i = 1; i <= m; ++i)
             if (mset.merge(edges[i].a, edges[i].b)) {
@@ -215,8 +216,31 @@ public :
 //        for (int i = 1; i <= n; ++i) if (mset.merge(i, 1)) cout << i << endl;
     }
 
+   template <class type>
+   void collect_edges(Array3<type> & rgb) {
+     H = rgb.height; W = rgb.width;
+     n = H * W;
+     m = 2 * H * W - H - W;
+     edges = (Edge *) malloc((m + 2) * sizeof(Edge));
+     trees = (Edge *) malloc((n + 2) * sizeof(Edge));
+     int k = 0;
+     for (int i = 0; i < H; ++i)
+       for (int j = 0; j < W; ++j)
+          for (int p = 0; p < 2; ++p)
+            for (int q = 0; q < 2; ++q) if (p + q == 1)
+              if (i + p < H && j + q < W) {
+                ++k;
+                edges[k].a = node_number(i, j);
+                edges[k].b = node_number(i+p, j+q);
+                edges[k].weight =
+									  mylib::max3abs(rgb[0][i][j] - rgb[0][i+p][j+q],
+                                   rgb[1][i][j] - rgb[1][i+p][j+q],
+                                   rgb[2][i][j] - rgb[2][i+p][j+q]);
+            }
+    }
+
 		void build_MST() {
-		  printf("THIS IS FOREST2.H\n");
+		  // printf("THIS IS FOREST2.H\n");
 			std::sort(edges + 1, edges + m + 1, smaller_edge);
 			mset.init(n);
 			ts = 0;
