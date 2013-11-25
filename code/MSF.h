@@ -57,10 +57,10 @@ void build_tree(Array3<type>& left,
   // Build graph.
 	left_graph.collect_edges(left);
 	right_graph.collect_edges(right);
-	// left_graph.build_MST();
-	// right_graph.build_MST();
-	left_graph.build_RandTree();
-	right_graph.build_RandTree();
+	left_graph.build_MST();
+	right_graph.build_MST();
+	// left_graph.build_RandTree();
+	// right_graph.build_RandTree();
 
 	// Build forests.
   forest_left.init(left_graph);
@@ -77,16 +77,16 @@ void build_tree(Array3<type>& left,
 								Graph& right_graph,
 								Forest& forest_left,
 								Forest& forest_right,
-								Grid<type> occ_left,
-								Grid<type> occ_right) {
+								Grid<type>& occ_left,
+								Grid<type>& occ_right) {
 	// Median filter.
 	for (int i = 0; i < 3; ++i) {
 	  median_filter(left[i]);
 		median_filter(right[i]);
 	}
   // Build graph.
-	left_graph.collect_edges(left, occ_left);
-	right_graph.collect_edges(right, occ_right);
+	left_graph.collect_edges_edgeaware(left, occ_left);
+	right_graph.collect_edges_edgeaware(right, occ_right);
 	// left_graph.build_MST();
 	// right_graph.build_MST();
 	left_graph.build_RandTree(true);

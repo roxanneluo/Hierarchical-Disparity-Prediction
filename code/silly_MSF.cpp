@@ -19,7 +19,7 @@ char file_name[4][300] =
 
 int max_disparity = 16;
 int scale = 16;
-const int level = 3;
+const int level = 2;
 
 // typedef Array3<unsigned char> ARRAY3;
 // typedef Grid<unsigned char> GRID;
@@ -170,11 +170,14 @@ int main(int args, char ** argv) {
 			build_tree(rgb_left[i], rgb_right[i], graph_left[i], graph_right[i],
 				  forest_left[i], forest_right[i]);
 		} else {
+			// Not the highest layer. BUILD forest from here!
 			compute_first_matching_cost(rgb_left[i], rgb_right[i],
 					cost_left, cost_right, disparity_left[i + 1], max_disparity / pi[i]);
 		  build_tree(rgb_left[i], rgb_right[i], graph_left[i], graph_right[i],
 				  forest_left[i], forest_right[i],
-					occlusion_left[i + 1], occlusion_right[i + 1]);
+					// disparity_left[i + 1], disparity_right[i + 1]
+					occlusion_left[i + 1], occlusion_right[i + 1]
+					);
 		}
 		disparity_computation(forest_left[i], forest_right[i],
 				cost_left, cost_right, disparity_left[i], disparity_right[i]);
