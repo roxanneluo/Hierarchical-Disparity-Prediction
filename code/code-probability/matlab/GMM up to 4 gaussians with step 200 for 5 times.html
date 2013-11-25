@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>GMM up to 4 gaussians with step 200 for 5 times</h1>
+<h2>d1|d0 small base</h2>
+<table border = "3">
+<thead>
+<tr><td rowspan=3>disp range</td></tr>
+<tr>
+<td>mod</td>
+<td colspan="6">0</td>
+<td colspan="6">1</td>
+</tr>
+<tr>
+<td>K</td>
+<td></td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>KL-div</td>
+<td></td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>KL-div</td>
+</tr>
+</thead>
+<tbody>
+<tr style="background:white">
+<td rowspan="17">60-100</td>
+</tr>
+<tr style="background:white"><td rowspan="4">1</td></tr>
+<tr style="background:white">
+<td>mu</td>
+<td>-0.515968</td>
+<td></td>
+<td></td>
+<td></td>
+<td rowspan="3">0.926280</td>
+<td>mu</td>
+<td>-0.103496</td>
+<td></td>
+<td></td>
+<td></td>
+<td rowspan="3">0.991257</td>
+</tr>
+<tr style="background:white">
+<td>sigma</td>
+<td>4.868368</td>
+<td></td>
+<td></td>
+<td></td>
+<td>sigma</td>
+<td>4.504313</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr style="background:white">
+<td>Pi</td>
+<td>1.000000</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Pi</td>
+<td>1.000000</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr style="background:#e3e3e3"><td rowspan="4">2</td></tr>
+<tr style="background:#e3e3e3">
+<td>mu</td>
+<td>0.006599</td>
+<td>-2.100588</td>
+<td></td>
+<td></td>
+<td rowspan="3">0.038121</td>
+<td>mu</td>
+<td>-2.277375</td>
+<td>0.500922</td>
+<td></td>
+<td></td>
+<td rowspan="3">0.043893</td>
+</tr>
+<tr style="background:#e3e3e3">
+<td>sigma</td>
+<td>0.559044</td>
+<td>9.554292</td>
+<td></td>
+<td></td>
+<td>sigma</td>
+<td>9.269545</td>
+<td>0.600388</td>
+<td></td>
+<td></td>
+</tr>
+<tr style="background:#e3e3e3">
+<td>Pi</td>
+<td>0.752007</td>
+<td>0.247993</td>
+<td></td>
+<td></td>
+<td>Pi</td>
+<td>0.217550</td>
+<td>0.782450</td>
+<td></td>
+<td></td>
+</tr>
+<tr style="background:white"><td rowspan="4">3</td></tr>
+<tr style="background:white">
+<td>mu</td>
+<td>-0.002251</td>
+<td>-3.739380</td>
+<td>0.652710</td>
+<td></td>
+<td rowspan="3">0.018669</td>
+<td>mu</td>
+<td>0.498251</td>
+<td>-4.350633</td>
+<td>1.357117</td>
+<td></td>
+<td rowspan="3">0.027834</td>
+</tr>
+<tr style="background:white">
+<td>sigma</td>
+<td>0.517039</td>
+<td>11.258740</td>
+<td>2.456607</td>
+<td></td>
+<td>sigma</td>
+<td>0.578842</td>
+<td>10.557650</td>
+<td>3.396781</td>
+<td></td>
+</tr>
+<tr style="background:white">
+<td>Pi</td>
+<td>0.695103</td>
+<td>0.162431</td>
+<td>0.142465</td>
+<td></td>
+<td>Pi</td>
+<td>0.757265</td>
+<td>0.141952</td>
+<td>0.100783</td>
+<td></td>
+</tr>
+<tr style="background:#e3e3e3"><td rowspan="4">4</td></tr>
+<tr style="background:#e3e3e3">
+<td>mu</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td rowspan="3">1.000000</td>
+<td>mu</td>
+<td>-4.396691</td>
+<td>1.374635</td>
+<td>0.449823</td>
+<td>0.515506</td>
+<td rowspan="3">0.027785</td>
+</tr>
+<tr style="background:#e3e3e3">
+<td>sigma</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>sigma</td>
+<td>10.565781</td>
+<td>3.431947</td>
+<td>0.582285</td>
+<td>0.577064</td>
+</tr>
+<tr style="background:#e3e3e3">
+<td>Pi</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>Pi</td>
+<td>0.141052</td>
+<td>0.101277</td>
+<td>0.199989</td>
+<td>0.557683</td>
+</tr>
+</tbody>
+</table>
+<h2>d2|d0 small base</h2>
+<table border = "3">
+<thead>
+<tr><td rowspan=3>disp range</td></tr>
+<tr>
+<td>mod</td>
+<td colspan="6">0</td>
+<td colspan="6">1</td>
+<td colspan="6">2</td>
+<td colspan="6">3</td>
+</tr>
+<tr>
+<td>K</td>
+<td></td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>KL-div</td>
+<td></td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>KL-div</td>
+<td></td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>KL-div</td>
+<td></td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>KL-div</td>
+</tr>
+</thead>
+<tbody>
+<tr style="background:white">
+<td rowspan="17">60-100</td>
+</tr>
+<tr style="background:white"><td rowspan="4">1</td></tr>
+<tr style="background:white">
+<td>mu</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td></td>
+<td rowspan="3">1.000000</td>
+<td>mu</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td></td>
+<td rowspan="3">1.000000</td>
+<td>mu</td>
+<td>-3.765043</td>
+<td></td>
+<td></td>
+<td></td>
+<td rowspan="3">0.471683</td>
+<td>mu</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td></td>
+<td rowspan="3">1.000000</td>
+</tr>
+<tr style="background:white">
+<td>sigma</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td></td>
+<td>sigma</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td></td>
+<td>sigma</td>
+<td>5.284255</td>
+<td></td>
+<td></td>
+<td></td>
+<td>sigma</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr style="background:white">
+<td>Pi</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Pi</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Pi</td>
+<td>1.000000</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Pi</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr style="background:#e3e3e3"><td rowspan="4">2</td></tr>
+<tr style="background:#e3e3e3">
+<td>mu</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td rowspan="3">1.000000</td>
+<td>mu</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td rowspan="3">1.000000</td>
+<td>mu</td>
+<td>-7.875707</td>
+<td>0.385555</td>
+<td></td>
+<td></td>
+<td rowspan="3">0.038314</td>
+<td>mu</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td rowspan="3">1.000000</td>
+</tr>
+<tr style="background:#e3e3e3">
+<td>sigma</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td>sigma</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td>sigma</td>
+<td>4.613589</td>
+<td>0.580350</td>
+<td></td>
+<td></td>
+<td>sigma</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+</tr>
+<tr style="background:#e3e3e3">
+<td>Pi</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td>Pi</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td>Pi</td>
+<td>0.502417</td>
+<td>0.497583</td>
+<td></td>
+<td></td>
+<td>Pi</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+</tr>
+<tr style="background:white"><td rowspan="4">3</td></tr>
+<tr style="background:white">
+<td>mu</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td rowspan="3">1.000000</td>
+<td>mu</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td rowspan="3">1.000000</td>
+<td>mu</td>
+<td>-3.659683</td>
+<td>0.406719</td>
+<td>-10.178060</td>
+<td></td>
+<td rowspan="3">0.037202</td>
+<td>mu</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td rowspan="3">1.000000</td>
+</tr>
+<tr style="background:white">
+<td>sigma</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td>sigma</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td>sigma</td>
+<td>2.200234</td>
+<td>0.604493</td>
+<td>3.612260</td>
+<td></td>
+<td>sigma</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+</tr>
+<tr style="background:white">
+<td>Pi</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td>Pi</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td>Pi</td>
+<td>0.155906</td>
+<td>0.509861</td>
+<td>0.334233</td>
+<td></td>
+<td>Pi</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+</tr>
+<tr style="background:#e3e3e3"><td rowspan="4">4</td></tr>
+<tr style="background:#e3e3e3">
+<td>mu</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td rowspan="3">1.000000</td>
+<td>mu</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td rowspan="3">1.000000</td>
+<td>mu</td>
+<td>-3.665614</td>
+<td>0.406587</td>
+<td>-9.579023</td>
+<td>-10.653797</td>
+<td rowspan="3">0.037314</td>
+<td>mu</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td rowspan="3">1.000000</td>
+</tr>
+<tr style="background:#e3e3e3">
+<td>sigma</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>sigma</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>sigma</td>
+<td>2.200424</td>
+<td>0.604311</td>
+<td>3.734967</td>
+<td>3.479540</td>
+<td>sigma</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr style="background:#e3e3e3">
+<td>Pi</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>Pi</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>Pi</td>
+<td>0.154398</td>
+<td>0.509756</td>
+<td>0.159755</td>
+<td>0.176092</td>
+<td>Pi</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+</tbody>
+</table>
+<h2>d2|d1 small base</h2>
+<table border = "3">
+<thead>
+<tr><td rowspan=3>disp range</td></tr>
+<tr>
+<td>mod</td>
+<td colspan="6">0</td>
+<td colspan="6">1</td>
+</tr>
+<tr>
+<td>K</td>
+<td></td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>KL-div</td>
+<td></td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>KL-div</td>
+</tr>
+</thead>
+<tbody>
+<tr style="background:white">
+<td rowspan="17">60-100</td>
+</tr>
+<tr style="background:white"><td rowspan="4">1</td></tr>
+<tr style="background:white">
+<td>mu</td>
+<td>-0.187887</td>
+<td></td>
+<td></td>
+<td></td>
+<td rowspan="3">0.777827</td>
+<td>mu</td>
+<td>0.065757</td>
+<td></td>
+<td></td>
+<td></td>
+<td rowspan="3">0.781332</td>
+</tr>
+<tr style="background:white">
+<td>sigma</td>
+<td>2.695092</td>
+<td></td>
+<td></td>
+<td></td>
+<td>sigma</td>
+<td>2.775738</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr style="background:white">
+<td>Pi</td>
+<td>1.000000</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Pi</td>
+<td>1.000000</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr style="background:#e3e3e3"><td rowspan="4">2</td></tr>
+<tr style="background:#e3e3e3">
+<td>mu</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td rowspan="3">1.000000</td>
+<td>mu</td>
+<td>0.485597</td>
+<td>-1.580602</td>
+<td></td>
+<td></td>
+<td rowspan="3">0.013159</td>
+</tr>
+<tr style="background:#e3e3e3">
+<td>sigma</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td>sigma</td>
+<td>0.591802</td>
+<td>5.756984</td>
+<td></td>
+<td></td>
+</tr>
+<tr style="background:#e3e3e3">
+<td>Pi</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td></td>
+<td>Pi</td>
+<td>0.796805</td>
+<td>0.203195</td>
+<td></td>
+<td></td>
+</tr>
+<tr style="background:white"><td rowspan="4">3</td></tr>
+<tr style="background:white">
+<td>mu</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td rowspan="3">1.000000</td>
+<td>mu</td>
+<td>-3.385774</td>
+<td>0.478278</td>
+<td>2.500365</td>
+<td></td>
+<td rowspan="3">0.005962</td>
+</tr>
+<tr style="background:white">
+<td>sigma</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td>sigma</td>
+<td>5.707923</td>
+<td>0.585147</td>
+<td>2.849355</td>
+<td></td>
+</tr>
+<tr style="background:white">
+<td>Pi</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td></td>
+<td>Pi</td>
+<td>0.142508</td>
+<td>0.789178</td>
+<td>0.068314</td>
+<td></td>
+</tr>
+<tr style="background:#e3e3e3"><td rowspan="4">4</td></tr>
+<tr style="background:#e3e3e3">
+<td>mu</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td rowspan="3">1.000000</td>
+<td>mu</td>
+<td>0.480213</td>
+<td>0.476011</td>
+<td>-3.401627</td>
+<td>2.484441</td>
+<td rowspan="3">0.005945</td>
+</tr>
+<tr style="background:#e3e3e3">
+<td>sigma</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>sigma</td>
+<td>0.585176</td>
+<td>0.584868</td>
+<td>5.707309</td>
+<td>2.861037</td>
+</tr>
+<tr style="background:#e3e3e3">
+<td>Pi</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>Pi</td>
+<td>0.430365</td>
+<td>0.358670</td>
+<td>0.141992</td>
+<td>0.068974</td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>
