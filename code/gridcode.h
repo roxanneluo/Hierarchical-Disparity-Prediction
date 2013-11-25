@@ -4,10 +4,12 @@
 #include <cstring>
 #include <cassert>
 #include <cstdio>
+#include <random>
+#include <ctime>
 // this code is meant for memory management
 
 #define PADDING 10
-
+using namespace std;
 
 template <class type>
 class Grid {
@@ -79,6 +81,41 @@ public :
                 grid[i][j] = 255;
 	}
 	type * operator[] (int index) { return grid[index]; }
+	void addNoise(double sigma) {
+	    unsigned seed = time(NULL);
+        default_random_engine generator (seed);
+        normal_distribution<double> distribution (0.0,sigma);
+        double noise = 0;
+        for (int i = 0; i < height; ++i) {
+            if (grid[i][1] == 0.0) {
+                noise = distribution(generator);
+                grid[i][1] += (noise > 0)? noise:0;
+            }
+        }
+        normalize(1);
+	}
+
+	/*1: normalize along the col; 2: normalize along the column*/
+	void normalize(int direct) {
+	    double err = 0.000000001;
+        double sum = 0;
+	    if (direct == 1) {
+            for (int j = 0; j < width; ++j) {
+                sum = 0;
+                for (int i = 0; i < height; ++i) sum += grid[i][j];
+                if (sum > err)
+                    for (int i = 0; i < height; ++i) grid[i][j] /= sum;
+            }
+	    } else {
+            assert(direct == 2);
+            for (int i = 0; i < width; ++i) {
+                sum = 0;
+                for (int j = 0; j < height; ++j) sum += grid[i][j];
+                if (sum > err)
+                    for (int j = 0; j < height; ++j) grid[i][j] /= sum;
+            }
+	    }
+	}
 };
 
 template <class type>
@@ -134,7 +171,7 @@ public :
 			mat[a]->zero();
 		}
 	}
-	
+
 	void rgb_2_gray(Grid<type>& gray) {
 		if (array != 3) {
 			return;
