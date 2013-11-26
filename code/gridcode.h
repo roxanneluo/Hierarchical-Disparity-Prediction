@@ -12,6 +12,56 @@
 using namespace std;
 
 template <class type>
+class Array1 {
+public:
+  type* array;
+	int length;
+	Array1<type> () {length = -1; array = NULL;}
+	Array1<type> (const Array1<type>& a) {array = NULL;}
+	Array1<type> (int L) {
+	  reset(L);
+	}
+  ~Array1<type> () {
+	  freearray();
+	}
+  void reset(int L) {
+	  length = L;
+		array = (type*) malloc(sizeof(type) * (length + PADDING));
+    assert(array != NULL);
+	}
+	void freearray() {
+    if (array != NULL) {
+		  delete [] array;
+			array = NULL;
+		}	
+	}
+	type * operator[] (int index) { return &array[index]; }
+  void zero() {
+	  for (int i = 0; i < length; ++i) {
+		  array[i] = 0;
+		}
+	}
+	void white() {
+	  for (int i = 0; i < length; ++i) {
+		  array[i] = 255;
+		}
+	}
+	void copy (Array1<type>& other) {
+		if (other.length != length)
+			reset(other.length);
+			memcpy(array, other.array, length * sizeof(type));
+	}
+	void normalize () {
+    double err = 1e-10;
+    double sum = 0;
+    for (int i = 0; i < length; ++i)
+			sum += array[i];
+    if (sum > err)
+        for (int i = 0; i < length; ++i) array[i] /= sum;
+	}
+};
+
+template <class type>
 class Grid {
 public :
 	type ** grid;
@@ -81,6 +131,7 @@ public :
                 grid[i][j] = 255;
 	}
 	type * operator[] (int index) { return grid[index]; }
+/*
 	void addNoise(double sigma) {
 	    unsigned seed = time(NULL);
         default_random_engine generator (seed);
@@ -94,10 +145,11 @@ public :
         }
         normalize(1);
 	}
+*/
 
 	/*1: normalize along the col; 2: normalize along the column*/
 	void normalize(int direct) {
-	    double err = 0.000000001;
+	    double err = 1e-10;
         double sum = 0;
 	    if (direct == 1) {
             for (int j = 0; j < width; ++j) {
@@ -108,11 +160,11 @@ public :
             }
 	    } else {
             assert(direct == 2);
-            for (int i = 0; i < width; ++i) {
+            for (int i = 0; i < height; ++i) {
                 sum = 0;
-                for (int j = 0; j < height; ++j) sum += grid[i][j];
+                for (int j = 0; j < width; ++j) sum += grid[i][j];
                 if (sum > err)
-                    for (int j = 0; j < height; ++j) grid[i][j] /= sum;
+                    for (int j = 0; j < width; ++j) grid[i][j] /= sum;
             }
 	    }
 	}
