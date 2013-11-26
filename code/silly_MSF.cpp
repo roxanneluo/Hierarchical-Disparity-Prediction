@@ -11,6 +11,7 @@
 #include "filter.h"
 #include "algorithm"
 #include "support_match.h"
+#include "gen_interval.h"
 
 using namespace std;
 
@@ -30,13 +31,16 @@ vector< Grid<unsigned char> > disparity_left(level), disparity_right(level); // 
 vector<Graph> graph_left(level), graph_right(level);
 vector<Forest> forest_left(level), forest_right(level);
 
-
 vector< Grid<unsigned char> > occlusion_left(level), occlusion_right(level);
 
 // for image result
 Forest left_support_forest, right_support_forest;
 Grid<unsigned char> left_support_map[level], right_support_map[level];
 Grid<unsigned char> left_tree_img, right_tree_img;
+Array1<double> support_prob_left, support_prob_right;
+Array1<double> initial_prob_left, initial_prob_right;
+Grid<double> prob_matrix_left, prob_matrix_right;
+
 /*
 void draw_tree() {
   int times = 3;
@@ -82,7 +86,7 @@ void refinement(Grid<type>& d_left, Grid<type>& d_right,
   compute_disparity(cost_right, d_right);
   save_image("lefterror.pgm", occ_left);
   save_image("righterror.pgm", occ_right);
-}
+} /*
 char *get_file_name(char *filename, const char * prefix, int para, const char * suffix) {
     strcpy(filename, prefix);
     strcat(filename, "_");
@@ -106,7 +110,7 @@ void draw_tree(int level_index) {
     char filename[50];
     save_image(get_file_name(filename,"MSF_left_supportmap",level_index,".pgm"), left_support_map[level_index]);
     save_image(get_file_name(filename,"MSF_right_supportmap",level_index,".pgm"), right_support_map[level_index]);
-}
+}*/
 int main(int args, char ** argv) {
 
 	if (args > 2) {
@@ -141,11 +145,10 @@ int main(int args, char ** argv) {
 
   // Check the reliable points for left and right image.
   // NOTICE(xuejiaobai): variable scale is used in the output maps.	
-	save_image(strcat(file_name[0], "_left_initial_reliable_points.pgm"),
-			       sm.support_left_map, scale);
-	save_image(strcat(file_name[1], "_right_initial_reliable_points.pgm"),
-			       sm.support_right_map, scale);
-
+	// save_image(strcat(file_name[0], "_left_initial_reliable_points.pgm"),
+	// 		       sm.support_left_map, scale);
+	// save_image(strcat(file_name[1], "_right_initial_reliable_points.pgm"),
+	// 		       sm.support_right_map, scale);
 
 	// Get scaled image.
   for (int i = 0; i < level - 1; ++i) {
@@ -160,9 +163,16 @@ int main(int args, char ** argv) {
 	  pi[i] = 2 * pi[i - 1];
 	}
 
+	support_prob_left.reset(max_disparity + 1);
+	support_prob_right.reset(max_disparity + 1);
+	gen_support_prob(sm.support_left_map, support_prob_left, max_disparity);
+	gen_support_prob(sm.support_right_map, support_prob_right, max_disparity);
+
+	vector<double> gmm = read_prob_matrix("gmm");
+
 	for (int i = level - 1; i >= 0; --i) {
 		bool is_highest_layer = (i == level - 1) ? true : false;
-
+    bool is_lowest_layer = (i == 0) ? true : false;
     Array3<double> cost_left, cost_right;
     if (is_highest_layer) {
 		  compute_first_matching_cost(rgb_left[i], rgb_right[i],
@@ -182,11 +192,38 @@ int main(int args, char ** argv) {
 		disparity_computation(forest_left[i], forest_right[i],
 				cost_left, cost_right, disparity_left[i], disparity_right[i]);
 
+		// disparity prediction model
+		if (!is_lowest_layer) {
+		  initial_prob_left.reset(max_disparity / pi[i] + 1);
+		  initial_prob_right.reset(max_disparity / pi[i] + 1);
+      gen_initial_prob(disparity_left[i], initial_prob_left, max_disparity / pi[i]);
+		  gen_initial_prob(disparity_right[i], initial_prob_right, max_disparity / pi[i]);
+		  prob_matrix_left.reset(max_disparity / pi[i] + 1,
+			  	                   max_disparity / pi[i] * 2 - 1);
+
+		  prob_matrix_right.reset(max_disparity / pi[i] + 1,
+			  	                    max_disparity / pi[i] * 2 - 1);
+
+	    gen_small_given_large(prob_matrix_left, gmm);	
+      gen_small_given_large(prob_matrix_right, gmm);
+
+		  gen_large_given_small(initial_prob_left,
+			  	                  prob_matrix_left,
+				  									support_prob_left);
+		  gen_large_given_small(initial_prob_right,
+			  	                  prob_matrix_right,
+				  									support_prob_right);
+		  save_large_given_small(prob_matrix_left,
+		   		                   strcat(file_name[0], "_left_lgs.txt"));
+		  save_large_given_small(prob_matrix_right,
+			 		                   strcat(file_name[1], "_right_lgs.txt"));
+		}
+
 	  find_stable_pixels(disparity_left[i], disparity_right[i],
 		  	 occlusion_left[i], occlusion_right[i]);
 	}
     refinement(disparity_left[0], disparity_right[0],
-				occlusion_left[0], occlusion_right[0]);
+		occlusion_left[0], occlusion_right[0]);
     median_filter(disparity_left[0]);
     median_filter(disparity_right[0]);
 
