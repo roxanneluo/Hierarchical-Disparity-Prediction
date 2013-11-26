@@ -119,4 +119,16 @@ int gen_interval(Grid<double>& prob_matrix,
 	return err;
 }
 
+void save_large_given_small(Grid<double>& prob_matrix,
+		                        const char* path) {
+  FILE* file = fopen(path, "w");
+	for (int i = 0; i < prob_matrix.height; ++i) {
+	  for (int j = 0; j < prob_matrix.width; ++j) {
+		  fprintf(file, "%.6lf ", prob_matrix[i][j]);
+		}
+		fprintf(file, "\n");
+	}
+	fclose(file);
+}
+
 #endif
