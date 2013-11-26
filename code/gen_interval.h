@@ -6,7 +6,6 @@
 #include "arithmetics.h"
 #include "iomanager.h"
 #include "timekeeper.h"
-
 #include "filter.h"
 #include "filename.h"
 
@@ -19,23 +18,22 @@ inline int dcmp(double a, double b) {
 void gen_support_prob (Grid<unsigned char>& support,
 		                   Array1<double>& support_prob,
 											 int max_disparity) {
-  support_prob.zero();
+	support_prob.zero();
 	int W = support.width, H = support.height;
 	int d;
 	for (int i = 0; i < H; ++i) {
 	  for (int j = 0; j < W; ++j) {
 		  d = support[i][j];
 			if (d != 0) {
-				if (d < max_disparity)
-					*support_prob[d] += 1.0;
+				if (d <= max_disparity)
+					support_prob[d] += 1.0;
 			}
 		}
 	}
 	// normalize
 	support_prob.normalize();
 	// add noise
-	// normalize
-
+	support_prob.normalize();
 }
 
 void gen_initial_prob(Grid<unsigned char>& initial_d,
@@ -46,42 +44,48 @@ void gen_initial_prob(Grid<unsigned char>& initial_d,
 	int d;
 	for (int i = 0; i < H; ++i) {
 	  for (int j = 0; j < W; ++j) {
-		  if (d < max_disparity)
-				*initial_prob[d] += 1.0;
+			if (d <= max_disparity)
+				initial_prob[d] += 1.0;
 		}
 	}
 	// normalize
   initial_prob.normalize();
 }
 
-void read_prob_matrix (Grid<double>& prob_matrix, char* path) {
-  prob_matrix.zero();
+// prob_matrix(initial_d_max + 1, initial_d_max * 2 - 1)
+vector<double> read_prob_matrix (char* path) {
 	FILE* file = fopen(path, "r");
-	vector<double> prob;
+	vector<double> gmm;
 	double tmp;
 	while (fscanf(file, "%lf", &tmp) == 1) {
-	  prob.push_back(tmp);
+	  gmm.push_back(tmp);
 	}
 	// prob_matrix.reset(prob.size(), prob.size() * 2 - 1);
-	for (int j = 0; j < prob_matrix.width; ++j) {
-		for (int i = 1; j / 2 - i >= 0; ++i) {
-		  prob_matrix[j / 2 - i][j] = prob[prob.size() / 2 - i];
-		}
-	  for (int i = 0; j / 2 + i < prob_matrix.height; ++i) {
-		  prob_matrix[j / 2 + i][j] = prob[prob.size() / 2 + i];
-		}
-	}
 	fclose(file);
+	return gmm;
 }
 
-void gen_prob_matrix (Array1<double>& initial_prob,
+void gen_small_given_large (Grid<double>& prob_matrix,
+		                        const vector<double>& gmm) {
+	prob_matrix.zero();
+	for (int j = 0; j < prob_matrix.width; ++j) {
+		for (int i = 1; j / 2 - i >= 0; ++i) {
+		  prob_matrix[j / 2 - i][j] = gmm[gmm.size() / 2 - i];
+		}
+	  for (int i = 0; j / 2 + i < prob_matrix.height; ++i) {
+		  prob_matrix[j / 2 + i][j] = gmm[gmm.size() / 2 + i];
+		}
+	}
+}
+
+void gen_large_given_small (Array1<double>& initial_prob,
 		                  Grid<double>& prob_matrix,
 											Array1<double>& support_prob) {
-  int W = prob_matrix.width, H = prob_matrix.height;
+  int W = support_prob.length, H = initial_prob.length;
   for (int i = 0 ; i < H; ++i) {
 	  for (int j = 0; j < W; ++j) {
-		  prob_matrix[i][j] /= *initial_prob[i];
-		  prob_matrix[i][j] *= *support_prob[j];
+		  prob_matrix[i][j] /= initial_prob[i];
+		  prob_matrix[i][j] *= support_prob[j];
 		}
 	}
 	prob_matrix.normalize(2);
