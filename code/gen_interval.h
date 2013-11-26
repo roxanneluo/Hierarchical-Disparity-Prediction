@@ -33,6 +33,8 @@ void gen_support_prob (Grid<unsigned char>& support,
 	// normalize
 	support_prob.normalize();
 	// add noise
+	support_prob.addNoise(0.03);
+	// normaliza
 	support_prob.normalize();
 }
 
