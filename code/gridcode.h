@@ -17,7 +17,7 @@ public:
   type* array;
 	int length;
 	Array1<type> () {length = -1; array = NULL;}
-	Array1<type> (const Array1<type>& a) {array = NULL;}
+	Array1<type> (const Array1<type>& a) {array = NULL;}//??
 	Array1<type> (int L) {
 	  reset(L);
 	}
@@ -33,9 +33,9 @@ public:
     if (array != NULL) {
 		  delete [] array;
 			array = NULL;
-		}	
+		}
 	}
-	type * operator[] (int index) { return &array[index]; }
+	type & operator[] (int index) { return array[index]; }
   void zero() {
 	  for (int i = 0; i < length; ++i) {
 		  array[i] = 0;
@@ -59,6 +59,21 @@ public:
     if (sum > err)
         for (int i = 0; i < length; ++i) array[i] /= sum;
 	}
+
+	void addNoise(double sigma) {
+	    unsigned seed = time(NULL);
+        default_random_engine generator (seed);
+        normal_distribution<double> distribution (0.0,sigma);
+        double noise = 0;
+        for (int i = 0; i < length; ++i) {
+            if (array[i] == 0.0) {
+                noise = distribution(generator);
+                array[i] += (noise > 0)? noise:0;
+            }
+        }
+        normalize();
+	}
+
 };
 
 template <class type>
@@ -131,21 +146,6 @@ public :
                 grid[i][j] = 255;
 	}
 	type * operator[] (int index) { return grid[index]; }
-/*
-	void addNoise(double sigma) {
-	    unsigned seed = time(NULL);
-        default_random_engine generator (seed);
-        normal_distribution<double> distribution (0.0,sigma);
-        double noise = 0;
-        for (int i = 0; i < height; ++i) {
-            if (grid[i][1] == 0.0) {
-                noise = distribution(generator);
-                grid[i][1] += (noise > 0)? noise:0;
-            }
-        }
-        normalize(1);
-	}
-*/
 
 	/*1: normalize along the col; 2: normalize along the column*/
 	void normalize(int direct) {
