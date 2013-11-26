@@ -15,9 +15,21 @@ inline int dcmp(double a, double b) {
 	return 0;
 }
 
-void gen_support_prob (Grid<unsigned char>& support,
-		                   Array1<double>& support_prob,
-											 int max_disparity) {
+void save_large_given_small(Grid<double>& prob_matrix,
+		                        const char* path) {
+  FILE* file = fopen(path, "w");
+	for (int i = 0; i < prob_matrix.height; ++i) {
+	  for (int j = 0; j < prob_matrix.width; ++j) {
+		  fprintf(file, "%.6lf ", prob_matrix[i][j]);
+		}
+		fprintf(file, "\n");
+	}
+	fclose(file);
+}
+
+void gen_support_prob(Grid<unsigned char>& support,
+		                  Array1<double>& support_prob,
+											int max_disparity) {
 	support_prob.zero();
 	int W = support.width, H = support.height;
 	int d;
@@ -34,8 +46,9 @@ void gen_support_prob (Grid<unsigned char>& support,
 	support_prob.normalize();
 	// add noise
 	support_prob.addNoise(0.03);
-	// normaliza
-	support_prob.normalize();
+  // for (int i = 0; i < support_prob.length; ++i) {
+	//   printf("%d %.5lf\n", i, support_prob[i]);
+	// }
 }
 
 void gen_initial_prob(Grid<unsigned char>& initial_d,
@@ -46,12 +59,16 @@ void gen_initial_prob(Grid<unsigned char>& initial_d,
 	int d;
 	for (int i = 0; i < H; ++i) {
 	  for (int j = 0; j < W; ++j) {
+			d = initial_d[i][j];
 			if (d <= max_disparity)
 				initial_prob[d] += 1.0;
 		}
 	}
 	// normalize
   initial_prob.normalize();
+	// for (int i = 0; i < initial_prob.length; ++i) {
+	//   printf("%d %.5lf\n", i, initial_prob[i]);
+	// }
 }
 
 // prob_matrix(initial_d_max + 1, initial_d_max * 2 - 1)
@@ -61,6 +78,7 @@ vector<double> read_prob_matrix (char* path) {
 	double tmp;
 	while (fscanf(file, "%lf", &tmp) == 1) {
 	  gmm.push_back(tmp);
+//		printf("%.5lf\n", tmp);
 	}
 	// prob_matrix.reset(prob.size(), prob.size() * 2 - 1);
 	fclose(file);
@@ -86,10 +104,15 @@ void gen_large_given_small (Array1<double>& initial_prob,
   int W = support_prob.length, H = initial_prob.length;
   for (int i = 0 ; i < H; ++i) {
 	  for (int j = 0; j < W; ++j) {
-		  prob_matrix[i][j] /= initial_prob[i];
-		  prob_matrix[i][j] *= support_prob[j];
+		  if (dcmp(initial_prob[i], 0) == 0) {
+			  prob_matrix[i][j] = 0;
+			} else {
+				prob_matrix[i][j] /= initial_prob[i];
+			  prob_matrix[i][j] *= support_prob[j];
+			}
 		}
 	}
+	save_large_given_small(prob_matrix, "no_norm_lgs.txt");
 	prob_matrix.normalize(2);
 }
 
@@ -117,18 +140,6 @@ int gen_interval(Grid<double>& prob_matrix,
 		}	
 	}
 	return err;
-}
-
-void save_large_given_small(Grid<double>& prob_matrix,
-		                        const char* path) {
-  FILE* file = fopen(path, "w");
-	for (int i = 0; i < prob_matrix.height; ++i) {
-	  for (int j = 0; j < prob_matrix.width; ++j) {
-		  fprintf(file, "%.6lf ", prob_matrix[i][j]);
-		}
-		fprintf(file, "\n");
-	}
-	fclose(file);
 }
 
 #endif
