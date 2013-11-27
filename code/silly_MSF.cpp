@@ -15,8 +15,8 @@
 
 using namespace std;
 
-char file_name[4][300] =
-    {"left.ppm", "right.ppm", "silly_left.pgm", "silly_right.pgm"};
+char file_name[5][300] =
+    {"left.ppm", "right.ppm", "silly_left.pgm", "silly_right.pgm", "tsukuba"};
 
 int max_disparity = 16;
 int scale = 16;
@@ -61,9 +61,7 @@ void draw_tree() {
   save_image("RandTree_rightsupportmap.pgm", right_support_map);
 }
 */
-template <class type>
-void refinement(Grid<type>& d_left, Grid<type>& d_right,
-		Grid<type>& occ_left, Grid<type>& occ_right) {
+void refinement(int i) {
   // find stable pixels by using left-right consisty check
   // left_graph.build_MST();
   // right_graph.build_MST();
@@ -72,20 +70,20 @@ void refinement(Grid<type>& d_left, Grid<type>& d_right,
   // forest_right.init(right_graph);
   // forest_left.order_of_visit();
   // forest_right.order_of_visit();
-
 	Array3<double> cost_left, cost_right;
-  cost_left.reset(max_disparity, d_left.height, d_left.width);
-	cost_right.reset(max_disparity, d_right.height, d_right.width);
+  cost_left.reset(max_disparity, disparity_left[i].height, disparity_left[i].width);
+	cost_right.reset(max_disparity, disparity_right[i].height, disparity_right[i].width);
   // find_stable_pixels(d_left, d_right, occlusion_left, occlusion_right);
-  update_matching_cost(cost_left, cost_right, d_left, d_right,
-      occ_left, occ_right);
-
-  forest_left[0].compute_cost_on_tree(cost_left, 255 * 0.05);
-  forest_right[0].compute_cost_on_tree(cost_right, 255 * 0.05);
-  compute_disparity(cost_left, d_left);
-  compute_disparity(cost_right, d_right);
-  save_image("lefterror.pgm", occ_left);
-  save_image("righterror.pgm", occ_right);
+  update_matching_cost(cost_left, cost_right, disparity_left[i], disparity_right[i],
+      occlusion_left[i], occlusion_right[i]);
+  forest_left[i].compute_cost_on_tree(cost_left, 255 * 0.05);
+  forest_right[i].compute_cost_on_tree(cost_right, 255 * 0.05);
+  compute_disparity(cost_left, disparity_left[i]);
+  compute_disparity(cost_right, disparity_right[i]);
+	median_filter(disparity_left[i]);
+	median_filter(disparity_right[i]);
+  save_image("lefterror.pgm", occlusion_left[i]);
+  save_image("righterror.pgm", occlusion_right[i]);
 } /*
 char *get_file_name(char *filename, const char * prefix, int para, const char * suffix) {
     strcpy(filename, prefix);
@@ -128,6 +126,9 @@ int main(int args, char ** argv) {
     strcpy(file_name[2], argv[5]);
     strcpy(file_name[3], argv[6]);
   }
+	if (args > 7) {
+	  strcpy(file_name[4], argv[7]);
+	}
 
   try {
     load_image(file_name[0], rgb_left[0]);
@@ -191,41 +192,45 @@ int main(int args, char ** argv) {
 		}
 		disparity_computation(forest_left[i], forest_right[i],
 				cost_left, cost_right, disparity_left[i], disparity_right[i]);
-
+	  
+// 		find_stable_pixels(disparity_left[i], disparity_right[i],
+// 		  	 occlusion_left[i], occlusion_right[i]);
+	  
+// 		refinement(i);
+		
 		// disparity prediction model
 		if (!is_lowest_layer) {
 		  initial_prob_left.reset(max_disparity / pi[i] + 1);
 		  initial_prob_right.reset(max_disparity / pi[i] + 1);
+			// generate initial prob vector for level i + 1.
       gen_initial_prob(disparity_left[i], initial_prob_left, max_disparity / pi[i]);
 		  gen_initial_prob(disparity_right[i], initial_prob_right, max_disparity / pi[i]);
+			
 		  prob_matrix_left.reset(max_disparity / pi[i] + 1,
 			  	                   max_disparity / pi[i] * 2 - 1);
 
 		  prob_matrix_right.reset(max_disparity / pi[i] + 1,
 			  	                    max_disparity / pi[i] * 2 - 1);
-
+      // generate small given large matrix.
 	    gen_small_given_large(prob_matrix_left, gmm);	
       gen_small_given_large(prob_matrix_right, gmm);
-
+      // generate large given small matrix.
 		  gen_large_given_small(initial_prob_left,
 			  	                  prob_matrix_left,
 				  									support_prob_left);
 		  gen_large_given_small(initial_prob_right,
 			  	                  prob_matrix_right,
 				  									support_prob_right);
-		  save_large_given_small(prob_matrix_left,
-		   		                   strcat(file_name[0], "_left_lgs.txt"));
-		  save_large_given_small(prob_matrix_right,
-			 		                   strcat(file_name[1], "_right_lgs.txt"));
+		  // Output for test.
+			if (args > 7)
+			  save_large_given_small(prob_matrix_left, file_name[4]);
 		}
-
-	  find_stable_pixels(disparity_left[i], disparity_right[i],
+		find_stable_pixels(disparity_left[i], disparity_right[i],
 		  	 occlusion_left[i], occlusion_right[i]);
+	  
+		refinement(i);
+
 	}
-    refinement(disparity_left[0], disparity_right[0],
-		occlusion_left[0], occlusion_right[0]);
-    median_filter(disparity_left[0]);
-    median_filter(disparity_right[0]);
 
     save_image(file_name[2], disparity_left[0], scale);
     save_image(file_name[3], disparity_right[0], scale);

@@ -16,7 +16,10 @@ inline int dcmp(double a, double b) {
 }
 
 void save_large_given_small(Grid<double>& prob_matrix,
-		                        const char* path) {
+		                        const char* dataset) {
+	char path[100] = "all_large_given_small/";
+  strcat(path, dataset);
+	strcat(path, "_LgS.txt");
   FILE* file = fopen(path, "w");
 	for (int i = 0; i < prob_matrix.height; ++i) {
 	  for (int j = 0; j < prob_matrix.width; ++j) {
@@ -112,7 +115,6 @@ void gen_large_given_small (Array1<double>& initial_prob,
 			}
 		}
 	}
-	save_large_given_small(prob_matrix, "no_norm_lgs.txt");
 	prob_matrix.normalize(2);
 }
 
