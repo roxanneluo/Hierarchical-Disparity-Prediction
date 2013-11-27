@@ -87,10 +87,10 @@ void build_tree(Array3<type>& left,
   // Build graph.
 	left_graph.collect_edges_edgeaware(left, occ_left);
 	right_graph.collect_edges_edgeaware(right, occ_right);
-	left_graph.build_MST();
-	right_graph.build_MST();
-	// left_graph.build_RandTree(true);
-	// right_graph.build_RandTree(true);
+	// left_graph.build_MST();
+	// right_graph.build_MST();
+	left_graph.build_RandTree(true);
+	right_graph.build_RandTree(true);
 
 	// Build forests.
   forest_left.init(left_graph);
