@@ -24,7 +24,7 @@ void save_large_given_small(Grid<double>& prob_matrix,
   FILE* file = fopen(path, "w");
 	for (int i = 0; i < prob_matrix.height; ++i) {
 	  for (int j = 0; j < prob_matrix.width; ++j) {
-		  fprintf(file, "%.6lf ", prob_matrix[i][j]);
+		  fprintf(file, "%.9lf ", prob_matrix[i][j]);
 		}
 		fprintf(file, "\n");
 	}
