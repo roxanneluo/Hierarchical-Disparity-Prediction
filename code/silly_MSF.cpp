@@ -6,7 +6,6 @@
 #include "iomanager.h"
 #include "timekeeper.h"
 #include "refinement.h"
-//#include "imageresult.h"
 #include "MSF.h"
 #include "filter.h"
 #include "algorithm"

@@ -8,6 +8,7 @@ DATASETS = (
 	'Middlebury_others',
 )
 
+
 algorithm = 'MSF'
 
 left_result = 'MSF_left.pgm'
