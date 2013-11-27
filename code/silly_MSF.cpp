@@ -192,10 +192,10 @@ int main(int args, char ** argv) {
 		disparity_computation(forest_left[i], forest_right[i],
 				cost_left, cost_right, disparity_left[i], disparity_right[i]);
 	  
-// 		find_stable_pixels(disparity_left[i], disparity_right[i],
-// 		  	 occlusion_left[i], occlusion_right[i]);
+ 		find_stable_pixels(disparity_left[i], disparity_right[i],
+ 		  	 occlusion_left[i], occlusion_right[i]);
 	  
-// 		refinement(i);
+ 		refinement(i);
 		
 		// disparity prediction model
 		if (!is_lowest_layer) {
@@ -206,10 +206,10 @@ int main(int args, char ** argv) {
 		  gen_initial_prob(disparity_right[i], initial_prob_right, max_disparity / pi[i]);
 			
 		  prob_matrix_left.reset(max_disparity / pi[i] + 1,
-			  	                   max_disparity / pi[i] * 2 - 1);
+			  	                   max_disparity / pi[i - 1] + 1);
 
 		  prob_matrix_right.reset(max_disparity / pi[i] + 1,
-			  	                    max_disparity / pi[i] * 2 - 1);
+			  	                    max_disparity / pi[i - 1] + 1);
       // generate small given large matrix.
 	    gen_small_given_large(prob_matrix_left, gmm);	
       gen_small_given_large(prob_matrix_right, gmm);
@@ -224,10 +224,10 @@ int main(int args, char ** argv) {
 			if (args > 7)
 			  save_large_given_small(prob_matrix_left, file_name[4]);
 		}
-		find_stable_pixels(disparity_left[i], disparity_right[i],
-		  	 occlusion_left[i], occlusion_right[i]);
+//		find_stable_pixels(disparity_left[i], disparity_right[i],
+//		  	 occlusion_left[i], occlusion_right[i]);
 	  
-		refinement(i);
+//		refinement(i);
 
 	}
 
