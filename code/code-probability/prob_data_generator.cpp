@@ -16,7 +16,7 @@
 using namespace std;
 
 
-const int level = 3;
+const int level = 2;
 int contract = 2;
 int max_disparity = 60;
 int scale = 4;
@@ -37,8 +37,8 @@ Grid<unsigned char> left_tree_img, right_tree_img;
 */
 
 char prefix[300] = "MST_";
-char file_name[2][300] =
-    {"left.ppm", "right.ppm"};
+char file_name[4][300] =
+    {"left.ppm", "right.ppm","displeft.pgm","dispright.pgm"};
 char save_file_name[50];
 
 template <class type>
@@ -67,7 +67,7 @@ void find_disparity() {
     }
 
 
-	for (int i = level - 1; i >= 0; --i) {
+	for (int i = level - 1; i >= 1; --i) {
 		bool is_highest_layer = (i == level - 1) ? true : false;
 
         Array3<double> cost_left, cost_right;
@@ -89,10 +89,10 @@ void find_disparity() {
              occlusion_left[i], occlusion_right[i]);
 	}
 
-	refinement(disparity_left[0], disparity_right[0], occlusion_left[0], occlusion_right[0],
+	/*refinement(disparity_left[0], disparity_right[0], occlusion_left[0], occlusion_right[0],
                    forest_left[0], forest_right[0]);
     median_filter(disparity_left[0]);
-    median_filter(disparity_right[0]);
+    median_filter(disparity_right[0]);*/
 }
 
 float *pd;
@@ -101,16 +101,16 @@ int **cnt;
  *  pr[di]
  */
 void gen_pd(int index) {
-    int disparity = max_disparity/pi[index];
+    int disparity = max_disparity/pi[index]; 
     gen_pd(pd, disparity_left[index], disparity_right[index], disparity);
-    char pd_prefix[100];
+		char pd_prefix[100];
     strcpy(pd_prefix, prefix);
     strcat(pd_prefix, "_pd");
     save_pd(get_file_name(save_file_name, pd_prefix, index, ".txt"), pd, disparity);
 }
 
 void cnt_small_large(int small_i, int large_i) {
-    cnt_small_large(cnt, disparity_left[small_i], disparity_left[small_i],
+    cnt_small_large(cnt, disparity_left[small_i], disparity_right[small_i],
                         disparity_left[large_i], disparity_right[large_i],
                         max_disparity/pi[small_i], max_disparity/pi[large_i]);
 
@@ -119,6 +119,7 @@ void cnt_small_large(int small_i, int large_i) {
     strcat(cnt_prefix, "_cnt");
     save_small_large(cnt, get_file_name(save_file_name, cnt_prefix, small_i, large_i,".txt"),
                         max_disparity/pi[small_i], max_disparity/pi[large_i]);
+
 }
 
 int main(int args, char ** argv) {
@@ -133,16 +134,29 @@ int main(int args, char ** argv) {
     if (args > 4) {
         scale = atoi(argv[4]);
     }
-    if (args > 6) {
+    if (args > 5) {
         strcpy(prefix, argv[5]);
-        int len = strlen(prefix);
-        prefix[len-8] = '\0';
-        strcat(prefix, "_MST");
     }
+		if (args > 7) {
+			strcpy(file_name[2],argv[6]);
+			strcpy(file_name[3],argv[7]);
+		}
 
     try {
         load_image(file_name[0], rgb_left[0]);
         load_image(file_name[1], rgb_right[0]);
+				load_image_gray(file_name[2], disparity_left[0]);
+				load_image_gray(file_name[3], disparity_right[0]);
+				for (int i = 0; i < disparity_left[0].height; ++i) {
+				  for (int j = 0; j < disparity_left[0].width; ++j) {
+					  disparity_left[0][i][j] /= scale;
+						disparity_right[0][i][j] /= scale;
+					  if (disparity_left[0][i][j] >= max_disparity)
+							disparity_left[0][i][j] = max_disparity - 1;
+						if (disparity_right[0][i][j] >= max_disparity)
+							disparity_right[0][i][j] = max_disparity - 1;
+					}
+				}
     } catch (...) {
         puts("Error loading file");
         return 0;
@@ -154,10 +168,12 @@ int main(int args, char ** argv) {
 	}
 
     find_disparity();
-    pd = new float[max_disparity+1];
-    for (int i = 0; i < level; ++i) {
+
+		pd = new float[max_disparity+1];
+    for (int i = 1; i < level; ++i) {
         gen_pd(i);
-    }
+		}
+
     cnt = new int*[max_disparity/pi[1]+1];
     for (int i = 0; i < max_disparity/pi[1]+1; ++i)
         cnt[i] = new int[max_disparity+1];
@@ -166,11 +182,11 @@ int main(int args, char ** argv) {
     for (int j = i+1; j < level; ++j) {
         cnt_small_large(j,i);
     }
-
+/*
     delete [] pd;
     for (int i = 0; i < max_disparity/pi[1]+1; ++i)
         delete [] cnt[i];
     delete [] cnt;
-
+*/
     return 0;
 }

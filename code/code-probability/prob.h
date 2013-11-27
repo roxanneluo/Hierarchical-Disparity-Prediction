@@ -67,7 +67,7 @@ void gen_pd(float *pd, Grid<type> &support_left, Grid<type> &support_right, int 
 
     cnt_disp(pd, support_left, scale);
     cnt_disp(pd, support_right, scale);
-    int size = support_left.width*support_left.height;
+	 	int size = support_left.width*support_left.height;
     for (int i = 0; i < max_disparity+1; ++i) {
         pd[i] /= 2*size;
     }
@@ -79,4 +79,5 @@ void save_pd(const char * file_name, float * pd, int disparity) {
         fprintf(file, "%f\n", pd[i]);
     fclose(file);
 }
+
 #endif // _PROBABILITY_
