@@ -50,7 +50,7 @@ void compute_first_cost (Array3<double> &cost_left, Array3<double> &cost_right,
 	cost_left.reset(max_disparity, H=rgb_left.height, W=rgb_left.width);
 	cost_right.reset(max_disparity, rgb_left.height, rgb_left.width); // assume left and right rgb image has the exact same size;
 	double max_gradient_color_difference= 2.0;
-	double max_color_difference = 7.0;
+	double max_color_difference = 10.0;
 	double weight_on_color = 0.11;
 	for (int d = 0; d < max_disparity; ++d)
 		for (int x = 0; x < H; ++x)
