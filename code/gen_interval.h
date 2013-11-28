@@ -18,7 +18,7 @@ inline int dcmp(double a, double b) {
 
 void save_large_given_small(Grid<double>& prob_matrix,
 		                        const char* dataset) {
-	char path[100] = "all_large_given_small/";
+	char path[100] = "even_old_all_large_given_small_no_ref/";
   strcat(path, dataset);
 	strcat(path, "_LgS.txt");
   FILE* file = fopen(path, "w");
@@ -49,12 +49,38 @@ void gen_support_prob(Grid<unsigned char>& support,
 	// normalize
 	support_prob.normalize();
 	// add noise
-	support_prob.addNoise(0.03);
+	support_prob.addNoise(0.05);
   // for (int i = 0; i < support_prob.length; ++i) {
 	//   printf("%d %.5lf\n", i, support_prob[i]);
 	// }
 }
 
+void gen_support_prob(Grid<unsigned char>& support_left,
+		                  Grid<unsigned char>& support_right,
+		                  Array1<double>& support_prob,
+											int max_disparity) {
+	support_prob.zero();
+	int W = support_left.width, H = support_left.height;
+	int d;
+	for (int i = 0; i < H; ++i) {
+	  for (int j = 0; j < W; ++j) {
+		  d = support_left[i][j];
+			if (d != 0) {
+				if (d <= max_disparity)
+					support_prob[d] += 1.0;
+			}
+			d = support_right[i][j];
+			if (d != 0) {
+			  if (d <= max_disparity)
+					support_prob[d] += 1.0;
+			}
+		}
+	}
+	// normalize
+	support_prob.normalize();
+	// add noise
+	support_prob.addNoise(0.05);
+}
 void gen_initial_prob(Grid<unsigned char>& initial_d,
 		                  Array1<double>& initial_prob,
 											int max_disparity) {
@@ -74,11 +100,32 @@ void gen_initial_prob(Grid<unsigned char>& initial_d,
 	//   printf("%d %.5lf\n", i, initial_prob[i]);
 	// }
 }
-
+void gen_initial_prob(Grid<unsigned char>& initial_d_left,
+		                  Grid<unsigned char>& initial_d_right,
+		                  Array1<double>& initial_prob,
+											int max_disparity) {
+  initial_prob.zero();
+	int W = initial_d_left.width, H = initial_d_left.height;
+	int d;
+	for (int i = 0; i < H; ++i) {
+	  for (int j = 0; j < W; ++j) {
+			d = initial_d_left[i][j];
+			if (d <= max_disparity)
+				initial_prob[d] += 1.0;
+			d = initial_d_right[i][j];
+			if (d <= max_disparity)
+				initial_prob[d] += 1.0;
+		}
+	}
+	// normalize
+  initial_prob.normalize();
+	// for (int i = 0; i < initial_prob.length; ++i) {
+	//   printf("%d %.5lf\n", i, initial_prob[i]);
+	// }
+}
 // prob_matrix(initial_d_max + 1, initial_d_max * 2 - 1)
-vector<double> read_prob_matrix (char* path) {
+void read_prob_matrix (char* path, vector<double>& gmm) {
 	FILE* file = fopen(path, "r");
-	vector<double> gmm;
 	double tmp;
 	while (fscanf(file, "%lf", &tmp) == 1) {
 	  gmm.push_back(tmp);
@@ -86,7 +133,22 @@ vector<double> read_prob_matrix (char* path) {
 	}
 	// prob_matrix.reset(prob.size(), prob.size() * 2 - 1);
 	fclose(file);
-	return gmm;
+}
+
+void read_prob_matrix (char* path0,
+		                   char* path1,
+											 vector<double>& gmm0,
+											 vector<double>& gmm1) {
+  FILE * file = fopen(path0, "r");
+	double tmp;
+	while(fscanf(file, "%lf", &tmp) == 1) {
+	  gmm0.push_back(tmp);
+	}
+  fclose(file);
+	file = fopen(path1, "r");
+	while(fscanf(file, "%lf", &tmp) == 1) {
+	  gmm1.push_back(tmp);
+	}
 }
 
 void gen_small_given_large (Grid<double>& prob_matrix,
@@ -102,6 +164,23 @@ void gen_small_given_large (Grid<double>& prob_matrix,
 	}
 }
 
+void gen_small_given_large (Grid<double>& prob_matrix,
+		                        const vector<double>& gmm0,
+														const vector<double>& gmm1) {
+  prob_matrix.zero();
+	for (int j = 0; j < prob_matrix.width; j += 2) {
+	  for (int i = 1; j / 2 - i >= 0; ++i)
+			prob_matrix[j / 2 - i][j] = gmm0[gmm0.size() / 2 - i];
+		for (int i = 0; j / 2 + i < prob_matrix.height; ++i)
+			prob_matrix[j / 2 + i][j] = gmm0[gmm0.size() / 2 + i];
+	}
+	for (int j = 1; j < prob_matrix.width; j += 2) {
+	  for (int i = 1; j / 2 - i >= 0; ++i)
+			prob_matrix[j / 2 - i][j] = gmm1[gmm1.size() / 2 - i];
+		for (int i = 0; j / 2 + i < prob_matrix.height; ++i)
+			prob_matrix[j / 2 + i][j] = gmm1[gmm1.size() / 2 + i];
+	}
+}
 void gen_large_given_small (Array1<double>& initial_prob,
 		                  Grid<double>& prob_matrix,
 											Array1<double>& support_prob) {

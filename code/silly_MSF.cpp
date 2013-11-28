@@ -165,10 +165,13 @@ int main(int args, char ** argv) {
 
 	support_prob_left.reset(max_disparity + 1);
 	support_prob_right.reset(max_disparity + 1);
-	gen_support_prob(sm.support_left_map, support_prob_left, max_disparity);
-	gen_support_prob(sm.support_right_map, support_prob_right, max_disparity);
-
-	vector<double> gmm = read_prob_matrix("gmm");
+	// gen_support_prob(sm.support_left_map, support_prob_left, max_disparity);
+	// gen_support_prob(sm.support_right_map, support_prob_right, max_disparity);
+  gen_support_prob(sm.support_left_map, sm.support_right_map, support_prob_left, max_disparity);	
+	vector<double> gmm0, gmm1;
+	// vector<double> gmm;
+	// read_prob_matrix("gmm", gmm);
+  read_prob_matrix("bin/gmm0", "bin/gmm1", gmm0, gmm1);
 
 	for (int i = level - 1; i >= 0; --i) {
 		bool is_highest_layer = (i == level - 1) ? true : false;
@@ -193,41 +196,34 @@ int main(int args, char ** argv) {
 				cost_left, cost_right, disparity_left[i], disparity_right[i]);
 	  
  		find_stable_pixels(disparity_left[i], disparity_right[i],
- 		  	 occlusion_left[i], occlusion_right[i]);
+ 		   	 occlusion_left[i], occlusion_right[i]);
 	  
- 		refinement(i);
+ 		// refinement(i);
 		
 		// disparity prediction model
 		if (!is_lowest_layer) {
 		  initial_prob_left.reset(max_disparity / pi[i] + 1);
-		  initial_prob_right.reset(max_disparity / pi[i] + 1);
 			// generate initial prob vector for level i + 1.
-      gen_initial_prob(disparity_left[i], initial_prob_left, max_disparity / pi[i]);
-		  gen_initial_prob(disparity_right[i], initial_prob_right, max_disparity / pi[i]);
-			
+      // gen_initial_prob(disparity_left[i], initial_prob_left, max_disparity / pi[i]);
+		  // gen_initial_prob(disparity_right[i], initial_prob_right, max_disparity / pi[i]);
+			gen_initial_prob(disparity_left[i], disparity_right[i], initial_prob_left, max_disparity / pi[i]);
+	
 		  prob_matrix_left.reset(max_disparity / pi[i] + 1,
 			  	                   max_disparity / pi[i - 1] + 1);
-
-		  prob_matrix_right.reset(max_disparity / pi[i] + 1,
-			  	                    max_disparity / pi[i - 1] + 1);
       // generate small given large matrix.
-	    gen_small_given_large(prob_matrix_left, gmm);	
-      gen_small_given_large(prob_matrix_right, gmm);
-      // generate large given small matrix.
+	    // gen_small_given_large(prob_matrix_left, gmm);	
+      gen_small_given_large(prob_matrix_left, gmm0, gmm1);
+			// generate large given small matrix.
 		  gen_large_given_small(initial_prob_left,
 			  	                  prob_matrix_left,
 				  									support_prob_left);
-		  gen_large_given_small(initial_prob_right,
-			  	                  prob_matrix_right,
-				  									support_prob_right);
-		  // Output for test.
+		  prob_matrix_right.copy(prob_matrix_left);
+			// Output for test.
 			if (args > 7)
 			  save_large_given_small(prob_matrix_left, file_name[4]);
 		}
-//		find_stable_pixels(disparity_left[i], disparity_right[i],
-//		  	 occlusion_left[i], occlusion_right[i]);
-	  
-//		refinement(i);
+
+		refinement(i);
 
 	}
 
