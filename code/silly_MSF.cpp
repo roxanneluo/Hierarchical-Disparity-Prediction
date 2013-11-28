@@ -39,7 +39,7 @@ Grid<unsigned char> left_tree_img, right_tree_img;
 Array1<double> support_prob_left, support_prob_right;
 Array1<double> initial_prob_left, initial_prob_right;
 Grid<double> prob_matrix_left, prob_matrix_right;
-
+Grid<int> interval;
 /*
 void draw_tree() {
   int times = 3;
@@ -168,11 +168,10 @@ int main(int args, char ** argv) {
 	// gen_support_prob(sm.support_left_map, support_prob_left, max_disparity);
 	// gen_support_prob(sm.support_right_map, support_prob_right, max_disparity);
   gen_support_prob(sm.support_left_map, sm.support_right_map, support_prob_left, max_disparity);	
-	vector<double> gmm0, gmm1;
-	// vector<double> gmm;
-	// read_prob_matrix("gmm", gmm);
-  read_prob_matrix("bin/gmm0", "bin/gmm1", gmm0, gmm1);
-
+	
+	Array1<double> gmm;
+	// Array1<double> gmm0, gmm1; 
+	
 	for (int i = level - 1; i >= 0; --i) {
 		bool is_highest_layer = (i == level - 1) ? true : false;
     bool is_lowest_layer = (i == 0) ? true : false;
@@ -195,10 +194,10 @@ int main(int args, char ** argv) {
 		disparity_computation(forest_left[i], forest_right[i],
 				cost_left, cost_right, disparity_left[i], disparity_right[i]);
 	  
- 		find_stable_pixels(disparity_left[i], disparity_right[i],
- 		   	 occlusion_left[i], occlusion_right[i]);
-	  
- 		// refinement(i);
+    find_stable_pixels(disparity_left[i], disparity_right[i],
+ 	      occlusion_left[i], occlusion_right[i]);
+	 
+ 	  refinement(i);
 		
 		// disparity prediction model
 		if (!is_lowest_layer) {
@@ -207,12 +206,18 @@ int main(int args, char ** argv) {
       // gen_initial_prob(disparity_left[i], initial_prob_left, max_disparity / pi[i]);
 		  // gen_initial_prob(disparity_right[i], initial_prob_right, max_disparity / pi[i]);
 			gen_initial_prob(disparity_left[i], disparity_right[i], initial_prob_left, max_disparity / pi[i]);
-	
+
+			save_initial_cnt(initial_prob_left, file_name[4]);
+
+      initial_prob_left.normalize();
+
 		  prob_matrix_left.reset(max_disparity / pi[i] + 1,
 			  	                   max_disparity / pi[i - 1] + 1);
-      // generate small given large matrix.
-	    // gen_small_given_large(prob_matrix_left, gmm);	
-      gen_small_given_large(prob_matrix_left, gmm0, gmm1);
+      
+			// generate small given large matrix.
+	    gen_small_given_large(prob_matrix_left, gmm);	
+      // gen_small_given_large(prob_matrix_left, gmm0, gmm1);
+			
 			// generate large given small matrix.
 		  gen_large_given_small(initial_prob_left,
 			  	                  prob_matrix_left,
@@ -221,10 +226,16 @@ int main(int args, char ** argv) {
 			// Output for test.
 			if (args > 7)
 			  save_large_given_small(prob_matrix_left, file_name[4]);
+			
+			interval.reset(prob_matrix_left.height, 2);
+      // gen_interval(prob_matrix_left, interval, 0.01);
+      gen_interval_mid(prob_matrix_left, interval, 0.001);
+			save_interval(interval, file_name[4]);
 		}
-
-		refinement(i);
-
+    
+		// find_stable_pixels(disparity_left[i], disparity_right[i],
+ 		//    	 occlusion_left[i], occlusion_right[i]);
+	  // refinement(i);
 	}
 
     save_image(file_name[2], disparity_left[0], scale);

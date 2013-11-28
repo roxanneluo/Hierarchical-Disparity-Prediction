@@ -36,7 +36,15 @@ public:
 		}
 	}
 	type & operator[] (int index) { return array[index]; }
-  void zero() {
+  Array1<type> operator - (Array1<type>& a) {
+	  assert(a.length == length);
+		Array1<type> ans(length);
+		for (int i = 0; i < length; ++i) {
+		  ans[i] = array[i] - a[i];
+		}
+		return ans;
+	}
+	void zero() {
 	  for (int i = 0; i < length; ++i) {
 		  array[i] = 0;
 		}
@@ -68,7 +76,7 @@ public:
         for (int i = 0; i < length; ++i) {
             if (array[i] == 0.0) {
                 noise = distribution(generator);
-                array[i] += (noise > 0)? noise:0;
+                array[i] += (noise > 0)? noise : 0;
             }
         }
         normalize();
