@@ -8,17 +8,17 @@
 #include "timekeeper.h"
 #include "filter.h"
 #include "filename.h"
-
+#include "normrnd.h"
 
 inline int dcmp(double a, double b) {
-  if (a - b > 1e-8) return 1;
-	if (a - b < -1e-8) return -1;
+  if (a - b > 1e-9) return 1;
+	if (a - b < -1e-9) return -1;
 	return 0;
 }
 
 void save_large_given_small(Grid<double>& prob_matrix,
 		                        const char* dataset) {
-	char path[100] = "even_old_all_large_given_small_no_ref/";
+	char path[100] = "large_given_small_ref_2_gmm/";
   strcat(path, dataset);
 	strcat(path, "_LgS.txt");
   FILE* file = fopen(path, "w");
@@ -30,7 +30,17 @@ void save_large_given_small(Grid<double>& prob_matrix,
 	}
 	fclose(file);
 }
-
+void save_initial_cnt(Array1<double>& initial_prob,
+											char* dataset) {
+	char path[100] = "all_prob_gen/Prob_Gen";
+	strcat(path, dataset);
+	strcat(path, "__cnt_c++.txt");
+	FILE* file = fopen(path, "w");
+	for (int i = 0; i < initial_prob.length; ++i)
+		fprintf(file, "%.5lf ", initial_prob[i]);
+	fprintf(file, "\n");
+	fclose(file);	
+}
 void gen_support_prob(Grid<unsigned char>& support,
 		                  Array1<double>& support_prob,
 											int max_disparity) {
@@ -42,7 +52,7 @@ void gen_support_prob(Grid<unsigned char>& support,
 		  d = support[i][j];
 			if (d != 0) {
 				if (d <= max_disparity)
-					support_prob[d] += 1.0;
+					support_prob[d]++;
 			}
 		}
 	}
@@ -67,12 +77,12 @@ void gen_support_prob(Grid<unsigned char>& support_left,
 		  d = support_left[i][j];
 			if (d != 0) {
 				if (d <= max_disparity)
-					support_prob[d] += 1.0;
+					support_prob[d]++;
 			}
 			d = support_right[i][j];
 			if (d != 0) {
 			  if (d <= max_disparity)
-					support_prob[d] += 1.0;
+					support_prob[d]++;
 			}
 		}
 	}
@@ -91,7 +101,7 @@ void gen_initial_prob(Grid<unsigned char>& initial_d,
 	  for (int j = 0; j < W; ++j) {
 			d = initial_d[i][j];
 			if (d <= max_disparity)
-				initial_prob[d] += 1.0;
+				initial_prob[d]++;
 		}
 	}
 	// normalize
@@ -111,17 +121,14 @@ void gen_initial_prob(Grid<unsigned char>& initial_d_left,
 	  for (int j = 0; j < W; ++j) {
 			d = initial_d_left[i][j];
 			if (d <= max_disparity)
-				initial_prob[d] += 1.0;
+				initial_prob[d]++;
 			d = initial_d_right[i][j];
 			if (d <= max_disparity)
-				initial_prob[d] += 1.0;
+				initial_prob[d]++;
 		}
 	}
 	// normalize
-  initial_prob.normalize();
-	// for (int i = 0; i < initial_prob.length; ++i) {
-	//   printf("%d %.5lf\n", i, initial_prob[i]);
-	// }
+  // initial_prob.normalize();
 }
 // prob_matrix(initial_d_max + 1, initial_d_max * 2 - 1)
 void read_prob_matrix (char* path, vector<double>& gmm) {
@@ -148,7 +155,9 @@ void read_prob_matrix (char* path0,
 	file = fopen(path1, "r");
 	while(fscanf(file, "%lf", &tmp) == 1) {
 	  gmm1.push_back(tmp);
+//		cout << tmp << endl;
 	}
+	fclose(file);
 }
 
 void gen_small_given_large (Grid<double>& prob_matrix,
@@ -160,6 +169,20 @@ void gen_small_given_large (Grid<double>& prob_matrix,
 		}
 	  for (int i = 0; j / 2 + i < prob_matrix.height; ++i) {
 		  prob_matrix[j / 2 + i][j] = gmm[gmm.size() / 2 + i];
+		}
+	}
+}
+
+void gen_small_given_large (Grid<double>& prob_matrix,
+		                        Array1<double>& gmm) {
+	prob_matrix.zero();
+	genGMM(gmm);
+	for (int j = 0; j < prob_matrix.width; ++j) {
+		for (int i = 1; j / 2 - i >= 0; ++i) {
+		  prob_matrix[j / 2 - i][j] = gmm[gmm.length / 2 - i];
+		}
+	  for (int i = 0; j / 2 + i < prob_matrix.height; ++i) {
+		  prob_matrix[j / 2 + i][j] = gmm[gmm.length / 2 + i];
 		}
 	}
 }
@@ -180,6 +203,28 @@ void gen_small_given_large (Grid<double>& prob_matrix,
 		for (int i = 0; j / 2 + i < prob_matrix.height; ++i)
 			prob_matrix[j / 2 + i][j] = gmm1[gmm1.size() / 2 + i];
 	}
+  //  save_large_given_small(prob_matrix, "initial");
+}
+
+void gen_small_given_large (Grid<double>& prob_matrix,
+		                        Array1<double>& gmm0,
+														Array1<double>& gmm1) {
+  prob_matrix.zero();
+	genGMM(gmm0, 0);
+	genGMM(gmm1, 1);
+	for (int j = 0; j < prob_matrix.width; j += 2) {
+	  for (int i = 1; j / 2 - i >= 0; ++i)
+			prob_matrix[j / 2 - i][j] = gmm0[gmm0.length / 2 - i];
+		for (int i = 0; j / 2 + i < prob_matrix.height; ++i)
+			prob_matrix[j / 2 + i][j] = gmm0[gmm0.length / 2 + i];
+	}
+	for (int j = 1; j < prob_matrix.width; j += 2) {
+	  for (int i = 1; j / 2 - i >= 0; ++i)
+			prob_matrix[j / 2 - i][j] = gmm1[gmm1.length / 2 - i];
+		for (int i = 0; j / 2 + i < prob_matrix.height; ++i)
+			prob_matrix[j / 2 + i][j] = gmm1[gmm1.length / 2 + i];
+	}
+	// save_large_given_small(prob_matrix, "initial");
 }
 void gen_large_given_small (Array1<double>& initial_prob,
 		                  Grid<double>& prob_matrix,
@@ -187,7 +232,7 @@ void gen_large_given_small (Array1<double>& initial_prob,
   int W = support_prob.length, H = initial_prob.length;
   for (int i = 0 ; i < H; ++i) {
 	  for (int j = 0; j < W; ++j) {
-		  if (dcmp(initial_prob[i], 0) == 0) {
+		  if (dcmp(initial_prob[i], 0) == 0 /*initial_prob[i] == 0.0*/) {
 			  prob_matrix[i][j] = 0;
 			} else {
 				prob_matrix[i][j] /= initial_prob[i];
@@ -199,8 +244,8 @@ void gen_large_given_small (Array1<double>& initial_prob,
 }
 
 int gen_interval(Grid<double>& prob_matrix,
-		              Grid<int>& interval,
-									double threshold) {
+		             Grid<int>& interval,
+								 double threshold) {
   // interval[initial_max_disparity][2]
   // interval[d][0]: lower boundary of possible interval.
   // interval[d][1]: upper boundary of possible interval.	
@@ -215,13 +260,33 @@ int gen_interval(Grid<double>& prob_matrix,
 				   j > 0) j--;
 		interval[i][1] = j;
     // wrong interval
+		
 		if (interval[i][0] > interval[i][1]) {
-		  interval[i][0] = -1;
-			interval[i][1] = -1;
+		  interval[i][0] = 0;
+			interval[i][1] = 0;
 			err++;
 		}	
 	}
 	return err;
+}
+
+int gen_interval_mid(Grid<double>& prob_matrix,
+		                 Grid<int>& interval,
+										 double threshold) {
+  double highest;
+	// for (int i = 0; i < prob_matrix.height; ++i)
+}
+
+void save_interval(Grid<int>& interval, char* dataset) {
+
+	char path[300] = "all_interval/";
+  strcat(path, dataset);
+  strcat(path, "_interval.txt");	
+	FILE* file = fopen(path, "w");
+	for (int i = 0; i < interval.height; ++i) {
+	  fprintf(file, "%5d %5d\n", interval[i][0], interval[i][1]);
+	}
+	fclose(file);
 }
 
 #endif
