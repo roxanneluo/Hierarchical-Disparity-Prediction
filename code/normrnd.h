@@ -2,7 +2,7 @@
 #define __NORMRND__
 #include <cmath>
 #include "gridcode.h"
-const double PI = 3.141592653589793;
+const double PI = 3.14159265358979323846264;
 void genGMM(Array1<double> &gmm, int K, double const *mu, double const *sigma, double const *pi) {
     int maxGMMDisp = 60;
     gmm.reset(2*maxGMMDisp+1);
@@ -16,9 +16,18 @@ void genGMM(Array1<double> &gmm, int K, double const *mu, double const *sigma, d
         }
     }
 }
-/*void genGMM(Array1<double> &gmm) {
-    double mu = {}
-}*/
+/**
+%     mu = [0.2071;-2.2668];
+%     Pi = [0.7719;0.2281];
+%     sigma^2 = [0.4155;92.1834];
+**/
+void genGMM(Array1<double> &gmm) {
+    double mu[2] = {0.2071,-2.2668};
+    double pi[2] = {0.7719,0.2281};
+    double sigma[2] = {0.6446, 9.6012};
+    int k = 2;
+    genGMM(gmm,k,mu,sigma,pi);
+}
 /**
 --------------------0-----------------------
     mu = [0.138324438;7.344032560];
