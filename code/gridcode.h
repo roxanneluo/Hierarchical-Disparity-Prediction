@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <random>
 #include <ctime>
+#include "mylib.h"
 // this code is meant for memory management
 
 #define PADDING 10
@@ -35,8 +36,7 @@ public:
 			array = NULL;
 		}
 	}
-	type & operator[] (int index) { return array[index]; }
-  Array1<type> operator - (Array1<type>& a) {
+	Array1<type> operator - (Array1<type>& a) {
 	  assert(a.length == length);
 		Array1<type> ans(length);
 		for (int i = 0; i < length; ++i) {
@@ -44,7 +44,9 @@ public:
 		}
 		return ans;
 	}
-	void zero() {
+
+	type & operator[] (int index) { return array[index]; }
+  void zero() {
 	  for (int i = 0; i < length; ++i) {
 		  array[i] = 0;
 		}
@@ -69,14 +71,24 @@ public:
 	}
 
 	void addNoise(double sigma) {
+	    double err = 1e-9;
 	    unsigned seed = time(NULL);
         default_random_engine generator (seed);
         normal_distribution<double> distribution (0.0,sigma);
+        int left = 0, right = length-1;
+        while (left<length && array[left]<err) ++left;
+        while (right >= 0 && array[right]<err) --right;
+        for (int d = 1; d <= 2; ++d) {
+            if (left-d>=0)
+                array[left-d] += mylib::ABS(distribution(generator));
+            if (right+d<length)
+                array[right+d] += mylib::ABS(distribution(generator));
+        }
         double noise = 0;
-        for (int i = 0; i < length; ++i) {
-            if (array[i] == 0.0) {
+        for (int i = left; i <= right; ++i) {
+            if (array[i] < err) {
                 noise = distribution(generator);
-                array[i] += (noise > 0)? noise : 0;
+                array[i] += (noise > 0)? noise:0;
             }
         }
         normalize();
