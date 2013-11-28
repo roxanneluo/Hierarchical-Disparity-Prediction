@@ -274,7 +274,32 @@ int gen_interval_mid(Grid<double>& prob_matrix,
 		                 Grid<int>& interval,
 										 double threshold) {
   double highest;
-	// for (int i = 0; i < prob_matrix.height; ++i)
+	int highest_index;
+	for (int i = 0; i < prob_matrix.height; ++i) {
+	  highest = prob_matrix[i][0];
+		highest_index = 0;
+		for (int j = 1; j < prob_matrix.width; ++j) {
+		  if (highest < prob_matrix[i][j]) {
+			  highest = prob_matrix[i][j];
+				highest_index = j;
+			}
+		}
+		if (dcmp(highest, 0.0) == 0) {
+		  interval[i][0] = 0;
+			interval[i][1] = 0;
+		}
+    interval[i][0] = highest_index;
+		interval[i][1] = highest_index;
+
+		while(interval[i][0] > 0 &&
+				  dcmp(prob_matrix[i][interval[i][0]], threshold) == 1) {
+		  interval[i][0]--;
+		}
+		while(interval[i][1] < prob_matrix.width - 1 &&
+				  dcmp(prob_matrix[i][interval[i][1]], threshold) == 1) {
+		  interval[i][1]++;
+		}
+	}
 }
 
 void save_interval(Grid<int>& interval, char* dataset) {
