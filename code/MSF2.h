@@ -1,5 +1,8 @@
+/* This code is for silly_MSF2.cpp 
+    it uses forests3.h
+*/
 #include "gridcode.h"
-#include "forests2.h"
+#include "forests3.h"
 #include "arithmetics.h"
 #include "iomanager.h"
 #include "timekeeper.h"
@@ -71,34 +74,39 @@ void build_tree(Array3<type>& left,
 
 // Build forests for other layers.
 template<class type>
-void build_tree(Array3<type>& left,
+void build_tree_with_interval(Array3<type>& left,
                 Array3<type>& right,
                 Graph& left_graph,
                 Graph& right_graph,
                 Forest& forest_left,
                 Forest& forest_right,
-                Grid<type>& occ_left,
-                Grid<type>& occ_right) {
+                Grid<type>& disp_left, 
+                Grid<type>& disp_right,
+                Grid<int>& interval,
+                double threshold=0.9) {
+
   // Median filter.
   for (int i = 0; i < 3; ++i) {
     median_filter(left[i]);
     median_filter(right[i]);
   }
   // Build graph.
-  left_graph.collect_edges_edgeaware(left, occ_left);
-  right_graph.collect_edges_edgeaware(right, occ_right);
-  // left_graph.build_MST();
-  // right_graph.build_MST();
-  left_graph.build_RandTree(true);
-  right_graph.build_RandTree(true);
+  left_graph.collect_edges_with_interval(left, disp_left, interval);
+  right_graph.collect_edges_with_interval(right, disp_right, interval);
+
+  left_graph.build_tree_with_interval(threshold);
+  right_graph.build_tree_with_interval(threshold);
 
   // Build forests.
   forest_left.init(left_graph);
   forest_right.init(right_graph);
+
   forest_left.order_of_visit();
   forest_right.order_of_visit();
 }
 
+// in disparity_computation, the highest level should use a different method.
+// But i didnt .  Still problems in this part.
 template<class type>
 void disparity_computation(Forest& forest_left,
                            Forest& forest_right,

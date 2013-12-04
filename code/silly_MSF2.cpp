@@ -1,5 +1,6 @@
 /* This code is the implemention 
     of the probability driven algorithm of MSF */
+
 #include <vector>
 #include <cstdlib>
 #include "gridcode.h"
@@ -8,7 +9,7 @@
 #include "iomanager.h"
 #include "timekeeper.h"
 #include "refinement.h"
-#include "MSF.h"
+#include "MSF2.h"
 #include "filter.h"
 #include "algorithm"
 #include "support_match.h"
@@ -188,14 +189,13 @@ int main(int args, char ** argv) {
       compute_first_matching_cost(rgb_left[i], rgb_right[i],
           cost_left, cost_right, disparity_left[i + 1], max_disparity / pi[i]);
       build_tree_with_interval(rgb_left[i], rgb_right[i], graph_left[i], graph_right[i],
-          forest_left[i], forest_right[i], interval
+          forest_left[i], forest_right[i], 
+          disparity_left[i+1], disparity_right[i+1], interval, 
+          0.9 //  the threshold
           );
     }
     disparity_computation(forest_left[i], forest_right[i],
         cost_left, cost_right, disparity_left[i], disparity_right[i]);
-    
-    find_stable_pixels(disparity_left[i], disparity_right[i],
-         occlusion_left[i], occlusion_right[i]);
    
      refinement(i);
     

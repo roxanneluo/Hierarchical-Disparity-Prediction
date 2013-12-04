@@ -1,5 +1,3 @@
-/* This code is written for silly_MSF2.cpp and MSF2.h */
-
 #ifndef FORESTS_CODE_H_OCT_2013
 #define FORESTS_CODE_H_OCT_2013
 #include <cstdlib>
@@ -7,9 +5,11 @@
 #include <algorithm>
 #include <ctime>
 #include <cmath>
-
+#include <vector>
 #include "gridcode.h"
 #include "mylib.h"
+#include "filter.h"
+#define MAX_TOLERANCE 7
 
 const float sigma_const = 255 * 0.1;
 
@@ -17,6 +17,13 @@ class Edge {
 public :
     int a, b; // Node ID
     int weight;
+
+    Edge() {}
+    Edge(const int& aa, const int& bb, const int& ww) {
+      a = aa;
+      b = bb;
+      weight = ww;
+    }
 
     bool operator > (Edge &e) {
         //if (e.a > e.b)  {int temp = e.a; e.a = e.b; e.b = temp;}
@@ -41,11 +48,11 @@ bool smaller_edge(const Edge & a, const Edge &b) {return a.weight < b.weight;}
 
 class MergeSet {
     int n;  int *f;
+public :
     int find(int x) {
         if (x != f[x]) f[x] = find(f[x]);
         return f[x];
     }
-public :
     void init(int x) {
         n = x; f = (int*) malloc((n + 2) * sizeof(int));
         for (int i = 0; i <= n; ++i) f[i] = i;
@@ -58,22 +65,34 @@ public :
     }
 };
 
+class Interval {
+public :
+    int l, r;
+    Interval() : l(0), r(-1)  {}
+    Interval(int a, int b) : l(a), r(b) {}
+    Interval cap(Interval b) {
+        return Interval(mylib::max(l, b.l), mylib::min(r, b.r));
+    }
+    int length() { return r - l + 1; }
+};
+
 class Graph {
 
-    MergeSet mset; // for buiding mst
-    Edge* edges; // all candidate edges  1-based
-
 public :
-		Graph() {}
-		Graph(const Graph& g) {}
+    Edge* edges; // all candidate edges  1-based
+    MergeSet mset; // for buiding mst
+    Graph() {}
+    Graph(const Graph& g) {}
     Edge* trees; // collected tree edges 1-based
     int n, m; // number of nodes and edges
+    int boundary_m;
     int ts; // number of tree edges
     int H, W; // graph info
     int node_number(int x, int y) { return x * W + y + 1; }
     void node_location(int p, int &x, int &y) {--p; x = p / W; y = p % W; }
-
-	template <class type>
+    Interval* itv;
+    
+    template <class type>
     void collect_edges(Array3<type> & rgb) {
         H = rgb.height; W = rgb.width;
         n = H * W;
@@ -91,31 +110,82 @@ public :
                 edges[k].b = node_number(i+p, j+q);
                 edges[k].weight = mylib::max3abs(rgb[0][i][j] - rgb[0][i+p][j+q],
                                      rgb[1][i][j] - rgb[1][i+p][j+q],
-                                     rgb[2][i][j] - rgb[2][i+p][j+q]); // ERROR: max not min
+                                     rgb[2][i][j] - rgb[2][i+p][j+q]); 
             }
-//        cout << k << ' ' << m << endl;
     }
 
-    void build_RandTree() {
-        //std::sort(edges + 1, edges + m + 1, smaller_edge); // this is not good.. a bit lazy
-        srand(time(NULL));
-        std::random_shuffle(edges + 1, edges + m + 1);
-        mset.init(n); ts = 0;
-        for (int i = 1; i <= m; ++i)
+    template <class type>
+    void collect_edges_with_interval(Array3<type> & rgb, Grid<type>& disp, Grid<int>& interval) {
+        H = rgb.height; W = rgb.width;
+        n = H * W;
+        m = 2 * H * W - H - W;
+        edges = (Edge *) malloc((m + 2) * sizeof(Edge));
+        trees = (Edge *) malloc((n + 2) * sizeof(Edge));
+        itv = (Interval *) malloc((n + 2) * sizeof(Interval));
+        for (int i = 0; i < H; ++i)
+        for (int j = 0; j < W; ++j) {
+            itv[node_number(i, j)].l = interval[disp[i/2][j/2]][0];
+            itv[node_number(i, j)].r = interval[disp[i/2][j/2]][1]; 
+            // now this will be fine
+        }
+        int k = 0;
+        for (int i = 0; i < H; ++i)
+        for (int j = 0; j < W; ++j)
+            for (int p = 0; p < 2; ++p)
+            for (int q = 0; q < 2; ++q) if (p + q == 1)
+            if (i + p < H && j + q < W) {
+                int XX = node_number(i, j), YY = node_number(i+p, j+q);
+                if (itv[XX].cap(itv[YY]).length() <= 0) continue;
+                ++k;
+                edges[k].a = XX; edges[k].b = YY;
+                edges[k].weight = mylib::max3abs(rgb[0][i][j] - rgb[0][i+p][j+q],
+                                     rgb[1][i][j] - rgb[1][i+p][j+q],
+                                     rgb[2][i][j] - rgb[2][i+p][j+q]); 
+            }
+    }
+
+    void build_tree_with_interval(double threshold) {
+        std::sort(edges + 1, edges + m + 1, smaller_edge);
+        mset.init(n);
+        ts = 0;
+        for (int i = 1; i <= m; ++i) {
+            Interval t1 = itv[mset.find(edges[i].a)];
+            Interval t2 = itv[mset.find(edges[i].b)];
+            Interval t3 = t1.cap(t2);
+            double tmp = t3.length();
+            printf("XXX"); fflush(stdout);
+            tmp /= (t1.length() + t2.length());
+            printf("YYY"); fflush(stdout);
+            // what this threshold thing ? IDK
+            if ( tmp < threshold ) continue;
             if (mset.merge(edges[i].a, edges[i].b)) {
                 trees[++ts] = edges[i];
-//                cout << ts << endl;
+                itv[mset.find(edges[i].a)] = t3;
             }
-//        for (int i = 1; i <= n; ++i) if (mset.merge(i, 1)) cout << i << endl;
+        }
+    }
+
+    void build_MST() {
+      // printf("THIS IS FOREST2.H\n");
+      std::sort(edges + 1, edges + m + 1, smaller_edge);
+      mset.init(n);
+      ts = 0;
+      for (int i = 1; i <= m; ++i) {
+        if (mset.merge(edges[i].a, edges[i].b)) {
+          trees[++ts] = edges[i];
+        }
+      }
     }
 };
 
+
+
 class TreeNode {
 public :
-	int x, y, id ; // id = its index in an array
-	int ord, up_weight; // the bfs order and the edge weight to parent after direct tree constructed
-	TreeNode() {}
-	TreeNode(int a, int b) : x(a) , y(b) {}
+  int x, y, id ; // id = its index in an array
+  int ord, up_weight; // the bfs order and the edge weight to parent after direct tree constructed
+  TreeNode() {}
+  TreeNode(int a, int b) : x(a) , y(b) {}
     int degree, next_node[4], edge_weight[4];
     void add_edge(int node, int weight) {
         next_node[degree] = node;
@@ -126,17 +196,18 @@ public :
 
 class Forest {
 
-	// static const double sigma_const = 255 * 0.1; // is used in calculation of match cost
+  // static const double sigma_const = 255 * 0.1; // is used in calculation of match cost
 
     int n; // number of tree nodes
     TreeNode * nodes;
     bool * visited;
-	int * order; // the sequence of index, the visiting order of the tree
-	Array3<double> backup; // used in calculate cost on tree
-	double table[256]; // weight table
+  int * order; // the sequence of index, the visiting order of the tree
+  Array3<double> backup; // used in calculate cost on tree
+  double table[256]; // weight table
+    Graph * graph;
 public :
-	  Forest() {}
-		Forest(const Forest& f) {}
+    Forest() {}
+    Forest(const Forest& f) {}
     void init(Graph & g) {
         n = g.n;
 //        cout << "n=" << n << endl;
@@ -153,11 +224,12 @@ public :
             nodes[aa].add_edge(bb, zz);
             nodes[bb].add_edge(aa, zz);
         }
+        graph = & g;
     }
     void order_of_visit(int rootx, int rooty, int W) {
-		order = (int * ) malloc((n + 2) * sizeof(int));
-		for (int i = 1; i <= n; ++i) visited[i] = false;
-		int num = 0;
+    order = (int * ) malloc((n + 2) * sizeof(int));
+    for (int i = 1; i <= n; ++i) visited[i] = false;
+    int num = 0;
 
         int root = rooty*W+rootx+1;
 //            cout << root << endl;
@@ -177,86 +249,133 @@ public :
                 }
             }
         } // end for bfs
-	}
-	void order_of_visit() {
-		order = (int * ) malloc((n + 2) * sizeof(int));
-		for (int i = 1; i <= n; ++i) 
+  }
+  void order_of_visit() {
+    order = (int * ) malloc((n + 2) * sizeof(int));
+    for (int i = 1; i <= n; ++i) 
                 nodes[i].ord = -1;
-		int num = 0;
-		while (1) {
-			int root = -1;
-			for (int i = 1, j = mylib::randint(1, n); i <= n; ++i) {
+    int num = 0;
+    while (1) {
+      int root = -1;
+      for (int i = 1, j = mylib::randint(1, n); i <= n; ++i) {
                 if (nodes[i].ord == -1) { root = i; break; }
                 if (++j > n) j = 1;
             }
-			if (root == -1) break;
-			order[++num] = root;
-			nodes[root].ord = num;
-			nodes[root].up_weight = 0;
-			for (int i = num; i <= num; ++i) { // this is a bfs
-				int t = order[i];
-				for (int j = 0; j < nodes[t].degree; ++j) {
-					int p = nodes[t].next_node[j];
+      if (root == -1) break;
+      order[++num] = root;
+      nodes[root].ord = num;
+      nodes[root].up_weight = 0;
+      for (int i = num; i <= num; ++i) { // this is a bfs
+        int t = order[i];
+        for (int j = 0; j < nodes[t].degree; ++j) {
+          int p = nodes[t].next_node[j];
                     if (nodes[p].ord == -1) {
-						order[++num] = p;
-						nodes[p].ord = num;
-						nodes[p].up_weight = nodes[t].edge_weight[j];
+            order[++num] = p;
+            nodes[p].ord = num;
+            nodes[p].up_weight = nodes[t].edge_weight[j];
                         visited[p] = true;
-					}
-				}
-			} // end for bfs
-		}// end for the while
-	}
-	void update_table(double sigma ) {
-		table[0] = 1;
-		for(int i = 1; i <= 255; i++)
-			table[i] = table[i-1] * exp(-1.0 / sigma);//weight table
-	}
-	void compute_cost_on_tree(Array3<double> & cost, double sigma = 255 * 0.1 ) {
-		update_table(sigma);
-		backup.copy(cost);
-		for (int i = n; i >= 1; --i) {
-			int p = order[i];
-			for (int j = 0; j < nodes[p].degree; ++j) {
-				int q = nodes[p].next_node[j];
-				if (nodes[q].ord < nodes[p].ord) continue; // parent node has smaller order number. q is the child.
+          }
+        }
+      } // end for bfs
+    }// end for the while
+  }
+  void update_table(double sigma ) {
+    table[0] = 1;
+    for(int i = 1; i <= 255; i++)
+      table[i] = table[i-1] * exp(-1.0 / sigma);//weight table
+  }
+
+  void compute_cost_on_tree_with_interval(Array3<double> & cost, double sigma = 255 * 0.1 ) {
+    update_table(sigma);
+    backup.copy(cost);
+    for (int i = n; i >= 1; --i) {
+      int p = order[i];
+      for (int j = 0; j < nodes[p].degree; ++j) {
+        int q = nodes[p].next_node[j];
+        if (nodes[q].ord < nodes[p].ord) continue; // parent node has smaller order number. q is the child.
+        double w = table[nodes[q].up_weight];
+
+        // The possibility model used here :
+        Interval bound = graph->itv[graph->mset.find(graph->node_number(i, j))].cap(Interval(0, cost.array-1));        
+        
+        for (int d = bound.l; d <= bound.r; ++d) {
+          double value_p = backup[d][nodes[p].x][nodes[p].y];
+          double value_q = backup[d][nodes[q].x][nodes[q].y];
+          value_p += w * value_q;
+          backup[d][nodes[p].x][nodes[p].y] = value_p;
+        }
+      }
+    }
+    /*
+    for (int d = 0; d < cost.array; ++d) {
+      cost[d][nodes[order[1]].x][nodes[order[1]].y] = backup[d][nodes[order[1]].x][nodes[order[1]].y];
+    } // ERROR: forgot this part.
+    !!!!!!
+    I dont know if this part is still necessary.
+    But the I shoud reconsider the boundaries.
+    */
+    for (int i = 1; i <= n; ++i) {
+      int p = order[i];
+      for (int j = 0; j < nodes[p].degree; ++j) {
+        int q =  nodes[p].next_node[j];
+        if (nodes[q].ord < nodes[p].ord) continue; // ERROR: Not > but <. q is child
+        // double w = exp(-1.0 * nodes[q].up_weight / sigma_const);
+        double w = table[nodes[q].up_weight];
+        Interval bound = graph->itv[graph->mset.find(graph->node_number(i, j))].cap(Interval(0, cost.array-1));        
+        for (int d = bound.l; d <= bound.r; ++d) {
+          double value_q_current = backup[d][nodes[q].x][nodes[q].y];
+          double value_p = cost[d][nodes[p].x][nodes[p].y];
+          cost[d][nodes[q].x][nodes[q].y] = w * (value_p - w* value_q_current) + value_q_current;
+        }
+      }
+    }
+  } // compute cost on tree
+
+  void compute_cost_on_tree(Array3<double> & cost, double sigma = 255 * 0.1 ) {
+    update_table(sigma);
+    backup.copy(cost);
+    for (int i = n; i >= 1; --i) {
+      int p = order[i];
+      for (int j = 0; j < nodes[p].degree; ++j) {
+        int q = nodes[p].next_node[j];
+        if (nodes[q].ord < nodes[p].ord) continue; // parent node has smaller order number. q is the child.
 //               cout << i <<  ' ' << j << ' ' <<  endl;
-				// double w = exp(-1.0 * nodes[q].up_weight / sigma_const);
-				double w = table[nodes[q].up_weight];
-				for (int d = 0; d < cost.array; ++d) {
+        // double w = exp(-1.0 * nodes[q].up_weight / sigma_const);
+        double w = table[nodes[q].up_weight];
+        for (int d = 0; d < cost.array; ++d) {
 //                    cout << d << ' ' << nodes[p].x << ' ' << nodes[p].y << endl;
-					double value_p = backup[d][nodes[p].x][nodes[p].y];
-					double value_q = backup[d][nodes[q].x][nodes[q].y];
-					value_p += w * value_q;
-					backup[d][nodes[p].x][nodes[p].y] = value_p;
-				}
-			}
-		}
-		for (int d = 0; d < cost.array; ++d) {
-			cost[d][nodes[order[1]].x][nodes[order[1]].y] = backup[d][nodes[order[1]].x][nodes[order[1]].y];
-		} // ERROR: forgot this part.
-		for (int i = 1; i <= n; ++i) {
-			int p = order[i];
-			for (int j = 0; j < nodes[p].degree; ++j) {
-				int q =  nodes[p].next_node[j];
-				if (nodes[q].ord < nodes[p].ord) continue; // ERROR: Not > but <. q is child
-				// double w = exp(-1.0 * nodes[q].up_weight / sigma_const);
-				double w = table[nodes[q].up_weight];
-				for (int d = 0; d < cost.array; ++d) {
-					double value_q_current = backup[d][nodes[q].x][nodes[q].y];
-					double value_p = cost[d][nodes[p].x][nodes[p].y];
-					cost[d][nodes[q].x][nodes[q].y] = w * (value_p - w* value_q_current) + value_q_current;
-				}
-			}
-		}
-	} // compute cost on tree
+          double value_p = backup[d][nodes[p].x][nodes[p].y];
+          double value_q = backup[d][nodes[q].x][nodes[q].y];
+          value_p += w * value_q;
+          backup[d][nodes[p].x][nodes[p].y] = value_p;
+        }
+      }
+    }
+    for (int d = 0; d < cost.array; ++d) {
+      cost[d][nodes[order[1]].x][nodes[order[1]].y] = backup[d][nodes[order[1]].x][nodes[order[1]].y];
+    } // ERROR: forgot this part.
+    for (int i = 1; i <= n; ++i) {
+      int p = order[i];
+      for (int j = 0; j < nodes[p].degree; ++j) {
+        int q =  nodes[p].next_node[j];
+        if (nodes[q].ord < nodes[p].ord) continue; // ERROR: Not > but <. q is child
+        // double w = exp(-1.0 * nodes[q].up_weight / sigma_const);
+        double w = table[nodes[q].up_weight];
+        for (int d = 0; d < cost.array; ++d) {
+          double value_q_current = backup[d][nodes[q].x][nodes[q].y];
+          double value_p = cost[d][nodes[p].x][nodes[p].y];
+          cost[d][nodes[q].x][nodes[q].y] = w * (value_p - w* value_q_current) + value_q_current;
+        }
+      }
+    }
+  } // compute cost on tree
 
     template <class type>
-	void compute_support(Grid<type> &support, double sigma = 255 * 0.1) {
-	    update_table(sigma);
+      void compute_support(Grid<type> &support, double sigma = 255 * 0.1) {
+      update_table(sigma);
         backup.reset(1, support.height, support.width);
 
-	    support[nodes[order[1]].x][nodes[order[1]].y]=backup[0][nodes[order[1]].x][nodes[order[1]].y] = 255;
+      support[nodes[order[1]].x][nodes[order[1]].y]=backup[0][nodes[order[1]].x][nodes[order[1]].y] = 255;
         for (int i = 1; i <= n; ++i) {
             int p = order[i];
             for (int j = 0; j < nodes[p].degree; ++j) {
@@ -267,7 +386,7 @@ public :
                                                 = backup[0][nodes[p].x][nodes[p].y]*table[nodes[q].up_weight];
             }
         }
-	}
+  }
 };
 
 #endif
