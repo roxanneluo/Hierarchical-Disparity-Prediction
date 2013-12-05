@@ -73,7 +73,7 @@ public :
     Interval cap(Interval b) {
         return Interval(mylib::max(l, b.l), mylib::min(r, b.r));
     }
-    int length() { return r - l + 1; }
+    int length() { return r - l + 1; } // Error: Should be r - l - 1;
 };
 
 class Graph {
@@ -119,13 +119,16 @@ public :
         H = rgb.height; W = rgb.width;
         n = H * W;
         m = 2 * H * W - H - W;
-        edges = (Edge *) malloc((m + 2) * sizeof(Edge));
+				edges = (Edge *) malloc((m + 2) * sizeof(Edge));
         trees = (Edge *) malloc((n + 2) * sizeof(Edge));
-        itv = (Interval *) malloc((n + 2) * sizeof(Interval));
-        for (int i = 0; i < H; ++i)
+        
+				itv = (Interval *) malloc((n + 2) * sizeof(Interval));
+       
+			  printf("%d %d\n", interval[disp[0][0]][0], interval[disp[0][0]][1]);	 
+				for (int i = 0; i < H; ++i)
         for (int j = 0; j < W; ++j) {
-            itv[node_number(i, j)].l = interval[disp[i/2][j/2]][0];
-            itv[node_number(i, j)].r = interval[disp[i/2][j/2]][1]; 
+           itv[node_number(i, j)].l = interval[disp[mylib::min(i / 2, disp.height - 1)][mylib::min(j / 2, disp.width - 1)]][0];
+           itv[node_number(i, j)].r = interval[disp[mylib::min(i / 2, disp.height - 1)][mylib::min(j / 2, disp.width - 1)]][1]; 
             // now this will be fine
         }
         int k = 0;
@@ -135,7 +138,10 @@ public :
             for (int q = 0; q < 2; ++q) if (p + q == 1)
             if (i + p < H && j + q < W) {
                 int XX = node_number(i, j), YY = node_number(i+p, j+q);
-                if (itv[XX].cap(itv[YY]).length() <= 0) continue;
+                // if (itv[XX].cap(itv[YY]).length() <= 0) {
+								// 	m--;
+								// 	continue;
+								// }
                 ++k;
                 edges[k].a = XX; edges[k].b = YY;
                 edges[k].weight = mylib::max3abs(rgb[0][i][j] - rgb[0][i+p][j+q],
@@ -145,7 +151,7 @@ public :
     }
 
     void build_tree_with_interval(double threshold) {
-        std::sort(edges + 1, edges + m + 1, smaller_edge);
+        std::sort(edges + 1, edges + m + 1, smaller_edge); // m + 1 ?
         mset.init(n);
         ts = 0;
         for (int i = 1; i <= m; ++i) {
@@ -153,9 +159,9 @@ public :
             Interval t2 = itv[mset.find(edges[i].b)];
             Interval t3 = t1.cap(t2);
             double tmp = t3.length();
-            printf("XXX"); fflush(stdout);
+            // printf("XXX"); fflush(stdout);
             tmp /= (t1.length() + t2.length());
-            printf("YYY"); fflush(stdout);
+            // printf("YYY"); fflush(stdout);
             // what this threshold thing ? IDK
             if ( tmp < threshold ) continue;
             if (mset.merge(edges[i].a, edges[i].b)) {

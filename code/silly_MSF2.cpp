@@ -78,7 +78,8 @@ void refinement(int i) {
   // find_stable_pixels(d_left, d_right, occlusion_left, occlusion_right);
   update_matching_cost(cost_left, cost_right, disparity_left[i], disparity_right[i],
       occlusion_left[i], occlusion_right[i]);
-  forest_left[i].compute_cost_on_tree(cost_left, 255 * 0.05);
+  
+	forest_left[i].compute_cost_on_tree(cost_left, 255 * 0.05);
   forest_right[i].compute_cost_on_tree(cost_right, 255 * 0.05);
   compute_disparity(cost_left, disparity_left[i]);
   compute_disparity(cost_right, disparity_right[i]);
@@ -194,11 +195,13 @@ int main(int args, char ** argv) {
           0.9 //  the threshold
           );
     }
+		
     disparity_computation(forest_left[i], forest_right[i],
         cost_left, cost_right, disparity_left[i], disparity_right[i]);
-   
-     refinement(i);
-    
+    find_stable_pixels(disparity_left[i], disparity_right[i],
+           occlusion_left[i], occlusion_right[i]);
+    refinement(i);
+
     // disparity prediction model
     if (!is_lowest_layer) {
       initial_prob_left.reset(max_disparity / pi[i] + 1);
@@ -207,7 +210,7 @@ int main(int args, char ** argv) {
       // gen_initial_prob(disparity_right[i], initial_prob_right, max_disparity / pi[i]);
       gen_initial_prob(disparity_left[i], disparity_right[i], initial_prob_left, max_disparity / pi[i]);
 
-      save_initial_cnt(initial_prob_left, file_name[4]);
+      // save_initial_cnt(initial_prob_left, file_name[4]);
 
       initial_prob_left.normalize();
 
@@ -224,18 +227,18 @@ int main(int args, char ** argv) {
                             support_prob_left);
       prob_matrix_right.copy(prob_matrix_left);
       // Output for test.
-      if (args > 7)
-        save_large_given_small(prob_matrix_left, file_name[4]);
+      // if (args > 7)
+      //  save_large_given_small(prob_matrix_left, file_name[4]);
       
       interval.reset(prob_matrix_left.height, 2);
       // gen_interval(prob_matrix_left, interval, 0.01);
       gen_interval_mid(prob_matrix_left, interval, 0.001);
-      save_interval(interval, file_name[4]);
+      // save_interval(interval, file_name[4]);
     }
     
     // find_stable_pixels(disparity_left[i], disparity_right[i],
      //       occlusion_left[i], occlusion_right[i]);
-    // refinement(i);
+    // refinement(i);*/
   }
 
     save_image(file_name[2], disparity_left[0], scale);

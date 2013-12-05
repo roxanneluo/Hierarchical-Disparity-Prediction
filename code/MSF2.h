@@ -91,13 +91,18 @@ void build_tree_with_interval(Array3<type>& left,
     median_filter(right[i]);
   }
   // Build graph.
-  left_graph.collect_edges_with_interval(left, disp_left, interval);
+  // printf("XXXXXXXXXXXXXX\n");
+	left_graph.collect_edges_with_interval(left, disp_left, interval);
   right_graph.collect_edges_with_interval(right, disp_right, interval);
-
   left_graph.build_tree_with_interval(threshold);
   right_graph.build_tree_with_interval(threshold);
-
-  // Build forests.
+	
+	// left_graph.collect_edges(left);
+  // right_graph.collect_edges(right);
+	// left_graph.build_MST();
+  // right_graph.build_MST();
+  
+	// Build forests.
   forest_left.init(left_graph);
   forest_right.init(right_graph);
 
