@@ -159,6 +159,7 @@ template <class type>
 void compute_disparity (Array3<double> & cost, Grid<type> &disparity, Grid<type>& pre_disp, Grid<int>& interval) {
 	// something weired in the doc. left right not symetric
 	disparity.reset(cost.height, cost.width);
+	printf("XXXXXXXXXXXXXX");fflush(stdout);
 	for (int i = 0; i < cost.height; ++i)
 		for (int j = 0; j < cost.width; ++j) {
 			int prei = mylib::min(i / 2, pre_disp.height - 1);

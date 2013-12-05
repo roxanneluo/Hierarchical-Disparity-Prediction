@@ -159,9 +159,10 @@ void disparity_computation(Forest& forest_left,
 													 Grid<type>& pre_disp_right,
 													 Grid<int>& interval) {
   // Aggregate matching cost on tree.  
-  forest_left.compute_cost_on_tree(cost_left);
-  forest_right.compute_cost_on_tree(cost_right);
-  
+  // forest_left.compute_cost_on_tree(cost_left);
+  // forest_right.compute_cost_on_tree(cost_right);
+  forest_left.compute_cost_on_tree_with_interval(cost_left);
+	forest_right.compute_cost_on_tree_with_interval(cost_right);
   // Compute disparity.
   compute_disparity(cost_left, disparity_left, pre_disp_left, interval);
   compute_disparity(cost_right, disparity_right, pre_disp_right, interval);
