@@ -43,7 +43,24 @@ void compute_first_matching_cost(Array3<type>& left,
                      pre_disparity_left,
                      max_disparity);
 }
-
+template<class type>
+void compute_first_matching_cost(Array3<type>& left, 
+                                 Array3<type>& right,
+                                 Array3<double>& cost_left,
+                                 Array3<double>& cost_right,
+                                 Grid<type>& pre_disparity_left,
+                                 Grid<int>& interval,
+																 const int& max_disparity) {
+  Grid<float> left_gradient, right_gradient;
+  compute_gradient(left_gradient, left);
+  compute_gradient(right_gradient, right);
+  compute_first_cost(cost_left, cost_right,
+                     left, right,
+                     left_gradient, right_gradient, 
+                     pre_disparity_left,
+										 interval,
+                     max_disparity);
+}
 // Build trees only for the highest layer.
 template<class type>
 void build_tree(Array3<type>& left,

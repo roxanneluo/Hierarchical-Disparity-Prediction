@@ -73,6 +73,9 @@ public :
     Interval cap(Interval b) {
         return Interval(mylib::max(l, b.l), mylib::min(r, b.r));
     }
+		Interval uu(Interval b) {
+			  return Interval(mylib::min(l, b.l), mylib::max(r, b.r));
+		}
     int length() { return r - l + 1; } // Error: Should be r - l - 1;
 };
 
@@ -138,10 +141,10 @@ public :
             for (int q = 0; q < 2; ++q) if (p + q == 1)
             if (i + p < H && j + q < W) {
                 int XX = node_number(i, j), YY = node_number(i+p, j+q);
-                // if (itv[XX].cap(itv[YY]).length() <= 0) {
-								// 	m--;
-								// 	continue;
-								// }
+                if (itv[XX].cap(itv[YY]).length() <= 0) {
+									m--;
+							   	continue;
+								}
                 ++k;
                 edges[k].a = XX; edges[k].b = YY;
                 edges[k].weight = mylib::max3abs(rgb[0][i][j] - rgb[0][i+p][j+q],
@@ -158,9 +161,10 @@ public :
             Interval t1 = itv[mset.find(edges[i].a)];
             Interval t2 = itv[mset.find(edges[i].b)];
             Interval t3 = t1.cap(t2);
+						Interval t4 = t1.uu(t2);
             double tmp = t3.length();
             // printf("XXX"); fflush(stdout);
-            tmp /= (t1.length() + t2.length());
+            tmp /= t4.length(); // (t1.length() + t2.length());
             // printf("YYY"); fflush(stdout);
             // what this threshold thing ? IDK
             if ( tmp < threshold ) continue;

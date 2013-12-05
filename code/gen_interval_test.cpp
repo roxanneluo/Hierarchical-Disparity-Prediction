@@ -97,7 +97,7 @@ int main(int args, char* argv[]) {
 	double search = 0;
 	initial_cnt_c.normalize();
 	for (int i = 0; i < interval.height; ++i) {
-    search += (interval[i][1] - interval[i][0]) * initial_cnt_c[i];
+    search += (interval[i][1] - interval[i][0] + 1) * initial_cnt_c[i];
 	}
 	// fprintf(file,
 	// 		    "Average Search Range ( %d ): %.4lf %.4lf\%\n",
