@@ -188,11 +188,11 @@ int main(int args, char ** argv) {
     } else {
       // Not the highest layer. BUILD forest from here!
       compute_first_matching_cost(rgb_left[i], rgb_right[i],
-          cost_left, cost_right, disparity_left[i + 1], max_disparity / pi[i]);
+          cost_left, cost_right, disparity_left[i + 1], interval, max_disparity / pi[i]);
       build_tree_with_interval(rgb_left[i], rgb_right[i], graph_left[i], graph_right[i],
           forest_left[i], forest_right[i], 
           disparity_left[i+1], disparity_right[i+1], interval, 
-          0.9 //  the threshold
+          0.3 //  the threshold
           );
     }
 		
