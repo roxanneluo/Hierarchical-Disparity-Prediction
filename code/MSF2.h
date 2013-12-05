@@ -148,7 +148,28 @@ void disparity_computation(Forest& forest_left,
   median_filter(disparity_left);
   median_filter(disparity_right);
 }
-
+template<class type>
+void disparity_computation(Forest& forest_left,
+                           Forest& forest_right,
+                           Array3<double>& cost_left,
+                           Array3<double>& cost_right,
+                           Grid<type>& disparity_left,
+                           Grid<type>& disparity_right,
+                           Grid<type>& pre_disp_left,
+													 Grid<type>& pre_disp_right,
+													 Grid<int>& interval) {
+  // Aggregate matching cost on tree.  
+  forest_left.compute_cost_on_tree(cost_left);
+  forest_right.compute_cost_on_tree(cost_right);
+  
+  // Compute disparity.
+  compute_disparity(cost_left, disparity_left, pre_disp_left, interval);
+  compute_disparity(cost_right, disparity_right, pre_disp_right, interval);
+  
+  // Median filter.
+  median_filter(disparity_left);
+  median_filter(disparity_right);
+}
 template<class type>
 void stereo_matching(Array3<type>& left,
                      Array3<type>& right,

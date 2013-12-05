@@ -154,8 +154,9 @@ public :
     }
 
     void build_tree_with_interval(double threshold) {
-        std::sort(edges + 1, edges + m + 1, smaller_edge); // m + 1 ?
-        mset.init(n);
+        // std::sort(edges + 1, edges + m + 1, smaller_edge); // m + 1 ?
+			  std::random_shuffle(edges + 1, edges + m + 1);
+			  mset.init(n);
         ts = 0;
         for (int i = 1; i <= m; ++i) {
             Interval t1 = itv[mset.find(edges[i].a)];
@@ -170,7 +171,7 @@ public :
             if ( tmp < threshold ) continue;
             if (mset.merge(edges[i].a, edges[i].b)) {
                 trees[++ts] = edges[i];
-                itv[mset.find(edges[i].a)] = t3;
+                itv[mset.find(edges[i].a)] = t4; // t3;
             }
         }
     }
