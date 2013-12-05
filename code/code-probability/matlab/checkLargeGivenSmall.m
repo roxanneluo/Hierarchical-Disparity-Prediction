@@ -7,7 +7,7 @@ function checkLargeGivenSmall(HTMLNameSpec,ref, drawflag,prec,folderPrefix)
     name = name(IX);
     level = 2;
     contract = 2;
-    maxRange = 1;
+    maxRange = 10;
     ratio = zeros(level, level,maxRange, dataSetSize);
     err = zeros(level, level,maxRange, dataSetSize);
     times = 1;
@@ -22,7 +22,7 @@ function checkLargeGivenSmall(HTMLNameSpec,ref, drawflag,prec,folderPrefix)
                 else
                    dataset = ['Prob_Gen/Prob_Gen_',name{i},'__'];
                 end
-                [r,e] = generateMultiLayer(dataset, name{i}, maxDisp(i), level, contract, 0.05, 1, ref, drawflag,prec,folderPrefix);
+                [r,e] = generateMultiLayer(dataset, name{i}, maxDisp(i), level, contract, 0.05, 1, ref, drawflag,10^(-range),folderPrefix);
                 ratio(:, :, range,i) = ratio(:,:,range,i)+r;
                 err(:,:,range,i) = err(:,:,range,i)+e;
             end
@@ -40,8 +40,8 @@ function checkLargeGivenSmall(HTMLNameSpec,ref, drawflag,prec,folderPrefix)
     else
         HTMLNameSpec = [HTMLNameSpec, ' no ref'];
     end
-    genRatioHTMLReport(ratio, name, maxDisp, level, 0.05, 'Uncover Ratio',HTMLNameSpec,'sigma');
-    genRatioHTMLReport(err, name, maxDisp, level, 0.05, 'E[err]',HTMLNameSpec,'sigma');
+    genRatioHTMLReport(ratio, name, maxDisp, level,-[1:maxRange], 'Uncover Ratio',HTMLNameSpec,'sigma');
+    genRatioHTMLReport(err, name, maxDisp, level, -[1:maxRange], 'E[err]',HTMLNameSpec,'sigma');
 % 
 %     for d = 1:dataSetSize
 %         drawRatio_Para(ratio, 0.01:0.01:0.1, 2,1,d,name);
@@ -101,15 +101,35 @@ function [ratio,err]= generateMultiLayer(dataset, dataSetName, maxDisp, level, c
             err(small,large) = getExpectedErr(largeGivenSmall,...
                                     trueLargeGivenSmall(1:m(small), 1:m(large), small, large), ...
                                     A(1:m(small), 1:m(large), small, large));
-            largeGivenSmall(largeGivenSmall<prec) = -0.1;
+            truelgs = trueLargeGivenSmall(1:m(small), 1:m(large), small, large);
+%             truelgs(getWrongCoverIndex(truelgs, trueLargeGivenSmall,prec)) = -0.1;
+%             figure();
+% %             draw(truelgs, 1,1, 1, [dataSetName,' interval'], false) 
+%             largeGivenSmall(getWrongCoverIndex(largeGivenSmall, trueLargeGivenSmall,prec)) = -0.1;
 %             figure();
 %             draw(largeGivenSmall, 1,1, 1, [dataSetName,' interval'], false) 
-           if drawflag
-                drawAll(A(1:m(small), 1:m(large), small, large),...
-                    largeGivenSmall,...
-                    trueLargeGivenSmall(1:m(small), 1:m(large), small, large),...
-                    smallGivenLarge(1:m(small), 1:m(large), small, large),...
-                    small, large, dataset, range,ref,prec);
+            if drawflag
+                gndIX = ~getWrongCoverIndexOld(truelgs,truelgs,prec);
+                IX = ~getWrongCoverIndexOld(largeGivenSmall,largeGivenSmall,prec);
+                bothIX = gndIX & IX;
+                miss = gndIX&~bothIX;
+                more = IX & (~bothIX); 
+                a = A(1:m(small), 1:m(large), small, large);
+                a(bothIX|~(gndIX|IX)) = 0;
+                a(more) = -a(more);
+                truelgs(~gndIX) = -0.1;
+                largeGivenSmall(~IX) = -0.1;
+                largeGivenSmall(miss) = 1;
+                figure();
+                draw(a, 2,2, 1, [dataSetName,' xor',int2str(log10(prec))], false) ;
+                draw(largeGivenSmall,2,2,2,[dataSetName, 'lgs'],false);
+                draw(truelgs,2,2,4,[dataSetName, 'true lgs'],false);
+           
+%                 drawAll(A(1:m(small), 1:m(large), small, large),...
+%                     largeGivenSmall,...
+%                     trueLargeGivenSmall(1:m(small), 1:m(large), small, large),...
+%                     smallGivenLarge(1:m(small), 1:m(large), small, large),...
+%                     small, large, dataset, range,ref,prec);
             end
             
 %             if smallBase
@@ -270,34 +290,205 @@ function IX = getWrongCoverIndex(largeGivenSmall, trueLargeGivenSmall,prec)
     [m,n] = size(largeGivenSmall);
     IX = ones(m,n);
     IX(:,1) = 0;
+%     for i = 1:m
+%         start = i*2-1;
+%         for j=start:-1:2
+%            if largeGivenSmall(i,j)>=prec
+%                 IX(i,j) = 0;
+%            else
+%                if j>=1
+%                    IX(i,j) = 0;
+%                end
+%                break;
+%            end
+%         end
+%         for j=start+1:n
+%            if largeGivenSmall(i,j)>=prec
+%                 IX(i,j) = 0;
+%            else
+%                if j<=n
+%                   IX(i,j) = 0; 
+%                end
+%                break;
+%            end
+%         end
+%     end
+    delta = 0.15;
     for i = 1:m
-        start = i*2-1;
-        for j=start:-1:2
-           if largeGivenSmall(i,j)>=prec
-                IX(i,j) = 0;
-           else
-               if j>=1
-                   IX(i,j) = 0;
-               end
-               break;
-           end
-        end
-        for j=start+1:n
-           if largeGivenSmall(i,j)>=prec
-                IX(i,j) = 0;
-           else
-               if j<=n
-                  IX(i,j) = 0; 
-               end
-               break;
-           end
-        end
+       mid = 2*i-1;
+       total = largeGivenSmall(i,mid);
+       lstop = false;
+       rstop = false;
+       IX(i,mid) = 0;
+       for j = 1:max(mid-1,n-mid)
+          l = mid-j;
+          lmid = floor((l-1)/2)+1;
+          r = mid+j;
+          rmid = floor((r-1)/2)+1;
+          if ~lstop && 1<=l
+              lratio = largeGivenSmall(i,l)/(largeGivenSmall(i,l)+total);
+              if(largeGivenSmall(lmid,l)<delta&&lratio>=prec || lratio>=5*prec)
+                IX(i,l) = 0; 
+                total = total+largeGivenSmall(i,l);
+              else
+                  lstop = true;
+              end
+          end
+          if ~rstop && r<=n
+              rratio = largeGivenSmall(i,r)/(largeGivenSmall(i,r)+total);
+              if (largeGivenSmall(rmid,r)<delta&&rratio>=prec || rratio>=5*prec)
+                IX(i,r) = 0; 
+                total = total+largeGivenSmall(i,r);
+              else
+                  rstop = true;
+              end
+          end
+          if lstop && rstop
+             break; 
+          end
+       end
     end
+%     prec = 1-prec;
+%     for i = 1:m
+%        mid = 2*i-1;
+%        if largeGivenSmall(i,mid) < 10^(-9)
+%            continue;
+%        end
+%        total = largeGivenSmall(i,mid);
+%        lstop = false;
+%        rstop = false;
+%        IX(i,mid) = 0;
+%        
+%        for j = 1:max(mid-1,n-mid)
+%           l = mid-j;
+%           r = mid+j;
+%           if ~lstop
+%               if 1<=l && total+largeGivenSmall(i,l) <= prec
+%                 IX(i,l) = 0; 
+%                 total = total+largeGivenSmall(i,l);
+%               else
+%                   lstop = true;
+%               end
+%           end
+%           if ~rstop
+%               if r<=n && largeGivenSmall(i,r)+total <=prec
+%                 IX(i,r) = 0; 
+%                 total = total+largeGivenSmall(i,r);
+%               else
+%                   rstop = true;
+%               end
+%           end
+%           if lstop && rstop
+%              break; 
+%           end
+%        end
+%     end
     IX = logical(IX);
 end
+
+function IX = getWrongCoverIndexOld(largeGivenSmall, trueLargeGivenSmall,prec) 
+%     trueLargeGivenSmall(:,1)=0;
+%     IX = (largeGivenSmall < prec) & (trueLargeGivenSmall ~= 0);
+    [m,n] = size(largeGivenSmall);
+    IX = ones(m,n);
+    IX(:,1) = 0;
+%     for i = 1:m
+%         start = i*2-1;
+%         for j=start:-1:2
+%            if largeGivenSmall(i,j)>=prec
+%                 IX(i,j) = 0;
+%            else
+%                if j>=1
+%                    IX(i,j) = 0;
+%                end
+%                break;
+%            end
+%         end
+%         for j=start+1:n
+%            if largeGivenSmall(i,j)>=prec
+%                 IX(i,j) = 0;
+%            else
+%                if j<=n
+%                   IX(i,j) = 0; 
+%                end
+%                break;
+%            end
+%         end
+%     end
+    for i = 1:m
+       mid = 2*i-1;
+       total = largeGivenSmall(i,mid);
+       lstop = false;
+       rstop = false;
+       IX(i,mid) = 0;
+       for j = 1:max(mid-1,n-mid)
+          l = mid-j;
+          r = mid+j;
+          if ~lstop && 1<=l
+              lratio = largeGivenSmall(i,l)/(largeGivenSmall(i,l)+total);
+              if lratio>= prec 
+                IX(i,l) = 0; 
+                total = total+largeGivenSmall(i,l);
+              else
+                  lstop = true;
+              end
+          end
+          if ~rstop && r<=n
+              rratio = largeGivenSmall(i,r)/(largeGivenSmall(i,r)+total);
+              if  rratio>= prec
+                IX(i,r) = 0; 
+                total = total+largeGivenSmall(i,r);
+              else
+                  rstop = true;
+              end
+          end
+          if lstop && rstop
+             break; 
+          end
+       end
+    end
+%     prec = 1-prec;
+%     for i = 1:m
+%        mid = 2*i-1;
+%        if largeGivenSmall(i,mid) < 10^(-9)
+%            continue;
+%        end
+%        total = largeGivenSmall(i,mid);
+%        lstop = false;
+%        rstop = false;
+%        IX(i,mid) = 0;
+%        
+%        for j = 1:max(mid-1,n-mid)
+%           l = mid-j;
+%           r = mid+j;
+%           if ~lstop
+%               if 1<=l && total+largeGivenSmall(i,l) <= prec
+%                 IX(i,l) = 0; 
+%                 total = total+largeGivenSmall(i,l);
+%               else
+%                   lstop = true;
+%               end
+%           end
+%           if ~rstop
+%               if r<=n && largeGivenSmall(i,r)+total <=prec
+%                 IX(i,r) = 0; 
+%                 total = total+largeGivenSmall(i,r);
+%               else
+%                   rstop = true;
+%               end
+%           end
+%           if lstop && rstop
+%              break; 
+%           end
+%        end
+%     end
+    IX = logical(IX);
+end
+
 function ratio = getWrongCoverRatio(largeGivenSmall, trueLargeGivenSmall, A,prec)
     totalPoints = sum(sum(A))-sum(A(:,1));
-    IX = getWrongCoverIndex(largeGivenSmall, trueLargeGivenSmall,prec);
+%     IX = getWrongCoverIndex(trueLargeGivenSmall, trueLargeGivenSmall,prec);
+    IX = getWrongCoverIndexOld(trueLargeGivenSmall, trueLargeGivenSmall,prec);
     wrongPoints = A(IX);
     ratio = sum(wrongPoints)/totalPoints;
 end
