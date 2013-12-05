@@ -286,11 +286,13 @@ int gen_interval_mid(Grid<double>& prob_matrix,
 		}
 		if (dcmp(highest, 0.0) == 0) {
 		  interval[i][0] = 0;
-			interval[i][1] = 0;
+			interval[i][1] = -1;
+			continue;
 		}
     interval[i][0] = highest_index;
 		interval[i][1] = highest_index;
 
+		/*
 		while(interval[i][0] > 0 &&
 				  dcmp(prob_matrix[i][interval[i][0]], threshold) == 1) {
 		  interval[i][0]--;
@@ -298,7 +300,25 @@ int gen_interval_mid(Grid<double>& prob_matrix,
 		while(interval[i][1] < prob_matrix.width - 1 &&
 				  dcmp(prob_matrix[i][interval[i][1]], threshold) == 1) {
 		  interval[i][1]++;
+		}*/
+
+		double total = 0.0;
+		bool mark = true;
+		while(mark && interval[i][0] > 0 && interval[i][1] < prob_matrix.width - 1) {
+		  mark = false;
+			if (dcmp(prob_matrix[i][interval[i][0]]  / (prob_matrix[i][interval[i][0]] + total) , threshold) == 1) {
+				total += prob_matrix[i][interval[i][0]];
+				interval[i][0]--;
+				mark = true;
+			}
+			if (dcmp(prob_matrix[i][interval[i][1]] / (prob_matrix[i][interval[i][1]] + total), threshold) == 1) {
+			  total += prob_matrix[i][interval[i][1]];
+				interval[i][1]++;
+				mark = true;
+			}
 		}
+		interval[i][0]++;
+		interval[i][1]--;
 	}
 }
 
