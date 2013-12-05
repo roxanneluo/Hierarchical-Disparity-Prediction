@@ -32,7 +32,7 @@ void save_large_given_small(Grid<double>& prob_matrix,
 }
 void save_initial_cnt(Array1<double>& initial_prob,
 											char* dataset) {
-	char path[100] = "all_prob_gen/Prob_Gen";
+	char path[100] = "all_prob_gen/Prob_Gen_";
 	strcat(path, dataset);
 	strcat(path, "__cnt_c++.txt");
 	FILE* file = fopen(path, "w");
@@ -304,7 +304,7 @@ int gen_interval_mid(Grid<double>& prob_matrix,
 
 void save_interval(Grid<int>& interval, char* dataset) {
 
-	char path[300] = "all_interval/";
+	char path[300] = "all_gen_interval/";
   strcat(path, dataset);
   strcat(path, "_interval.txt");	
 	FILE* file = fopen(path, "w");

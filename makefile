@@ -1,4 +1,4 @@
-all : silly0 silly1 checke0 checke1 checke2 MST_blind silly_MSF Prob_Gen cnt_Gen SgL_Gen
+all : silly0 silly1 checke0 checke1 checke2 MST_blind silly_MSF Prob_Gen cnt_Gen SgL_Gen gen_interval_test
 
 silly0:
 	g++ code/silly.cpp -o bin/Original.out -O2 -Wall -std=c++0x
@@ -20,3 +20,5 @@ cnt_Gen:
 	g++ code/gen_support_cnt.cpp -o bin/cnt_Gen.out -O2 -Wall -std=c++0x -msse3
 SgL_Gen:
 	g++ code/code-probability/gen_small_given_large_matrix.cpp -o bin/SgL_Gen.out -O2 -Wall -std=c++0x
+gen_interval_test :
+	g++ code/gen_interval_test.cpp -o bin/gen_interval_test.out -O2 -Wall -std=c++0x
