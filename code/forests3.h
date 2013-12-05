@@ -154,8 +154,9 @@ public :
     }
 
     void build_tree_with_interval(double threshold) {
-        std::sort(edges + 1, edges + m + 1, smaller_edge); // m + 1 ?
-        mset.init(n);
+        // std::sort(edges + 1, edges + m + 1, smaller_edge); // m + 1 ?
+			  std::random_shuffle(edges + 1, edges + m + 1);
+			  mset.init(n);
         ts = 0;
         for (int i = 1; i <= m; ++i) {
             Interval t1 = itv[mset.find(edges[i].a)];
@@ -170,7 +171,7 @@ public :
             if ( tmp < threshold ) continue;
             if (mset.merge(edges[i].a, edges[i].b)) {
                 trees[++ts] = edges[i];
-                itv[mset.find(edges[i].a)] = t3;
+                itv[mset.find(edges[i].a)] = t4; // t3;
             }
         }
     }
@@ -306,8 +307,13 @@ public :
         double w = table[nodes[q].up_weight];
 
         // The possibility model used here :
-        Interval bound = graph->itv[graph->mset.find(graph->node_number(i, j))].cap(Interval(0, cost.array-1));        
-        
+        // int set_number_p = graph->mset.find(p);
+				// int set_number_q = graph->mset.find(q);
+				// printf("set: %d %d\n", set_number_p, set_number_q);
+				// fflush(stdout);
+				Interval bound = graph->itv[graph->mset.find(p)].cap(Interval(0, cost.array-1));        
+        // bound.l = mylib::max(0, bound.l);
+			  // bound.r = mylib::min(bound.r, cost.array - 1);	
         for (int d = bound.l; d <= bound.r; ++d) {
           double value_p = backup[d][nodes[p].x][nodes[p].y];
           double value_q = backup[d][nodes[q].x][nodes[q].y];
@@ -316,11 +322,11 @@ public :
         }
       }
     }
-    /*
+    
     for (int d = 0; d < cost.array; ++d) {
       cost[d][nodes[order[1]].x][nodes[order[1]].y] = backup[d][nodes[order[1]].x][nodes[order[1]].y];
     } // ERROR: forgot this part.
-    !!!!!!
+    /*!!!!!!
     I dont know if this part is still necessary.
     But the I shoud reconsider the boundaries.
     */
@@ -331,7 +337,7 @@ public :
         if (nodes[q].ord < nodes[p].ord) continue; // ERROR: Not > but <. q is child
         // double w = exp(-1.0 * nodes[q].up_weight / sigma_const);
         double w = table[nodes[q].up_weight];
-        Interval bound = graph->itv[graph->mset.find(graph->node_number(i, j))].cap(Interval(0, cost.array-1));        
+        Interval bound = graph->itv[graph->mset.find(p)].cap(Interval(0, cost.array-1));        
         for (int d = bound.l; d <= bound.r; ++d) {
           double value_q_current = backup[d][nodes[q].x][nodes[q].y];
           double value_p = cost[d][nodes[p].x][nodes[p].y];

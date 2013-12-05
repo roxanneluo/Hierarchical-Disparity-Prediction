@@ -155,7 +155,26 @@ void compute_disparity (Array3<double> & cost, Grid<type> &disparity) {
 		}
 	// ctmf ignored
 }
-
+template <class type>
+void compute_disparity (Array3<double> & cost, Grid<type> &disparity, Grid<type>& pre_disp, Grid<int>& interval) {
+	// something weired in the doc. left right not symetric
+	disparity.reset(cost.height, cost.width);
+	printf("XXXXXXXXXXXXXX");fflush(stdout);
+	for (int i = 0; i < cost.height; ++i)
+		for (int j = 0; j < cost.width; ++j) {
+			int prei = mylib::min(i / 2, pre_disp.height - 1);
+			int prej = mylib::min(j / 2, pre_disp.width - 1);
+			int best_dis = max(0, interval[pre_disp[prei][prej]][0]);
+			double best = cost[best_dis][i][j];// cost[0][i][j];
+			for (int d = best_dis + 1; d <= mylib::min(interval[pre_disp[prei][prej]][1], cost.array - 1); ++d)
+				if (cost[d][i][j] < best) {
+					best = cost[d][i][j];
+                    best_dis = d;
+                }
+			disparity[i][j] = best_dis;
+		}
+	// ctmf ignored
+}
 // ctmf should be here
 
 #endif

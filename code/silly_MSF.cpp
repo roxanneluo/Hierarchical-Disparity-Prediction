@@ -229,7 +229,7 @@ int main(int args, char ** argv) {
 			
 			interval.reset(prob_matrix_left.height, 2);
       // gen_interval(prob_matrix_left, interval, 0.01);
-      gen_interval_mid(prob_matrix_left, interval, 0.001);
+      gen_interval_mid(prob_matrix_left, interval, 1e-3);
 			save_interval(interval, file_name[4]);
 		}
     

@@ -185,7 +185,11 @@ int main(int args, char ** argv) {
           cost_left, cost_right, max_disparity / pi[i]);
       build_tree(rgb_left[i], rgb_right[i], graph_left[i], graph_right[i],
           forest_left[i], forest_right[i]);
-    } else {
+      
+			disparity_computation(forest_left[i], forest_right[i],
+          cost_left, cost_right, disparity_left[i], disparity_right[i]);
+
+		} else {
       // Not the highest layer. BUILD forest from here!
       compute_first_matching_cost(rgb_left[i], rgb_right[i],
           cost_left, cost_right, disparity_left[i + 1], interval, max_disparity / pi[i]);
@@ -194,11 +198,12 @@ int main(int args, char ** argv) {
           disparity_left[i+1], disparity_right[i+1], interval, 
           0.3 //  the threshold
           );
+    disparity_computation(forest_left[i], forest_right[i],
+        cost_left, cost_right, disparity_left[i], disparity_right[i],
+				disparity_left[i + 1], disparity_right[i + 1], interval);
     }
 		
-    disparity_computation(forest_left[i], forest_right[i],
-        cost_left, cost_right, disparity_left[i], disparity_right[i]);
-    find_stable_pixels(disparity_left[i], disparity_right[i],
+		find_stable_pixels(disparity_left[i], disparity_right[i],
            occlusion_left[i], occlusion_right[i]);
     refinement(i);
 
