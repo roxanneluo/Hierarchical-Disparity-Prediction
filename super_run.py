@@ -7,12 +7,13 @@ DATASETS = (
 #    'Middlebury_1',
     'Middlebury_4',
     'Middlebury_others',
+		'Middlebury_bad',
 )
 ALGORITHMS = (
-    'Original',
-    'RandTree',
-    'MST_blind',
-		'MSF'
+		'Original',
+#    'RandTree',
+#    'MST_blind',
+		'MSF2',
 #    'silly',
 )
 

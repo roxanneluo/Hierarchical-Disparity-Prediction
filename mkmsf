@@ -1,4 +1,4 @@
 all : silly_MSF2 
 
 silly_MSF2 :
-	g++ code/silly_MSF2.cpp -o bin/MSF.out -O2 -Wall -std=c++0x -msse3
+	g++ code/silly_MSF2.cpp -o bin/MSF2.out -O2 -Wall -std=c++0x -msse3
