@@ -100,7 +100,8 @@ void build_tree_with_interval(Array3<type>& left,
                 Grid<type>& disp_left, 
                 Grid<type>& disp_right,
                 Grid<int>& interval,
-                double threshold=0.9) {
+                double threshold,
+								bool build_MST = false) {
 
   // Median filter.
   for (int i = 0; i < 3; ++i) {
@@ -111,8 +112,8 @@ void build_tree_with_interval(Array3<type>& left,
   // printf("XXXXXXXXXXXXXX\n");
 	left_graph.collect_edges_with_interval(left, disp_left, interval);
   right_graph.collect_edges_with_interval(right, disp_right, interval);
-  left_graph.build_tree_with_interval(threshold);
-  right_graph.build_tree_with_interval(threshold);
+  left_graph.build_tree_with_interval(threshold, build_MST);
+  right_graph.build_tree_with_interval(threshold, build_MST);
 	
 	// left_graph.collect_edges(left);
   // right_graph.collect_edges(right);
@@ -163,10 +164,14 @@ void disparity_computation(Forest& forest_left,
   // forest_right.compute_cost_on_tree(cost_right);
   forest_left.compute_cost_on_tree_with_interval(cost_left);
 	forest_right.compute_cost_on_tree_with_interval(cost_right);
-  // Compute disparity.
+  
+	// Compute disparity.
   compute_disparity(cost_left, disparity_left, pre_disp_left, interval);
   compute_disparity(cost_right, disparity_right, pre_disp_right, interval);
-  
+ 
+	// forest_left.compute_disparity_on_tree_with_interval(cost_left, disparity_left);
+	// forest_right.compute_disparity_on_tree_with_interval(cost_right, disparity_right);
+
   // Median filter.
   median_filter(disparity_left);
   median_filter(disparity_right);
