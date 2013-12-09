@@ -153,9 +153,13 @@ public :
             }
     }
 
-    void build_tree_with_interval(double threshold) {
-        // std::sort(edges + 1, edges + m + 1, smaller_edge); // m + 1 ?
-			  std::random_shuffle(edges + 1, edges + m + 1);
+    void build_tree_with_interval(double threshold,
+				                          bool build_MST = false) {
+        if (build_MST) {
+					std::sort(edges + 1, edges + m + 1, smaller_edge); // m + 1 ?
+				} else {
+					std::random_shuffle(edges + 1, edges + m + 1);
+				}
 			  mset.init(n);
         ts = 0;
         for (int i = 1; i <= m; ++i) {
@@ -346,6 +350,47 @@ public :
       }
     }
   } // compute cost on tree
+  template <class type>
+	void compute_disparity_on_tree_with_interval(Array3<double>& cost,
+			                                         Grid<type>& disparity) {
+	  disparity.reset(cost.height, cost.width);
+		for (int i = 1; i <= n; ++i) {
+		  int p = order[i];
+			Interval bound = graph->itv[graph->mset.find(p)].cap(Interval(0, cost.array - 1));
+			int best_dis = mylib::min(cost.array - 1, bound.l);
+			int xx = nodes[p].x, yy = nodes[p].y;
+			double best = cost[best_dis][xx][yy];
+			for (int d = bound.l + 1; d <= mylib::min(cost.array - 1, bound.r); ++d) {
+			  if (cost[d][xx][yy] < best) {
+				  best = cost[d][xx][yy];
+					best_dis = d;
+				}	
+			}
+			disparity[xx][yy] = best_dis;
+		}
+	}
+
+	template <class type>
+	void update_matching_cost_on_tree_with_interval(Array3<double>& cost,
+			                                            Grid<type>& disparity,
+																									Grid<type>& occlusion) {
+	  int arr = cost.array;
+		int h = cost.height;
+		int w = cost.width;
+		cost.zero();
+		for (int i = 1; i <= n; ++i) {
+		  int p = order[i];
+			Interval bound = graph->itv[graph->mset.find(p)].cap(Interval(0, cost.array - 1));
+			bound.l = min(bound.l, cost.array - 1);
+			bound.r = min(bound.r, cost.array - 1);
+			if (occlusion[nodes[p].x][nodes[p].y] == 0) {
+			  for (int d = bound.l; d <= bound.r; ++d) {
+				  cost[d][nodes[p].x][nodes[p].y] =
+						  mylib::ABS(d - disparity[nodes[p].x][nodes[p].y]);
+				}
+			}
+		}
+	}
 
   void compute_cost_on_tree(Array3<double> & cost, double sigma = 255 * 0.1 ) {
     update_table(sigma);
@@ -387,7 +432,7 @@ public :
   } // compute cost on tree
 
     template <class type>
-      void compute_support(Grid<type> &support, double sigma = 255 * 0.1) {
+    void compute_support(Grid<type> &support, double sigma = 255 * 0.1) {
       update_table(sigma);
         backup.reset(1, support.height, support.width);
 

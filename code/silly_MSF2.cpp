@@ -76,18 +76,25 @@ void refinement(int i) {
   cost_left.reset(max_disparity, disparity_left[i].height, disparity_left[i].width);
   cost_right.reset(max_disparity, disparity_right[i].height, disparity_right[i].width);
   // find_stable_pixels(d_left, d_right, occlusion_left, occlusion_right);
-  update_matching_cost(cost_left, cost_right, disparity_left[i], disparity_right[i],
-      occlusion_left[i], occlusion_right[i]);
+  // update_matching_cost(cost_left, cost_right, disparity_left[i], disparity_right[i],
+  //     occlusion_left[i], occlusion_right[i]);
   
-	forest_left[i].compute_cost_on_tree(cost_left, 255 * 0.05);
-  forest_right[i].compute_cost_on_tree(cost_right, 255 * 0.05);
+   forest_left[i].update_matching_cost_on_tree_with_interval(cost_left, disparity_left[i], occlusion_left[i]);
+	 forest_right[i].update_matching_cost_on_tree_with_interval(cost_right, disparity_right[i], occlusion_right[i]);
 
-	compute_disparity(cost_left, disparity_left[i]);
-  compute_disparity(cost_right, disparity_right[i]);
-  median_filter(disparity_left[i]);
+	forest_left[i].compute_cost_on_tree_with_interval(cost_left, 255 * 0.05);
+  forest_right[i].compute_cost_on_tree_with_interval(cost_right, 255 * 0.05);
+
+	// compute_disparity(cost_left, disparity_left[i]);
+  // compute_disparity(cost_right, disparity_right[i]);
+  
+  forest_left[i].compute_disparity_on_tree_with_interval(cost_left, disparity_left[i]);
+	forest_right[i].compute_disparity_on_tree_with_interval(cost_right, disparity_right[i]);
+	
+	median_filter(disparity_left[i]);
   median_filter(disparity_right[i]);
-  save_image("lefterror.pgm", occlusion_left[i]);
-  save_image("righterror.pgm", occlusion_right[i]);
+  // save_image("lefterror.pgm", occlusion_left[i]);
+  // save_image("righterror.pgm", occlusion_right[i]);
 } /*
 char *get_file_name(char *filename, const char * prefix, int para, const char * suffix) {
     strcpy(filename, prefix);
@@ -170,7 +177,7 @@ int main(int args, char ** argv) {
   
   Array1<double> gmm;
   // Array1<double> gmm0, gmm1; 
-  
+ 	
   for (int i = level - 1; i >= 0; --i) {
     bool is_highest_layer = (i == level - 1) ? true : false;
     bool is_lowest_layer = (i == 0) ? true : false;
@@ -191,40 +198,49 @@ int main(int args, char ** argv) {
 			disparity_right[level].zero();
 		} else {
 			// left vector.
+			
 			initial_prob.reset(max_disparity / pi[i + 1] + 1);
 			gen_initial_prob(disparity_left[i + 1], disparity_right[i + 1], initial_prob, max_disparity / pi[i + 1]);
 			initial_prob.normalize();
 			// small_given_large matrix.
 			prob_matrix.reset(max_disparity / pi[i + 1] + 1,
 					              max_disparity / pi[i] + 1);
-			gen_small_given_large(prob_matrix, gmm);
+			gen_small_given_large(prob_matrix, gmm);	
+
 			gen_large_given_small(initial_prob, prob_matrix, support_prob);
 			// generate disparity interval.
+      // printf("XXXXXXXXXXXXXXX %d\n", i);
+      // fflush(stdout);
 			interval.reset(prob_matrix.height, 2);
+				
 			gen_interval_mid(prob_matrix, interval, 0.001);
 			if (args > 7)
 				save_interval(interval, file_name[4]);
     }
-    if (is_highest_layer) {
-      /* (@xuejiaobai) have no idea but the results are different.
+     // if (is_highest_layer) {
+      // (@xuejiaobai) have no idea but the results are different.
+		
 			compute_first_matching_cost(rgb_left[i], rgb_right[i],
           cost_left, cost_right, disparity_left[i + 1], interval, max_disparity / pi[i]);
       
 			build_tree_with_interval(rgb_left[i], rgb_right[i], graph_left[i], graph_right[i],
           forest_left[i], forest_right[i],
 					disparity_left[i + 1], disparity_right[i + 1], interval,
-					0.9);
+					0.9, is_highest_layer);
 			disparity_computation(forest_left[i], forest_right[i],
           cost_left, cost_right, disparity_left[i], disparity_right[i],
 					disparity_left[i + 1], disparity_right[i + 1], interval);
-			*/
+			
+			/*
 			compute_first_matching_cost(rgb_left[i], rgb_right[i],
 					cost_left, cost_right, max_disparity / pi[i]);
 			build_tree(rgb_left[i], rgb_right[i], graph_left[i], graph_right[i],
 			 		forest_left[i], forest_right[i]);
 			disparity_computation(forest_left[i], forest_right[i],
 			 		cost_left, cost_right, disparity_left[i], disparity_right[i]);
-		} else {
+		  */
+		/*	
+		  } else {
       // Not the highest layer. BUILD forest from here!
       compute_first_matching_cost(rgb_left[i], rgb_right[i],
           cost_left, cost_right, disparity_left[i + 1], interval, max_disparity / pi[i]);
@@ -236,7 +252,7 @@ int main(int args, char ** argv) {
       disparity_computation(forest_left[i], forest_right[i],
           cost_left, cost_right, disparity_left[i], disparity_right[i],
 				  disparity_left[i + 1], disparity_right[i + 1], interval);
-    }
+    }*/
 		
 		find_stable_pixels(disparity_left[i], disparity_right[i],
            occlusion_left[i], occlusion_right[i]);
