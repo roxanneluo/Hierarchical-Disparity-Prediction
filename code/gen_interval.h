@@ -174,9 +174,11 @@ void gen_small_given_large (Grid<double>& prob_matrix,
 }
 
 void gen_small_given_large (Grid<double>& prob_matrix,
-		                        Array1<double>& gmm) {
+		                        Array1<double>& gmm,
+														int layer = 0) {
 	prob_matrix.zero();
-	genGMM(gmm);
+	// genGMM(gmm);
+  genGMM_layer(gmm, layer);
 	for (int j = 0; j < prob_matrix.width; ++j) {
 		for (int i = 1; j / 2 - i >= 0; ++i) {
 		  prob_matrix[j / 2 - i][j] = gmm[gmm.length / 2 - i];
@@ -210,8 +212,8 @@ void gen_small_given_large (Grid<double>& prob_matrix,
 		                        Array1<double>& gmm0,
 														Array1<double>& gmm1) {
   prob_matrix.zero();
-	genGMM(gmm0, 0);
-	genGMM(gmm1, 1);
+	genGMMRem(gmm0, 0);
+	genGMMRem(gmm1, 1);
 	for (int j = 0; j < prob_matrix.width; j += 2) {
 	  for (int i = 1; j / 2 - i >= 0; ++i)
 			prob_matrix[j / 2 - i][j] = gmm0[gmm0.length / 2 - i];

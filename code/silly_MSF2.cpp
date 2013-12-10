@@ -203,7 +203,7 @@ int main(int args, char ** argv) {
 			// small_given_large matrix.
 			prob_matrix.reset(max_disparity / pi[i + 1] + 1,
 					              max_disparity / pi[i] + 1);
-			gen_small_given_large(prob_matrix, gmm);	
+			gen_small_given_large(prob_matrix, gmm, i);	
       
 			gen_large_given_small(initial_prob, prob_matrix, support_prob);
 			// generate disparity interval.

@@ -445,6 +445,7 @@ public :
 																								int max_disparity,
 																								bool is_left = true) {
 	  int H, W;
+		double search_range = 0;
 		cost.reset(max_disparity, H = rgb_left.height, W = rgb_right.width);
 		double max_gradient_color_difference = 2.0;
 		double max_color_difference = 11.0;
@@ -456,6 +457,7 @@ public :
 			Interval bound = graph->itv[graph->mset.find(p)].cap(Interval(0, cost.array - 1));
 			bound.l = min(bound.l, cost.array - 1);
 			bound.r = min(bound.r, cost.array - 1);
+			search_range += bound.r - bound.l + 1;
 			for (int d = bound.l; d <= bound.r; ++d) {
 				double first_cost = 0;
 			  for (int c = 0; c < 3; ++c) {
@@ -476,6 +478,7 @@ public :
 				cost[d][px][py] = weight_on_color * first_cost + (1 - weight_on_color) * cost_gradient;
 			}	
 		}
+		printf("average search range: %.4lf\n", search_range / n / max_disparity);
 	}
 
   void compute_cost_on_tree(Array3<double> & cost, double sigma = 255 * 0.1 ) {
