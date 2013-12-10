@@ -153,6 +153,50 @@ public :
             }
     }
 
+    template <class type>
+    void collect_edges_with_interval(Array3<type> & rgb, Grid<type>& disp, vector < Grid<int> >& interval) {
+        H = rgb.height; W = rgb.width;
+        n = H * W;
+        m = 2 * H * W - H - W;
+				edges = (Edge *) malloc((m + 2) * sizeof(Edge));
+        trees = (Edge *) malloc((n + 2) * sizeof(Edge));
+        
+				itv = (Interval *) malloc((n + 2) * sizeof(Interval));
+        int p;
+			  // printf("%d %d\n", interval[1]disp[0][0]][0], interval[1][disp[0][0]][1]);	 
+				for (int i = 0; i < H; ++i)
+        for (int j = 0; j < W; ++j) {
+           int prei = mylib::min(i / 2, disp.height - 1);
+           int prej = mylib::min(j / 2, disp.width - 1);
+
+        if (prei < disp.height / 2) {
+          p = prej < disp.width / 2 ? 1 : 2;
+        } else {
+          p = prej < disp.width / 2 ? 3 : 4;
+        }
+           itv[node_number(i, j)].l = interval[p][disp[prei][prej]][0];
+           itv[node_number(i, j)].r = interval[p][disp[prei][prej]][1]; 
+            // now this will be fine
+        }
+        int k = 0;
+        for (int i = 0; i < H; ++i)
+        for (int j = 0; j < W; ++j)
+            for (int p = 0; p < 2; ++p)
+            for (int q = 0; q < 2; ++q) if (p + q == 1)
+            if (i + p < H && j + q < W) {
+                int XX = node_number(i, j), YY = node_number(i+p, j+q);
+                if (itv[XX].cap(itv[YY]).length() <= 0) {
+									m--;
+							   	continue;
+								}
+                ++k;
+                edges[k].a = XX; edges[k].b = YY;
+                edges[k].weight = mylib::max3abs(rgb[0][i][j] - rgb[0][i+p][j+q],
+                                     rgb[1][i][j] - rgb[1][i+p][j+q],
+                                     rgb[2][i][j] - rgb[2][i+p][j+q]); 
+            }
+    }
+
     void build_tree_with_interval(double threshold,
 				                          bool build_MST = false) {
         if (build_MST) {
@@ -389,6 +433,48 @@ public :
 						  mylib::ABS(d - disparity[nodes[p].x][nodes[p].y]);
 				}
 			}
+		}
+	}
+
+	template <class type>
+	void compute_first_cost_on_tree_with_interval(Array3<double>& cost,
+			                                          Array3<type>& rgb_left,
+																								Array3<type>& rgb_right,
+																								Grid<float>& gradient_left,
+																								Grid<float>& gradient_right,
+																								int max_disparity,
+																								bool is_left = true) {
+	  int H, W;
+		cost.reset(max_disparity, H = rgb_left.height, W = rgb_right.width);
+		double max_gradient_color_difference = 2.0;
+		double max_color_difference = 11.0;
+		double weight_on_color = 0.11;// 0.20; // 0.11;
+		for (int i = 1; i <= n; ++i) {
+		  int p = order[i];
+			int px = nodes[p].x;
+			int py = nodes[p].y;
+			Interval bound = graph->itv[graph->mset.find(p)].cap(Interval(0, cost.array - 1));
+			bound.l = min(bound.l, cost.array - 1);
+			bound.r = min(bound.r, cost.array - 1);
+			for (int d = bound.l; d <= bound.r; ++d) {
+				double first_cost = 0;
+			  for (int c = 0; c < 3; ++c) {
+					if (is_left)
+						first_cost += mylib::ABS(rgb_left[c][px][py] -
+			          rgb_right[c][px][mylib::max(0, py - d)]);
+				  else
+					  first_cost += mylib::ABS(rgb_right[c][px][py] -
+						    rgb_left[c][px][mylib::min(rgb_left.width - 1, py + d)]);
+				}
+				first_cost = mylib::min(first_cost / 3, max_color_difference);
+				double cost_gradient = is_left ?
+			      (double) mylib::ABS(gradient_left[px][py] -
+																gradient_right[px][mylib::max(0, py - d)]) :
+						(double) mylib::ABS(gradient_right[px][py] -
+								                gradient_left[px][mylib::min(gradient_left.width - 1, py + d)]);
+				cost_gradient = mylib::min(cost_gradient, max_gradient_color_difference);
+				cost[d][px][py] = weight_on_color * first_cost + (1 - weight_on_color) * cost_gradient;
+			}	
 		}
 	}
 

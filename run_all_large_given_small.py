@@ -9,7 +9,7 @@ DATASETS = (
 )
 
 
-algorithm = 'MSF'
+algorithm = 'MSF2'
 
 left_result = 'MSF_left.pgm'
 right_result = 'MSF_right.pgm'
