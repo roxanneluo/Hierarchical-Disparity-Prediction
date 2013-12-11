@@ -61,6 +61,24 @@ void compute_first_matching_cost(Array3<type>& left,
 										 interval,
                      max_disparity);
 }
+
+template<class type>
+void compute_first_matching_cost(Array3<type>& left, 
+                                 Array3<type>& right,
+                                 Array3<double>& cost_left,
+                                 Array3<double>& cost_right,
+																 Forest& forest_left,
+																 Forest& forest_right,
+                                 const int& max_disparity) {
+  Grid<float> left_gradient, right_gradient;
+  compute_gradient(left_gradient, left);
+  compute_gradient(right_gradient, right);
+  forest_left.compute_first_cost_on_tree_with_interval(cost_left,
+			left, right, left_gradient, right_gradient, max_disparity, true);
+	forest_right.compute_first_cost_on_tree_with_interval(cost_right,
+			left, right, left_gradient, right_gradient, max_disparity, false);
+}
+
 // Build trees only for the highest layer.
 template<class type>
 void build_tree(Array3<type>& left,
@@ -166,11 +184,11 @@ void disparity_computation(Forest& forest_left,
 	forest_right.compute_cost_on_tree_with_interval(cost_right);
   
 	// Compute disparity.
-  compute_disparity(cost_left, disparity_left, pre_disp_left, interval);
-  compute_disparity(cost_right, disparity_right, pre_disp_right, interval);
+  // compute_disparity(cost_left, disparity_left, pre_disp_left, interval);
+  // compute_disparity(cost_right, disparity_right, pre_disp_right, interval);
  
-	// forest_left.compute_disparity_on_tree_with_interval(cost_left, disparity_left);
-	// forest_right.compute_disparity_on_tree_with_interval(cost_right, disparity_right);
+	forest_left.compute_disparity_on_tree_with_interval(cost_left, disparity_left);
+	forest_right.compute_disparity_on_tree_with_interval(cost_right, disparity_right);
 
   // Median filter.
   median_filter(disparity_left);

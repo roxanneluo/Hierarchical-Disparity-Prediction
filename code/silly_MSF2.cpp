@@ -24,6 +24,8 @@ int max_disparity = 16;
 int scale = 16;
 const int level = 2;
 
+TimeKeeper timer;
+
 // typedef Array3<unsigned char> ARRAY3;
 // typedef Grid<unsigned char> GRID;
 
@@ -63,24 +65,18 @@ void draw_tree() {
   save_image("RandTree_rightsupportmap.pgm", right_support_map);
 }
 */
-void refinement(int i) {
+void refinement(int i, int d_max) {
   // find stable pixels by using left-right consisty check
-  // left_graph.build_MST();
-  // right_graph.build_MST();
 
-  // forest_left.init(left_graph);
-  // forest_right.init(right_graph);
-  // forest_left.order_of_visit();
-  // forest_right.order_of_visit();
   Array3<double> cost_left, cost_right;
-  cost_left.reset(max_disparity, disparity_left[i].height, disparity_left[i].width);
-  cost_right.reset(max_disparity, disparity_right[i].height, disparity_right[i].width);
-  // find_stable_pixels(d_left, d_right, occlusion_left, occlusion_right);
-  // update_matching_cost(cost_left, cost_right, disparity_left[i], disparity_right[i],
+  cost_left.reset(d_max, disparity_left[i].height, disparity_left[i].width);
+  cost_right.reset(d_max, disparity_right[i].height, disparity_right[i].width);
+  
+	// update_matching_cost(cost_left, cost_right, disparity_left[i], disparity_right[i],
   //     occlusion_left[i], occlusion_right[i]);
   
-   forest_left[i].update_matching_cost_on_tree_with_interval(cost_left, disparity_left[i], occlusion_left[i]);
-	 forest_right[i].update_matching_cost_on_tree_with_interval(cost_right, disparity_right[i], occlusion_right[i]);
+  forest_left[i].update_matching_cost_on_tree_with_interval(cost_left, disparity_left[i], occlusion_left[i]);
+	forest_right[i].update_matching_cost_on_tree_with_interval(cost_right, disparity_right[i], occlusion_right[i]);
 
 	forest_left[i].compute_cost_on_tree_with_interval(cost_left, 255 * 0.05);
   forest_right[i].compute_cost_on_tree_with_interval(cost_right, 255 * 0.05);
@@ -148,17 +144,10 @@ int main(int args, char ** argv) {
     return 0;
   }
   // Get support image.
-  SupportMatch sm(rgb_left[0], rgb_right[0],
-      rgb_left[0].width, rgb_left[0].height);
+  // SupportMatch sm(rgb_left[0], rgb_right[0],
+  //    rgb_left[0].width, rgb_left[0].height);
   // Find support match for left and right image respectively.
-  sm.FindSupportMatch();
-
-  // Check the reliable points for left and right image.
-  // NOTICE(xuejiaobai): variable scale is used in the output maps.  
-  // save_image(strcat(file_name[0], "_left_initial_reliable_points.pgm"),
-  //            sm.support_left_map, scale);
-  // save_image(strcat(file_name[1], "_right_initial_reliable_points.pgm"),
-  //            sm.support_right_map, scale);
+  // sm.FindSupportMatch();
 
   // Get scaled image.
   for (int i = 0; i < level - 1; ++i) {
@@ -172,8 +161,9 @@ int main(int args, char ** argv) {
   for (int i = 1; i <= level; ++i) {
     pi[i] = 2 * pi[i - 1];
   }
-  support_prob.reset(max_disparity + 1); 
-	gen_support_prob(sm.support_left_map, sm.support_right_map, support_prob, max_disparity);  
+  
+	// support_prob.reset(max_disparity + 1); 
+	// gen_support_prob(sm.support_left_map, sm.support_right_map, support_prob, max_disparity);  
   
   Array1<double> gmm;
   // Array1<double> gmm0, gmm1; 
@@ -198,35 +188,49 @@ int main(int args, char ** argv) {
 			disparity_right[level].zero();
 		} else {
 			// left vector.
-			
+	    SupportMatch sm(rgb_left[i], rgb_right[i], rgb_left[i].width, rgb_left[i].height);
+		  sm.FindSupportMatch();
+    	support_prob.reset(max_disparity / pi[i] + 1); 
+	    gen_support_prob(sm.support_left_map, sm.support_right_map, support_prob, max_disparity / pi[i]); 
+
 			initial_prob.reset(max_disparity / pi[i + 1] + 1);
 			gen_initial_prob(disparity_left[i + 1], disparity_right[i + 1], initial_prob, max_disparity / pi[i + 1]);
+			
+			if (args > 7)
+			  save_initial_cnt(initial_prob, file_name[4]);
+
 			initial_prob.normalize();
 			// small_given_large matrix.
 			prob_matrix.reset(max_disparity / pi[i + 1] + 1,
 					              max_disparity / pi[i] + 1);
-			gen_small_given_large(prob_matrix, gmm);	
-
+			gen_small_given_large(prob_matrix, gmm, i);	
+      
 			gen_large_given_small(initial_prob, prob_matrix, support_prob);
 			// generate disparity interval.
       // printf("XXXXXXXXXXXXXXX %d\n", i);
       // fflush(stdout);
 			interval.reset(prob_matrix.height, 2);
-				
-			gen_interval_mid(prob_matrix, interval, 0.001);
+			// need experiments.	
+			gen_interval_mid(prob_matrix, interval, 0.001 * pi[i] /*0.001*/);
 			if (args > 7)
 				save_interval(interval, file_name[4]);
     }
      // if (is_highest_layer) {
       // (@xuejiaobai) have no idea but the results are different.
 		
-			compute_first_matching_cost(rgb_left[i], rgb_right[i],
-          cost_left, cost_right, disparity_left[i + 1], interval, max_disparity / pi[i]);
+			Array3<unsigned char> copy_rgb_left, copy_rgb_right;
+			copy_rgb_left.copy(rgb_left[i]);
+			copy_rgb_right.copy(rgb_right[i]);
+		  // compute_first_matching_cost(rgb_left[i], rgb_right[i],
+      //    cost_left, cost_right, disparity_left[i + 1], interval, max_disparity / pi[i]);
       
 			build_tree_with_interval(rgb_left[i], rgb_right[i], graph_left[i], graph_right[i],
           forest_left[i], forest_right[i],
 					disparity_left[i + 1], disparity_right[i + 1], interval,
-					0.9, is_highest_layer);
+					0.95, !is_lowest_layer);
+		
+		  compute_first_matching_cost(copy_rgb_left, copy_rgb_right, cost_left, cost_right, forest_left[i], forest_right[i], max_disparity);	
+			
 			disparity_computation(forest_left[i], forest_right[i],
           cost_left, cost_right, disparity_left[i], disparity_right[i],
 					disparity_left[i + 1], disparity_right[i + 1], interval);
@@ -256,12 +260,12 @@ int main(int args, char ** argv) {
 		
 		find_stable_pixels(disparity_left[i], disparity_right[i],
            occlusion_left[i], occlusion_right[i]);
-    refinement(i);  
+    refinement(i, max_disparity / pi[i]);  
   }
 
     save_image(file_name[2], disparity_left[0], scale);
     save_image(file_name[3], disparity_right[0], scale);
-
+    timer.check("all   ");
     //for (int i = 0; i < level; ++i)
        // draw_tree(0);
   return 0;

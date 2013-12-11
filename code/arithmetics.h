@@ -139,6 +139,48 @@ void compute_first_cost (Array3<double>& cost_left, Array3<double>& cost_right,
 }
 
 template <class type>
+void compute_first_cost (Array3<double>& cost_left, Array3<double>& cost_right,
+    Array3<type>& rgb_left, Array3<type>& rgb_right,
+    Grid<float>& graient_left, Grid<float>& gradient_right,
+		Grid<type>& pre_disparity,
+    vector < Grid<int> >& interval,
+		int max_disparity) {
+	int H, W;
+	cost_left.reset(max_disparity, H=rgb_left.height, W=rgb_left.width);
+	cost_right.reset(max_disparity, rgb_left.height, rgb_left.width); // assume left and right rgb image has the exact same size;
+	double max_gradient_color_difference= 2.0;
+	double max_color_difference = 10.0;
+	double weight_on_color = 0.11;
+  int p;
+	for (int d = 0; d < max_disparity; ++d)
+		for (int x = 0; x < H; ++x)
+			for (int y = 0; y < W; ++y) {
+				int prex = mylib::min(pre_disparity.height - 1, x / 2);
+				int prey = mylib::min(pre_disparity.width - 1, y / 2);
+        if (prex < pre_disparity.height / 2) {
+          p = prey < pre_disparity.width / 2 ? 1 : 2;
+        } else {
+          p = prey < pre_disparity.width / 2 ? 3 : 4;
+        }
+				if (interval[p][pre_disparity[prex][prey]][0] <= d &&
+						interval[p][pre_disparity[prex][prey]][1] >= d ) {
+					double cost = 0;
+				  for (int c = 0; c < 3; ++c)
+					  cost += mylib::ABS(
+								rgb_left[c][x][y] - rgb_right[c][x][mylib::max(y - d,0)]);
+
+					cost = mylib::min(cost / 3.0, max_color_difference); // here is weired
+				  double cost_gradient = mylib::min((double) mylib::ABS(graient_left[x][y] - gradient_right[x][mylib::max(0, y - d)]), max_gradient_color_difference);
+				  cost_left[d][x][y] = weight_on_color * cost + (1 - weight_on_color) * cost_gradient;
+
+				} else {
+				  cost_left[d][x][y] = MAX_MATCHING_COST;
+				}
+			}
+	copy_left_cost_to_right(cost_left, cost_right);
+}
+
+template <class type>
 void compute_disparity (Array3<double> & cost, Grid<type> &disparity) {
 	// something weired in the doc. left right not symetric
 	disparity.reset(cost.height, cost.width);
@@ -174,6 +216,35 @@ void compute_disparity (Array3<double> & cost, Grid<type> &disparity, Grid<type>
 		}
 	// ctmf ignored
 }
+
+template <class type>
+void compute_disparity (Array3<double> & cost, Grid<type> &disparity, Grid<type>& pre_disp, vector < Grid<int> >& interval) {
+	// something weired in the doc. left right not symetric
+	disparity.reset(cost.height, cost.width);
+  int p;
+	for (int i = 0; i < cost.height; ++i)
+		for (int j = 0; j < cost.width; ++j) {
+			int prei = mylib::min(i / 2, pre_disp.height - 1);
+			int prej = mylib::min(j / 2, pre_disp.width - 1);
+      
+      if (prei < pre_disp.height / 2) {
+          p = prej < pre_disp.width / 2 ? 1 : 2;
+        } else {
+          p = prej < pre_disp.width / 2 ? 3 : 4;
+        }
+
+			int best_dis = mylib::min(cost.array - 1, interval[p][pre_disp[prei][prej]][0]);
+			double best = cost[best_dis][i][j];// cost[0][i][j];
+			for (int d = best_dis + 1; d <= mylib::min(interval[p][pre_disp[prei][prej]][1], cost.array - 1); ++d)
+				if (cost[d][i][j] < best) {
+					best = cost[d][i][j];
+                    best_dis = d;
+                }
+			disparity[i][j] = best_dis;
+		}
+	// ctmf ignored
+}
+
 // ctmf should be here
 
 #endif
