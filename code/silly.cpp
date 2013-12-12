@@ -25,7 +25,7 @@ int scale = 16;
 int w = 1, b = 8;
 double a = 1;
 
-//TimeKeeper timer;
+TimeKeeper timer;
 
 Grid<unsigned char> occlusion_left, occlusion_right;
 
@@ -103,8 +103,8 @@ int main(int args, char ** argv) {
       left_gradient, right_gradient, max_disparity);
 //timer.check("initial cost ");
   for (int i = 0; i < 3; ++i){
-    median_filter(rgb_left[i]);
-    median_filter(rgb_right[i]);
+    median_filter(rgb_left[i], 1);
+    median_filter(rgb_right[i], 1);
   }
 
 //timer.check("ctmf for     ");
@@ -136,6 +136,6 @@ int main(int args, char ** argv) {
 //timer.check("get disparity");
   save_image(file_name[2], disparity_left, scale);
   save_image(file_name[3], disparity_right, scale);
-//timer.get_total_time();
+timer.get_total_time();
   return 0;
 }
