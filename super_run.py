@@ -7,13 +7,16 @@ DATASETS = (
 #    'Middlebury_1',
     'Middlebury_4',
     'Middlebury_others',
-		'Middlebury_bad',
+#		'Middlebury_bad',
 )
 ALGORITHMS = (
-		'Original',
-#    'RandTree',
+	'Original',
+    'RandTree',
 #    'MST_blind',
-		'MSF2',
+#		'MSF2',
+#     'MSF2_TEST',
+#     'MSF2_ALL_MST',
+#     'MSF2_LAST_RAND',
 #    'silly',
 )
 
@@ -128,9 +131,23 @@ for dataset in DATASETS :
     pic_names = subprocess.check_output(['ls', 'testdata/' + dataset + '/']).split()
     for picture in pic_names :
         report.write('<tr><td>'+dataset+'.'+picture+'</td>')
+        tmp = {}
+        for i in [0, 1] :
+            tmp[i] = []
+            for algoritm in ALGORITHMS :
+                tmp[i].append(table[algoritm][dataset][picture][i][2])
         for algoritm in ALGORITHMS :
+            color = []
             for i in [0, 1] :
-                report.write('<td>'+table[algoritm][dataset][picture][i][2]+'</td>')
+                if table[algoritm][dataset][picture][i][2] == max(tmp[i]) :
+                    color.append("#F79F81")
+                elif table[algoritm][dataset][picture][i][2] == min(tmp[i]) :
+                    color.append("#BEF781")
+                else :
+                    color.append("white")
+
+            for i in [0, 1] :
+                report.write('<td bgcolor = ' + color[i] + '>'+table[algoritm][dataset][picture][i][2]+'</td>')
         report.write('</tr>\n')
 
 report.write('</html>')

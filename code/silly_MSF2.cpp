@@ -22,7 +22,7 @@ char file_name[5][300] =
 
 int max_disparity = 16;
 int scale = 16;
-const int level = 2;
+const int level = 3;
 
 TimeKeeper timer;
 
@@ -175,7 +175,7 @@ int main(int args, char ** argv) {
 
     // disparity prediction model
     if (is_highest_layer) { 
-			interval.reset(max_disparity / pi[i + 1] + 1, 2);
+			interval.reset(max_disparity / pi[i + 1]/* + 1*/, 2);
 			
 			for (int j = 0; j < interval.height; ++j) {
 			  interval[j][0] = 0;
@@ -190,10 +190,10 @@ int main(int args, char ** argv) {
 			// left vector.
 	    SupportMatch sm(rgb_left[i], rgb_right[i], rgb_left[i].width, rgb_left[i].height);
 		  sm.FindSupportMatch();
-    	support_prob.reset(max_disparity / pi[i] + 1); 
+    	support_prob.reset(max_disparity / pi[i] /*+ 1*/); 
 	    gen_support_prob(sm.support_left_map, sm.support_right_map, support_prob, max_disparity / pi[i]); 
 
-			initial_prob.reset(max_disparity / pi[i + 1] + 1);
+			initial_prob.reset(max_disparity / pi[i + 1] /*+ 1*/);
 			gen_initial_prob(disparity_left[i + 1], disparity_right[i + 1], initial_prob, max_disparity / pi[i + 1]);
 			
 			if (args > 7)
@@ -201,8 +201,8 @@ int main(int args, char ** argv) {
 
 			initial_prob.normalize();
 			// small_given_large matrix.
-			prob_matrix.reset(max_disparity / pi[i + 1] + 1,
-					              max_disparity / pi[i] + 1);
+			prob_matrix.reset(max_disparity / pi[i + 1] /*+ 1*/,
+					              max_disparity / pi[i] /*+ 1*/);
 			gen_small_given_large(prob_matrix, gmm, i);	
       
 			gen_large_given_small(initial_prob, prob_matrix, support_prob);
@@ -227,10 +227,9 @@ int main(int args, char ** argv) {
 			build_tree_with_interval(rgb_left[i], rgb_right[i], graph_left[i], graph_right[i],
           forest_left[i], forest_right[i],
 					disparity_left[i + 1], disparity_right[i + 1], interval,
-					0.95, !is_lowest_layer);
-		
-		  compute_first_matching_cost(copy_rgb_left, copy_rgb_right, cost_left, cost_right, forest_left[i], forest_right[i], max_disparity);	
-			
+					0.95, /*true,*/ !is_lowest_layer, !is_highest_layer);
+	
+		  compute_first_matching_cost(copy_rgb_left, copy_rgb_right, cost_left, cost_right, forest_left[i], forest_right[i], max_disparity / pi[i]);	
 			disparity_computation(forest_left[i], forest_right[i],
           cost_left, cost_right, disparity_left[i], disparity_right[i],
 					disparity_left[i + 1], disparity_right[i + 1], interval);
@@ -260,7 +259,8 @@ int main(int args, char ** argv) {
 		
 		find_stable_pixels(disparity_left[i], disparity_right[i],
            occlusion_left[i], occlusion_right[i]);
-    refinement(i, max_disparity / pi[i]);  
+
+    refinement(i, max_disparity / pi[i]);
   }
 
     save_image(file_name[2], disparity_left[0], scale);

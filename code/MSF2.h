@@ -89,8 +89,8 @@ void build_tree(Array3<type>& left,
                 Forest& forest_right) {
   // Median filter.
   for (int i = 0; i < 3; ++i) {
-    median_filter(left[i]);
-    median_filter(right[i]);
+    median_filter(left[i], 1);
+    median_filter(right[i], 1);
   }
   // Build graph.
   left_graph.collect_edges(left);
@@ -119,12 +119,14 @@ void build_tree_with_interval(Array3<type>& left,
                 Grid<type>& disp_right,
                 Grid<int>& interval,
                 double threshold,
-								bool build_MST = false) {
+								bool build_MST = false,
+								bool use_median_filter = false) {
 
   // Median filter.
-  for (int i = 0; i < 3; ++i) {
-    median_filter(left[i]);
-    median_filter(right[i]);
+  if (use_median_filter)
+	for (int i = 0; i < 3; ++i) {
+    median_filter(left[i], 1);
+    median_filter(right[i], 1);
   }
   // Build graph.
   // printf("XXXXXXXXXXXXXX\n");

@@ -127,7 +127,7 @@ public :
         
 				itv = (Interval *) malloc((n + 2) * sizeof(Interval));
        
-			  printf("%d %d\n", interval[disp[0][0]][0], interval[disp[0][0]][1]);	 
+			  // printf("%d %d\n", interval[disp[0][0]][0], interval[disp[0][0]][1]);	 
 				for (int i = 0; i < H; ++i)
         for (int j = 0; j < W; ++j) {
            itv[node_number(i, j)].l = interval[disp[mylib::min(i / 2, disp.height - 1)][mylib::min(j / 2, disp.width - 1)]][0];
@@ -141,7 +141,10 @@ public :
             for (int q = 0; q < 2; ++q) if (p + q == 1)
             if (i + p < H && j + q < W) {
                 int XX = node_number(i, j), YY = node_number(i+p, j+q);
-                if (itv[XX].cap(itv[YY]).length() <= 0) {
+                int WW = mylib::max3abs(rgb[0][i][j] - rgb[0][i+p][j+q],
+                                        rgb[1][i][j] - rgb[1][i+p][j+q],
+                                        rgb[2][i][j] - rgb[2][i+p][j+q]); 
+								if (itv[XX].cap(itv[YY]).length() <= 0  && WW > MAX_TOLERANCE) {
 									m--;
 							   	continue;
 								}
@@ -185,7 +188,8 @@ public :
             for (int q = 0; q < 2; ++q) if (p + q == 1)
             if (i + p < H && j + q < W) {
                 int XX = node_number(i, j), YY = node_number(i+p, j+q);
-                if (itv[XX].cap(itv[YY]).length() <= 0) {
+                // How about color similarity`
+								if (itv[XX].cap(itv[YY]).length() <= 0) {
 									m--;
 							   	continue;
 								}
@@ -263,7 +267,7 @@ class Forest {
   int * order; // the sequence of index, the visiting order of the tree
   Array3<double> backup; // used in calculate cost on tree
   double table[256]; // weight table
-    Graph * graph;
+	Graph * graph;
 public :
     Forest() {}
     Forest(const Forest& f) {}
@@ -347,6 +351,7 @@ public :
   void compute_cost_on_tree_with_interval(Array3<double> & cost, double sigma = 255 * 0.1 ) {
     update_table(sigma);
     backup.copy(cost);
+		int px, py, qx, qy;
     for (int i = n; i >= 1; --i) {
       int p = order[i];
       for (int j = 0; j < nodes[p].degree; ++j) {
@@ -361,12 +366,14 @@ public :
 				// fflush(stdout);
 				Interval bound = graph->itv[graph->mset.find(p)].cap(Interval(0, cost.array-1));        
         // bound.l = mylib::max(0, bound.l);
-			  // bound.r = mylib::min(bound.r, cost.array - 1);	
+			  // bound.r = mylib::min(bound.r, cost.array - 1);
+			  graph->node_location(p, px, py);
+			  graph->node_location(q, qx, qy);	
         for (int d = bound.l; d <= bound.r; ++d) {
-          double value_p = backup[d][nodes[p].x][nodes[p].y];
-          double value_q = backup[d][nodes[q].x][nodes[q].y];
+          double value_p = backup[d][px][py];
+          double value_q = backup[d][qx][qy];
           value_p += w * value_q;
-          backup[d][nodes[p].x][nodes[p].y] = value_p;
+          backup[d][px][py] = value_p;
         }
       }
     }
@@ -385,11 +392,13 @@ public :
         if (nodes[q].ord < nodes[p].ord) continue; // ERROR: Not > but <. q is child
         // double w = exp(-1.0 * nodes[q].up_weight / sigma_const);
         double w = table[nodes[q].up_weight];
-        Interval bound = graph->itv[graph->mset.find(p)].cap(Interval(0, cost.array-1));        
+        Interval bound = graph->itv[graph->mset.find(p)].cap(Interval(0, cost.array-1));
+        graph->node_location(p, px, py);
+        graph->node_location(q, qx, qy);				
         for (int d = bound.l; d <= bound.r; ++d) {
-          double value_q_current = backup[d][nodes[q].x][nodes[q].y];
-          double value_p = cost[d][nodes[p].x][nodes[p].y];
-          cost[d][nodes[q].x][nodes[q].y] = w * (value_p - w* value_q_current) + value_q_current;
+          double value_q_current = backup[d][qx][qy];
+          double value_p = cost[d][px][py];
+          cost[d][qx][qy] = w * (value_p - w* value_q_current) + value_q_current;
         }
       }
     }
@@ -402,9 +411,10 @@ public :
 		  int p = order[i];
 			Interval bound = graph->itv[graph->mset.find(p)].cap(Interval(0, cost.array - 1));
 			int best_dis = mylib::min(cost.array - 1, bound.l);
-			int xx = nodes[p].x, yy = nodes[p].y;
+			int xx, yy;
+			graph->node_location(p, xx, yy);
 			double best = cost[best_dis][xx][yy];
-			for (int d = bound.l + 1; d <= mylib::min(cost.array - 1, bound.r); ++d) {
+			for (int d = bound.l + 1; d <= bound.r; ++d) {
 			  if (cost[d][xx][yy] < best) {
 				  best = cost[d][xx][yy];
 					best_dis = d;
@@ -424,13 +434,15 @@ public :
 		cost.zero();
 		for (int i = 1; i <= n; ++i) {
 		  int p = order[i];
+			int px, py;
+			graph->node_location(p, px, py);
 			Interval bound = graph->itv[graph->mset.find(p)].cap(Interval(0, cost.array - 1));
-			bound.l = min(bound.l, cost.array - 1);
-			bound.r = min(bound.r, cost.array - 1);
-			if (occlusion[nodes[p].x][nodes[p].y] == 0) {
+			// bound.l = min(bound.l, cost.array - 1);
+			// bound.r = min(bound.r, cost.array - 1);
+			if (occlusion[px][py] == 0) {
 			  for (int d = bound.l; d <= bound.r; ++d) {
-				  cost[d][nodes[p].x][nodes[p].y] =
-						  mylib::ABS(d - disparity[nodes[p].x][nodes[p].y]);
+				  cost[d][px][py] =
+						  mylib::ABS(d - disparity[px][py]);
 				}
 			}
 		}
@@ -452,15 +464,20 @@ public :
 		double weight_on_color = 0.11;// 0.20; // 0.11;
 		for (int i = 1; i <= n; ++i) {
 		  int p = order[i];
-			int px = nodes[p].x;
-			int py = nodes[p].y;
+			int px, py;
+			graph->node_location(p, px, py);// nodes[p].x;
 			Interval bound = graph->itv[graph->mset.find(p)].cap(Interval(0, cost.array - 1));
-			bound.l = min(bound.l, cost.array - 1);
-			bound.r = min(bound.r, cost.array - 1);
+			// bound.l = min(bound.l, cost.array - 1);
+			// bound.r = min(bound.r, cost.array - 1);
 			search_range += bound.r - bound.l + 1;
+//			if (cost.array == 64)
+//			  printf("%d %d %d\n", i, bound.l, bound.r);
 			for (int d = bound.l; d <= bound.r; ++d) {
 				double first_cost = 0;
-			  for (int c = 0; c < 3; ++c) {
+			  // if (i == 393730 || i == 393729) {
+				//   printf("XXXXXXXX %d %d %d\n", p, px, py);fflush(stdout);
+				// }
+				for (int c = 0; c < 3; ++c) {
 					if (is_left)
 						first_cost += mylib::ABS(rgb_left[c][px][py] -
 			          rgb_right[c][px][mylib::max(0, py - d)]);
@@ -484,6 +501,7 @@ public :
   void compute_cost_on_tree(Array3<double> & cost, double sigma = 255 * 0.1 ) {
     update_table(sigma);
     backup.copy(cost);
+		int px, py, qx, qy;
     for (int i = n; i >= 1; --i) {
       int p = order[i];
       for (int j = 0; j < nodes[p].degree; ++j) {
@@ -492,12 +510,16 @@ public :
 //               cout << i <<  ' ' << j << ' ' <<  endl;
         // double w = exp(-1.0 * nodes[q].up_weight / sigma_const);
         double w = table[nodes[q].up_weight];
-        for (int d = 0; d < cost.array; ++d) {
+        graph->node_location(p, px, py);
+				graph->node_location(q, qx, qy);
+				for (int d = 0; d < cost.array; ++d) {
 //                    cout << d << ' ' << nodes[p].x << ' ' << nodes[p].y << endl;
-          double value_p = backup[d][nodes[p].x][nodes[p].y];
-          double value_q = backup[d][nodes[q].x][nodes[q].y];
-          value_p += w * value_q;
-          backup[d][nodes[p].x][nodes[p].y] = value_p;
+          // double value_p = backup[d][nodes[p].x][nodes[p].y];
+          // double value_q = backup[d][nodes[q].x][nodes[q].y];
+          double value_p = backup[d][px][py];
+          double value_q = backup[d][qx][qy];
+					value_p += w * value_q;
+          backup[d][px][py] = value_p;
         }
       }
     }
@@ -510,11 +532,18 @@ public :
         int q =  nodes[p].next_node[j];
         if (nodes[q].ord < nodes[p].ord) continue; // ERROR: Not > but <. q is child
         // double w = exp(-1.0 * nodes[q].up_weight / sigma_const);
-        double w = table[nodes[q].up_weight];
+        graph->node_location(p, px, py);
+				graph->node_location(q, qx, qy);
+				
+				double w = table[nodes[q].up_weight];
         for (int d = 0; d < cost.array; ++d) {
-          double value_q_current = backup[d][nodes[q].x][nodes[q].y];
-          double value_p = cost[d][nodes[p].x][nodes[p].y];
-          cost[d][nodes[q].x][nodes[q].y] = w * (value_p - w* value_q_current) + value_q_current;
+          // double value_q_current = backup[d][nodes[q].x][nodes[q].y];
+          // double value_p = cost[d][nodes[p].x][nodes[p].y];
+          
+          double value_q_current = backup[d][qx][qy];
+          double value_p = cost[d][px][py];
+					
+					cost[d][qx][qy] = w * (value_p - w* value_q_current) + value_q_current;
         }
       }
     }
