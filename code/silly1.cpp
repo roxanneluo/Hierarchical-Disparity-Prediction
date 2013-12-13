@@ -28,7 +28,7 @@ Grid<unsigned char> occlusion_left, occlusion_right;
 Forest left_support_forest, right_support_forest;
 Grid<unsigned char> left_support_map, right_support_map;
 Grid<unsigned char> left_tree_img, right_tree_img;
-
+/*
 void draw_tree() {
   int times = 3;
   int x = 252, y = 167;
@@ -47,7 +47,7 @@ void draw_tree() {
   save_image("RandTree_leftsupportmap.pgm", left_support_map);
   save_image("RandTree_rightsupportmap.pgm", right_support_map);
 }
-
+*/
 template <class type>
 void refinement(Grid<type>& d_left, Grid<type>& d_right) {
   // find stable pixels by using left-right consisty check
@@ -108,7 +108,7 @@ int main(int args, char ** argv) {
   forest_left.order_of_visit();
   forest_right.order_of_visit();
   
-  draw_tree();
+  // draw_tree();
   
   forest_left.compute_cost_on_tree(cost_left);
   forest_right.compute_cost_on_tree(cost_right);

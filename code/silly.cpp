@@ -48,7 +48,7 @@ void refinement(Grid<type>& d_left, Grid<type>& d_right) {
   compute_disparity(cost_right, d_right);
 }
 
-void draw_tree() {
+/*void draw_tree() {
   int times = 3;
   int x = 100, y = 80;
   draw_tree_and_RGBimage(left_tree_img, rgb_left,
@@ -66,7 +66,7 @@ void draw_tree() {
   save_image("MST_leftsupportmap.pgm", left_support_map);
   save_image("MST_rightsupportmap.pgm", right_support_map);
 }
-
+*/
 int main(int args, char ** argv) {
   if (args > 2) {
     strcpy(file_name[0], argv[1]);
@@ -118,7 +118,7 @@ int main(int args, char ** argv) {
   forest_left.order_of_visit();
   forest_right.order_of_visit();
 
-  draw_tree();
+  // draw_tree();
 
 //timer.check("MST          ");
   forest_left.compute_cost_on_tree(cost_left);
