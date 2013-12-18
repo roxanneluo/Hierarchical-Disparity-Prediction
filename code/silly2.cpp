@@ -30,28 +30,13 @@ Forest left_support_forest, right_support_forest;
 Grid<unsigned char> left_support_map, right_support_map;
 Grid<unsigned char> left_tree_img, right_tree_img;
 
-void draw_tree() {
-  int times = 3;
-  int x = 252, y = 167;
-  draw_tree_and_RGBimage(left_tree_img, rgb_left,
-      left_graph.trees, left_graph.n, times);
-  draw_tree_and_RGBimage(right_tree_img, rgb_right,
-      right_graph.trees, left_graph.n, times);
-  left_support_forest.init(left_graph);
-  right_support_forest.init(right_graph);
-  draw_support_map(left_support_map, left_support_forest,
-      left_graph, x, y, times);
-  draw_support_map(right_support_map, right_support_forest,
-      right_graph, x, y, times);
-  save_image("RandTree_lefttreeimage.pgm", left_tree_img);
-  save_image("RandTree_righttreeimage.pgm", right_tree_img);
-  save_image("RandTree_leftsupportmap.pgm", left_support_map);
-  save_image("RandTree_rightsupportmap.pgm", right_support_map);
-}
-
 template <class type>
 void refinement(Grid<type>& d_left, Grid<type>& d_right) {
-  // find stable pixels by using left-right consisty check
+  // find stable pixels by using left-right consisty check 
+  find_stable_pixels(d_left, d_right, occlusion_left, occlusion_right);
+  update_matching_cost(cost_left, cost_right, d_left, d_right,
+      occlusion_left, occlusion_right);
+
   left_graph.collect_edges_edgeaware(rgb_left);
   right_graph.collect_edges_edgeaware(rgb_right);
   left_graph.build_RandTree(true);
@@ -63,10 +48,6 @@ void refinement(Grid<type>& d_left, Grid<type>& d_right) {
   forest_right.init(right_graph);
   forest_left.order_of_visit();
   forest_right.order_of_visit();
- 
-  find_stable_pixels(d_left, d_right, occlusion_left, occlusion_right);
-  update_matching_cost(cost_left, cost_right, d_left, d_right,
-      occlusion_left, occlusion_right);
 
   forest_left.compute_cost_on_tree(cost_left, 255 * 0.05);
   forest_right.compute_cost_on_tree(cost_right, 255 * 0.05);
