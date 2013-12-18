@@ -161,10 +161,7 @@ int main(int args, char ** argv) {
   for (int i = 1; i <= level; ++i) {
     pi[i] = 2 * pi[i - 1];
   }
-  
-	// support_prob.reset(max_disparity + 1); 
-	// gen_support_prob(sm.support_left_map, sm.support_right_map, support_prob, max_disparity);  
-  
+   
   Array1<double> gmm;
   // Array1<double> gmm0, gmm1; 
  	
@@ -174,7 +171,6 @@ int main(int args, char ** argv) {
     Array3<double> cost_left, cost_right;
 
     // disparity prediction model
-    printf("Before generate interval.\n");fflush(stdout);
     if (is_highest_layer) { 
 			interval.reset(max_disparity / pi[i + 1]/* + 1*/, 2);
 			
@@ -189,11 +185,8 @@ int main(int args, char ** argv) {
 			disparity_right[level].zero();
 		} else {
 			// left vector.
-            printf("XXXXXXXXXXXXXXX\n"); fflush(stdout);
 	    SupportMatch sm(rgb_left[i], rgb_right[i], rgb_left[i].width, rgb_left[i].height);
-	    	  
-            sm.FindSupportMatch();
-            printf("XXXXXXXXXXXX\n"); fflush(stdout);
+	    sm.FindSupportMatch();
     	support_prob.reset(max_disparity / pi[i] /*+ 1*/); 
 	    gen_support_prob(sm.support_left_map, sm.support_right_map, support_prob, max_disparity / pi[i]); 
 			initial_prob.reset(max_disparity / pi[i + 1] /*+ 1*/);
@@ -209,57 +202,27 @@ int main(int args, char ** argv) {
 			gen_small_given_large(prob_matrix, gmm, i);	
       
 			gen_large_given_small(initial_prob, prob_matrix, support_prob);
-			// generate disparity interval.
-      // printf("XXXXXXXXXXXXXXX %d\n", i);
-      // fflush(stdout);
 			interval.reset(prob_matrix.height, 2);
 			// need experiments.	
 			gen_interval_mid(prob_matrix, interval, 0.001 * pi[i] /*0.001*/);
 			if (args > 7)
 				save_interval(interval, file_name[4]);
     }
-     // if (is_highest_layer) {
-      // (@xuejiaobai) have no idea but the results are different.
-	printf("After generate interval.\n"); fflush(stdout);	
-			Array3<unsigned char> copy_rgb_left, copy_rgb_right;
-			copy_rgb_left.copy(rgb_left[i]);
-			copy_rgb_right.copy(rgb_right[i]);
-		  // compute_first_matching_cost(rgb_left[i], rgb_right[i],
-      //    cost_left, cost_right, disparity_left[i + 1], interval, max_disparity / pi[i]);
+	  
+		Array3<unsigned char> copy_rgb_left, copy_rgb_right;
+		copy_rgb_left.copy(rgb_left[i]);
+		copy_rgb_right.copy(rgb_right[i]);
       
-			build_tree_with_interval(rgb_left[i], rgb_right[i], graph_left[i], graph_right[i],
-          forest_left[i], forest_right[i],
-					disparity_left[i + 1], disparity_right[i + 1], interval,
-					0.95, /*true,*/ !is_lowest_layer, !is_highest_layer);
+		build_tree_with_interval(rgb_left[i], rgb_right[i], graph_left[i], graph_right[i],
+        forest_left[i], forest_right[i],
+			  disparity_left[i + 1], disparity_right[i + 1], interval,
+				0.95, /*true,*/ !is_lowest_layer, false);
 	
-		  compute_first_matching_cost(copy_rgb_left, copy_rgb_right, cost_left, cost_right, forest_left[i], forest_right[i], max_disparity / pi[i]);	
-			disparity_computation(forest_left[i], forest_right[i],
-          cost_left, cost_right, disparity_left[i], disparity_right[i],
-					disparity_left[i + 1], disparity_right[i + 1], interval);
+		compute_first_matching_cost(copy_rgb_left, copy_rgb_right, cost_left, cost_right, forest_left[i], forest_right[i], max_disparity / pi[i]);	
+		disparity_computation(forest_left[i], forest_right[i],
+        cost_left, cost_right, disparity_left[i], disparity_right[i],
+				disparity_left[i + 1], disparity_right[i + 1], interval);
 			
-			/*
-			compute_first_matching_cost(rgb_left[i], rgb_right[i],
-					cost_left, cost_right, max_disparity / pi[i]);
-			build_tree(rgb_left[i], rgb_right[i], graph_left[i], graph_right[i],
-			 		forest_left[i], forest_right[i]);
-			disparity_computation(forest_left[i], forest_right[i],
-			 		cost_left, cost_right, disparity_left[i], disparity_right[i]);
-		  */
-		/*	
-		  } else {
-      // Not the highest layer. BUILD forest from here!
-      compute_first_matching_cost(rgb_left[i], rgb_right[i],
-          cost_left, cost_right, disparity_left[i + 1], interval, max_disparity / pi[i]);
-      build_tree_with_interval(rgb_left[i], rgb_right[i], graph_left[i], graph_right[i],
-          forest_left[i], forest_right[i], 
-          disparity_left[i + 1], disparity_right[i + 1], interval, 
-          0.9 //  the threshold
-          );
-      disparity_computation(forest_left[i], forest_right[i],
-          cost_left, cost_right, disparity_left[i], disparity_right[i],
-				  disparity_left[i + 1], disparity_right[i + 1], interval);
-    }*/
-		
 		find_stable_pixels(disparity_left[i], disparity_right[i],
            occlusion_left[i], occlusion_right[i]);
 
