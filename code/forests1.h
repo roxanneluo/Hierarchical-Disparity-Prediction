@@ -250,22 +250,25 @@ public :
 	} // compute cost on tree
 
     template <class type>
-	void compute_support(Grid<type> &support, double sigma = 255 * 0.1) {
-	    update_table(sigma);
+    void compute_support(Grid<type> &support, double sigma = 255 * 0.1) {
+        update_table(sigma);
         backup.reset(1, support.height, support.width);
 
-	    support[nodes[order[1]].x][nodes[order[1]].y]=backup[0][nodes[order[1]].x][nodes[order[1]].y] = 255;
+        support[nodes[order[1]].x][nodes[order[1]].y]=255;
+        // support[nodes[order[1]].x][nodes[order[1]].y]=backup[0][nodes[order[1]].x][nodes[order[1]].y] = 255;
+
         for (int i = 1; i <= n; ++i) {
             int p = order[i];
             for (int j = 0; j < nodes[p].degree; ++j) {
                 int q = nodes[p].next_node[j];
                 if (nodes[q].ord < nodes[p].ord) continue;
 
-                support[nodes[q].x][nodes[q].y] = backup[0][nodes[q].x][nodes[q].y]
-                                                = backup[0][nodes[p].x][nodes[p].y]*table[nodes[q].up_weight];
+                // support[nodes[q].x][nodes[q].y] = backup[0][nodes[q].x][nodes[q].y]
+                //                                 = backup[0][nodes[p].x][nodes[p].y]*table[nodes[q].up_weight];
+                support[nodes[q].x][nodes[q].y] = support[nodes[p].x][nodes[p].y]*table[nodes[q].up_weight];
             }
         }
-	}
+    }
 };
 
 #endif

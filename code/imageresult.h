@@ -105,7 +105,7 @@ void draw_image(Grid<type> &img, Grid<type> origin, int times) {
 }
 
 template<class type>
-void draw_RGBimage(Array3<type> &img, Grid<type> origin, int times, int channel,int scale) {
+void draw_RGBimage(Array3<unsigned char> &img, Grid<type> origin, int times, int channel,int scale) {
     int H = origin.height, W = origin.width;
     //printf("H = %d, W = %d\n", H, W);
     for (int i = 0; i < H*(1+times); ++i)
@@ -121,15 +121,6 @@ void draw_RGBimage(Array3<type> &img, Grid<type> origin, int times, int channel,
         }
 }
 
-template<class type>
-void draw_tree_and_image_RGB(Array3<type> &img, Grid<type> &origin1,Grid<type>&disp,
-                         Edge *trees, int n, int times, int dispScale, int color = -1) {
-    int H = origin1.height, W = origin1.width;
-    img.reset(3, H*(1+times), W*(1+times));
-    draw_RGBimage(img, origin1, times, 0, dispScale);
-    draw_RGBimage(img,disp, times, 2, dispScale);
-    draw_RGBtree(img, trees, n, times, color);
-}
 
 template<class type>
 void draw_tree_and_image(Grid<type> &img, Grid<type> &origin,
@@ -196,10 +187,20 @@ void compute_support(Grid<type> &support, Forest &forest, int x, int y, int W, d
     forest.compute_support(support, sigma);
 }
 
+template<class type, class type2>
+void draw_tree_and_image_RGB(Array3<type> &img, Grid<type2> &origin1,Grid<type>&disp,
+                         Edge *trees, int n, int times, int dispScale, int color = -1) {
+    int H = origin1.height, W = origin1.width;
+    img.reset(3, H*(1+times), W*(1+times));
+    draw_RGBimage(img, origin1, times, 0, 1);
+    draw_RGBimage(img,disp, times, 2, dispScale);
+    draw_RGBtree(img, trees, n, times, color);
+}
+
 template <class type>
 void draw_support_map(Array3<type> &output_support, Grid<type>&disp, Forest &support_forest, Graph &g,
                       int x, int y, int times, int scale, double sigma = 0.1*255) {
-    Grid<type> small_support;
+    Grid<double> small_support;
     small_support.reset(g.H, g.W);
     compute_support(small_support, support_forest, x, y, g.W, sigma);
     draw_tree_and_image_RGB(output_support, small_support, disp,g.trees, g.n, times, scale);

@@ -1,4 +1,4 @@
-all : silly0 silly1 checke0 checke1 checke2 MST_blind silly_MSF Prob_Gen cnt_Gen SgL_Gen gen_interval_test MSF2 Stable_RAND Stable_MST
+all : silly0 silly1 checke0 checke1 checke2 checker_print_err MST_blind silly_MSF Prob_Gen cnt_Gen SgL_Gen gen_interval_test MSF2 Stable_RAND Stable_MST
 silly0:
 	g++ code/silly.cpp -o bin/Original.out -O2 -Wall -std=c++0x
 checke0 :
@@ -9,6 +9,8 @@ checke1 :
 	g++ code/checker1.cpp -o bin/checker1.out -O2 -Wall -std=c++0x
 checke2 :
 	g++ code/checker_supportmap.cpp -o bin/checker_support.out -O2 -Wall -std=c++0x
+checker_print_err :
+	g++ code/checker2.cpp -o bin/checker_print_err.out -O2 -Wall -std=c++0x
 MST_blind :
 	g++ code/MST_blind.cpp -o bin/MST_blind.out -O2 -Wall -std=c++0x
 silly_MSF :

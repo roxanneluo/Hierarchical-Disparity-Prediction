@@ -33,8 +33,9 @@ Grid<unsigned char> left_tree_img, right_tree_img;
 Grid<unsigned char> left_occ_img, right_occ_img;
 
 // for input x, y
-const int num = 5;
-int x[num], y[num];
+const int MAX_NUM = 20;
+int num = 0;
+int x[MAX_NUM], y[MAX_NUM];
 
 
 template <class type>
@@ -70,11 +71,15 @@ int main(int args, char ** argv) {
   if (args > 7) {
     strcpy(file_name[4], argv[7]);
     //strcpy(file_name[5], argv[8]);
+    // printf("%s\n", file_name[4]);
   }
-  if (args > 8) 
+  if (args > 8)  {
     strcpy(file_name[5], argv[8]);
-  if (args > 18) {
+    // printf("%s\n", file_name[5]);
+  }
+  if (args > 10) {
     int start = 9;
+    num = mylib::min((args-8)/2,MAX_NUM);
     for (int i = 0; i < num; ++i){
       x[i] = atoi(argv[start++]);
       y[i] = atoi(argv[start++]);
@@ -95,10 +100,10 @@ int main(int args, char ** argv) {
   compute_gradient(right_gradient, rgb_right);
   compute_first_cost(cost_left, cost_right, rgb_left, rgb_right,
       left_gradient, right_gradient, max_disparity);
-  for (int i = 0; i < 3; ++i){
+  /*for (int i = 0; i < 3; ++i){
     median_filter(rgb_left[i], 1);
     median_filter(rgb_right[i], 1);
-  }
+  }*/
 
   left_graph.collect_edges(rgb_left);
   right_graph.collect_edges(rgb_right);
@@ -123,7 +128,7 @@ int main(int args, char ** argv) {
   save_image(file_name[3], right_occ_img, scale);
 
   int cnt = 0;
-  for (int i = 0; i < 5; ++i) {
+  for (int i = 0; i < num; ++i) {
    // if (bad_point(x,y,occlusion_left)) {
       draw_support_map(x[i],y[i],file_name[4],++cnt,file_name[5],left_support_forest, left_support_map, left_occ_img,left_graph, scale);
     //}
