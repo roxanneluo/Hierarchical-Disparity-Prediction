@@ -7,13 +7,14 @@ DATASETS = (
 #    'Middlebury_1',
     'Middlebury_4',
     'Middlebury_others',
-#		'Middlebury_bad',
+#    'Middlebury_bad',
 )
 ALGORITHMS = (
-	'Original',
+    'STCostAggre',
+    'Original',
     'RandTree',
 #    'MST_blind',
-#		'MSF2',
+#       'MSF2',
 #     'MSF2_TEST',
 #     'MSF2_ALL_MST',
 #     'MSF2_LAST_RAND',
@@ -27,6 +28,20 @@ right_result = ''
 total = 0
 correct = 0
 table = {}
+
+def run_ST_with_path(path, output) :
+    """ path should end with a / """
+    para = 0
+    with open(path + 'spec.txt','r') as f :
+        para = f.read().split()
+    what = subprocess.check_output([
+        'bin/' + algoritm + '.out', 
+        path + 'left.ppm', path + 'right.ppm', 
+        output,
+        para[0],para[1],
+        '0.1',
+        'ST-2',
+    ])
 
 def run_test_with_path(path, left_result, right_result) :
     """ path should end with a / """
@@ -49,9 +64,13 @@ def check_results(path) : #, left_result = 'leftdisp.pgm', right_result = 'right
     with open(path + 'spec.txt','r') as f :
         para = f.read().split()
     output = ('bin/left.pgm', 'bin/right.pgm')
-    run_test_with_path(thepath, output[0], output[1])
     #for side, filename in zip(('left', 'right'), (left_result, right_result)) :
-    for side, outfile in zip( ('left', 'right'), output ) :
+    if algoritm == 'STCostAggre' :
+        run_ST_with_path(thepath, output[0])
+        run_ST_with_path(thepath, output[1])
+    else :
+        run_test_with_path(thepath, output[0], output[1])
+    for side, outfile in zip( ('left','right'), output ) :
         try :
             res = subprocess.check_output(['bin/checker1.out',
                                               outfile, 

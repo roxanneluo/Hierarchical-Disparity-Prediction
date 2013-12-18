@@ -93,10 +93,10 @@ int main(int args, char ** argv) {
   compute_gradient(right_gradient, rgb_right);
   compute_first_cost(cost_left, cost_right, rgb_left, rgb_right,
       left_gradient, right_gradient, max_disparity);
-  for (int i = 0; i < 3; ++i){
-    median_filter(rgb_left[i], 1);
-    median_filter(rgb_right[i], 1);
-  }
+  // for (int i = 0; i < 3; ++i){
+  //  median_filter(rgb_left[i], 1);
+  //  median_filter(rgb_right[i], 1);
+  // }
 
   left_graph.collect_edges(rgb_left);
   right_graph.collect_edges(rgb_right);
