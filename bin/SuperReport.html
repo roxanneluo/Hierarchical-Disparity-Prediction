@@ -4,41 +4,45 @@
 <h1>Algorithm Overview</h1>
 <table border="3">
 <tr> <th>Algorithm</th> <th> Correctness </th> </tr>
-<tr><td>Original</td><td> 0.778604 </td></tr>
-<tr><td>RandTree</td><td> 0.820272 </td></tr>
-<tr><td>MSF2_TEST</td><td> 0.829607 </td></tr>
+<tr><td>Original</td><td> 0.804196 </td></tr>
+<tr><td>RandTree</td><td> 0.840966 </td></tr>
+<tr><td>RandTreeEdgeAware</td><td> 0.844305 </td></tr>
+<tr><td>MSF2_ALL_MST</td><td> 0.838624 </td></tr>
+<tr><td>MSF2_LAST_RAND</td><td> 0.855428 </td></tr>
 </table>
 <h1>Dataset Overview</h1>
 <table border="3">
 <tr> <th>Algorithm</th> <th>Middlebury_4</th> <th>Middlebury_others</th> </tr>
-<tr><td>Original</td><td> 0.932374 </td><td> 0.728439 </td></tr>
-<tr><td>RandTree</td><td> 0.923693 </td><td> 0.775986 </td></tr>
-<tr><td>MSF2_TEST</td><td> 0.927074 </td><td> 0.787383 </td></tr>
+<tr><td>Original</td><td> 0.938534 </td><td> 0.759255 </td></tr>
+<tr><td>RandTree</td><td> 0.914688 </td><td> 0.798858 </td></tr>
+<tr><td>RandTreeEdgeAware</td><td> 0.926522 </td><td> 0.804492 </td></tr>
+<tr><td>MSF2_ALL_MST</td><td> 0.934048 </td><td> 0.798948 </td></tr>
+<tr><td>MSF2_LAST_RAND</td><td> 0.924523 </td><td> 0.817200 </td></tr>
 </table>
 <h1>Dataset Detail</h1>
 <table border="3">
-<tr><td>Test Data</td><td colspan="2">Original</td><td colspan="2">RandTree</td><td colspan="2">MSF2_TEST</td></tr>
-<tr><td>Middlebury_4.cones</td><td> 0.917803 </td><td> 0.918489 </td><td> 0.904046 </td><td> 0.908560 </td><td> 0.909643 </td><td> 0.909963 </td></tr>
-<tr><td>Middlebury_4.teddy</td><td> 0.890894 </td><td> 0.906437 </td><td> 0.883518 </td><td> 0.900638 </td><td> 0.910852 </td><td> 0.924593 </td></tr>
-<tr><td>Middlebury_4.tsukuba</td><td> 0.906028 </td><td>null</td><td> 0.864361 </td><td>null</td><td> 0.850050 </td><td>null</td></tr>
-<tr><td>Middlebury_4.venus</td><td> 0.985148 </td><td> 0.989892 </td><td> 0.988388 </td><td> 0.990604 </td><td> 0.972399 </td><td> 0.979226 </td></tr>
-<tr><td>Middlebury_others.Aloe</td><td> 0.861400 </td><td> 0.858400 </td><td> 0.878646 </td><td> 0.866350 </td><td> 0.873896 </td><td> 0.868412 </td></tr>
-<tr><td>Middlebury_others.Baby1</td><td> 0.787880 </td><td> 0.791397 </td><td> 0.901343 </td><td> 0.905603 </td><td> 0.901481 </td><td> 0.905071 </td></tr>
-<tr><td>Middlebury_others.Baby2</td><td> 0.690450 </td><td> 0.701754 </td><td> 0.791933 </td><td> 0.799200 </td><td> 0.808657 </td><td> 0.819368 </td></tr>
-<tr><td>Middlebury_others.Baby3</td><td> 0.805334 </td><td> 0.834992 </td><td> 0.850287 </td><td> 0.893190 </td><td> 0.871102 </td><td> 0.898910 </td></tr>
-<tr><td>Middlebury_others.Bowling1</td><td> 0.567158 </td><td> 0.575145 </td><td> 0.673206 </td><td> 0.645228 </td><td> 0.655702 </td><td> 0.668187 </td></tr>
-<tr><td>Middlebury_others.Bowling2</td><td> 0.698113 </td><td> 0.697180 </td><td> 0.752181 </td><td> 0.771337 </td><td> 0.742110 </td><td> 0.762531 </td></tr>
-<tr><td>Middlebury_others.Cloth1</td><td> 0.928726 </td><td> 0.949039 </td><td> 0.954420 </td><td> 0.969183 </td><td> 0.952692 </td><td> 0.965736 </td></tr>
-<tr><td>Middlebury_others.Cloth2</td><td> 0.798512 </td><td> 0.792628 </td><td> 0.846216 </td><td> 0.861961 </td><td> 0.860375 </td><td> 0.853087 </td></tr>
-<tr><td>Middlebury_others.Cloth3</td><td> 0.912181 </td><td> 0.907418 </td><td> 0.940175 </td><td> 0.939390 </td><td> 0.945376 </td><td> 0.944864 </td></tr>
-<tr><td>Middlebury_others.Cloth4</td><td> 0.851178 </td><td> 0.843408 </td><td> 0.863966 </td><td> 0.871788 </td><td> 0.849144 </td><td> 0.857371 </td></tr>
-<tr><td>Middlebury_others.Flowerpots</td><td> 0.594075 </td><td> 0.567636 </td><td> 0.727755 </td><td> 0.694412 </td><td> 0.706767 </td><td> 0.683152 </td></tr>
-<tr><td>Middlebury_others.Lampshade1</td><td> 0.723987 </td><td> 0.744116 </td><td> 0.755194 </td><td> 0.773218 </td><td> 0.793299 </td><td> 0.825315 </td></tr>
-<tr><td>Middlebury_others.Lampshade2</td><td> 0.669778 </td><td> 0.707864 </td><td> 0.801293 </td><td> 0.777620 </td><td> 0.839071 </td><td> 0.819354 </td></tr>
-<tr><td>Middlebury_others.Monopoly</td><td> 0.505638 </td><td> 0.515663 </td><td> 0.572382 </td><td> 0.581574 </td><td> 0.638500 </td><td> 0.643605 </td></tr>
-<tr><td>Middlebury_others.Plastic</td><td> 0.500092 </td><td> 0.442565 </td><td> 0.532387 </td><td> 0.521446 </td><td> 0.560330 </td><td> 0.492007 </td></tr>
-<tr><td>Middlebury_others.Rocks1</td><td> 0.865334 </td><td> 0.864441 </td><td> 0.896792 </td><td> 0.892378 </td><td> 0.898711 </td><td> 0.890281 </td></tr>
-<tr><td>Middlebury_others.Rocks2</td><td> 0.891861 </td><td> 0.894701 </td><td> 0.918537 </td><td> 0.932242 </td><td> 0.928515 </td><td> 0.925289 </td></tr>
-<tr><td>Middlebury_others.Wood1</td><td> 0.753111 </td><td> 0.705467 </td><td> 0.766707 </td><td> 0.752375 </td><td> 0.800798 </td><td> 0.754975 </td></tr>
-<tr><td>Middlebury_others.Wood2</td><td> 0.853563 </td><td> 0.854537 </td><td> 0.804079 </td><td> 0.794832 </td><td> 0.839757 </td><td> 0.810542 </td></tr>
+<tr><td>Test Data</td><td colspan="2">Original</td><td colspan="2">RandTree</td><td colspan="2">RandTreeEdgeAware</td><td colspan="2">MSF2_ALL_MST</td><td colspan="2">MSF2_LAST_RAND</td></tr>
+<tr><td>Middlebury_4.cones</td><td bgcolor = white> 0.914227 </td><td bgcolor = #F79F81> 0.925816 </td><td bgcolor = #BEF781> 0.902099 </td><td bgcolor = white> 0.903693 </td><td bgcolor = #F79F81> 0.927923 </td><td bgcolor = white> 0.913365 </td><td bgcolor = white> 0.917789 </td><td bgcolor = white> 0.910295 </td><td bgcolor = white> 0.909562 </td><td bgcolor = #BEF781> 0.900026 </td></tr>
+<tr><td>Middlebury_4.teddy</td><td bgcolor = white> 0.903951 </td><td bgcolor = white> 0.921328 </td><td bgcolor = #BEF781> 0.873697 </td><td bgcolor = #BEF781> 0.889421 </td><td bgcolor = white> 0.882929 </td><td bgcolor = white> 0.891915 </td><td bgcolor = #F79F81> 0.911220 </td><td bgcolor = #F79F81> 0.926383 </td><td bgcolor = white> 0.899021 </td><td bgcolor = white> 0.918606 </td></tr>
+<tr><td>Middlebury_4.tsukuba</td><td bgcolor = #F79F81> 0.896575 </td><td bgcolor = #F79F81>null</td><td bgcolor = white> 0.842148 </td><td bgcolor = #F79F81>null</td><td bgcolor = white> 0.863175 </td><td bgcolor = #F79F81>null</td><td bgcolor = white> 0.854771 </td><td bgcolor = #F79F81>null</td><td bgcolor = #BEF781> 0.840551 </td><td bgcolor = #F79F81>null</td></tr>
+<tr><td>Middlebury_4.venus</td><td bgcolor = #F79F81> 0.993439 </td><td bgcolor = #F79F81> 0.995954 </td><td bgcolor = #BEF781> 0.976810 </td><td bgcolor = #BEF781> 0.983870 </td><td bgcolor = white> 0.987204 </td><td bgcolor = white> 0.991988 </td><td bgcolor = white> 0.990005 </td><td bgcolor = white> 0.993958 </td><td bgcolor = white> 0.981481 </td><td bgcolor = white> 0.986545 </td></tr>
+<tr><td>Middlebury_others.Aloe</td><td bgcolor = white> 0.876695 </td><td bgcolor = #F79F81> 0.876384 </td><td bgcolor = white> 0.877297 </td><td bgcolor = white> 0.866480 </td><td bgcolor = #F79F81> 0.900135 </td><td bgcolor = white> 0.871147 </td><td bgcolor = #BEF781> 0.873345 </td><td bgcolor = white> 0.859912 </td><td bgcolor = white> 0.877660 </td><td bgcolor = #BEF781> 0.858573 </td></tr>
+<tr><td>Middlebury_others.Baby1</td><td bgcolor = #BEF781> 0.801854 </td><td bgcolor = #BEF781> 0.811898 </td><td bgcolor = white> 0.918014 </td><td bgcolor = #F79F81> 0.923166 </td><td bgcolor = #F79F81> 0.922286 </td><td bgcolor = white> 0.916057 </td><td bgcolor = white> 0.879787 </td><td bgcolor = white> 0.876040 </td><td bgcolor = white> 0.920405 </td><td bgcolor = white> 0.921401 </td></tr>
+<tr><td>Middlebury_others.Baby2</td><td bgcolor = #BEF781> 0.698871 </td><td bgcolor = #BEF781> 0.738070 </td><td bgcolor = white> 0.843194 </td><td bgcolor = #F79F81> 0.856199 </td><td bgcolor = white> 0.792882 </td><td bgcolor = white> 0.801214 </td><td bgcolor = white> 0.777041 </td><td bgcolor = white> 0.814155 </td><td bgcolor = #F79F81> 0.848746 </td><td bgcolor = white> 0.849367 </td></tr>
+<tr><td>Middlebury_others.Baby3</td><td bgcolor = #BEF781> 0.834467 </td><td bgcolor = #BEF781> 0.859493 </td><td bgcolor = white> 0.879126 </td><td bgcolor = white> 0.890068 </td><td bgcolor = white> 0.889743 </td><td bgcolor = white> 0.889921 </td><td bgcolor = white> 0.870771 </td><td bgcolor = white> 0.898248 </td><td bgcolor = #F79F81> 0.890507 </td><td bgcolor = #F79F81> 0.920798 </td></tr>
+<tr><td>Middlebury_others.Bowling1</td><td bgcolor = #BEF781> 0.629394 </td><td bgcolor = #BEF781> 0.630945 </td><td bgcolor = #F79F81> 0.714034 </td><td bgcolor = white> 0.710949 </td><td bgcolor = white> 0.658332 </td><td bgcolor = white> 0.665375 </td><td bgcolor = white> 0.708833 </td><td bgcolor = #F79F81> 0.715865 </td><td bgcolor = white> 0.704332 </td><td bgcolor = white> 0.715632 </td></tr>
+<tr><td>Middlebury_others.Bowling2</td><td bgcolor = #BEF781> 0.732395 </td><td bgcolor = #BEF781> 0.746516 </td><td bgcolor = #F79F81> 0.795772 </td><td bgcolor = #F79F81> 0.836994 </td><td bgcolor = white> 0.776521 </td><td bgcolor = white> 0.800991 </td><td bgcolor = white> 0.767533 </td><td bgcolor = white> 0.803262 </td><td bgcolor = white> 0.788139 </td><td bgcolor = white> 0.825000 </td></tr>
+<tr><td>Middlebury_others.Cloth1</td><td bgcolor = #BEF781> 0.944869 </td><td bgcolor = #BEF781> 0.965203 </td><td bgcolor = white> 0.954657 </td><td bgcolor = white> 0.974502 </td><td bgcolor = #F79F81> 0.958299 </td><td bgcolor = #F79F81> 0.985189 </td><td bgcolor = white> 0.955723 </td><td bgcolor = white> 0.976128 </td><td bgcolor = white> 0.954909 </td><td bgcolor = white> 0.977683 </td></tr>
+<tr><td>Middlebury_others.Cloth2</td><td bgcolor = #BEF781> 0.834125 </td><td bgcolor = #BEF781> 0.839968 </td><td bgcolor = white> 0.876364 </td><td bgcolor = white> 0.871879 </td><td bgcolor = white> 0.878195 </td><td bgcolor = #F79F81> 0.898882 </td><td bgcolor = white> 0.852655 </td><td bgcolor = white> 0.856365 </td><td bgcolor = #F79F81> 0.881251 </td><td bgcolor = white> 0.880021 </td></tr>
+<tr><td>Middlebury_others.Cloth3</td><td bgcolor = #BEF781> 0.931680 </td><td bgcolor = #BEF781> 0.929070 </td><td bgcolor = white> 0.950911 </td><td bgcolor = white> 0.954627 </td><td bgcolor = #F79F81> 0.956272 </td><td bgcolor = white> 0.957375 </td><td bgcolor = white> 0.948727 </td><td bgcolor = white> 0.951409 </td><td bgcolor = white> 0.955981 </td><td bgcolor = #F79F81> 0.961592 </td></tr>
+<tr><td>Middlebury_others.Cloth4</td><td bgcolor = #BEF781> 0.859870 </td><td bgcolor = #BEF781> 0.856216 </td><td bgcolor = white> 0.870722 </td><td bgcolor = white> 0.872600 </td><td bgcolor = #F79F81> 0.898944 </td><td bgcolor = white> 0.876667 </td><td bgcolor = white> 0.863785 </td><td bgcolor = white> 0.873538 </td><td bgcolor = white> 0.865226 </td><td bgcolor = #F79F81> 0.880467 </td></tr>
+<tr><td>Middlebury_others.Flowerpots</td><td bgcolor = #BEF781> 0.626566 </td><td bgcolor = #BEF781> 0.585150 </td><td bgcolor = white> 0.766021 </td><td bgcolor = #F79F81> 0.723195 </td><td bgcolor = white> 0.747421 </td><td bgcolor = white> 0.710458 </td><td bgcolor = white> 0.699902 </td><td bgcolor = white> 0.659972 </td><td bgcolor = #F79F81> 0.770154 </td><td bgcolor = white> 0.718127 </td></tr>
+<tr><td>Middlebury_others.Lampshade1</td><td bgcolor = #BEF781> 0.732326 </td><td bgcolor = #BEF781> 0.770642 </td><td bgcolor = white> 0.800224 </td><td bgcolor = white> 0.817232 </td><td bgcolor = #F79F81> 0.826198 </td><td bgcolor = #F79F81> 0.854589 </td><td bgcolor = white> 0.790514 </td><td bgcolor = white> 0.813136 </td><td bgcolor = white> 0.801209 </td><td bgcolor = white> 0.832521 </td></tr>
+<tr><td>Middlebury_others.Lampshade2</td><td bgcolor = #BEF781> 0.706536 </td><td bgcolor = white> 0.742227 </td><td bgcolor = white> 0.776628 </td><td bgcolor = white> 0.748258 </td><td bgcolor = white> 0.763792 </td><td bgcolor = #BEF781> 0.734836 </td><td bgcolor = white> 0.797395 </td><td bgcolor = white> 0.803604 </td><td bgcolor = #F79F81> 0.852274 </td><td bgcolor = #F79F81> 0.836394 </td></tr>
+<tr><td>Middlebury_others.Monopoly</td><td bgcolor = #BEF781> 0.553267 </td><td bgcolor = white> 0.572305 </td><td bgcolor = white> 0.560147 </td><td bgcolor = #BEF781> 0.551429 </td><td bgcolor = white> 0.584938 </td><td bgcolor = white> 0.554368 </td><td bgcolor = white> 0.621426 </td><td bgcolor = white> 0.632304 </td><td bgcolor = #F79F81> 0.660665 </td><td bgcolor = #F79F81> 0.670218 </td></tr>
+<tr><td>Middlebury_others.Plastic</td><td bgcolor = #BEF781> 0.505780 </td><td bgcolor = #BEF781> 0.440089 </td><td bgcolor = white> 0.591460 </td><td bgcolor = white> 0.545046 </td><td bgcolor = white> 0.591794 </td><td bgcolor = white> 0.524050 </td><td bgcolor = white> 0.530101 </td><td bgcolor = white> 0.466349 </td><td bgcolor = #F79F81> 0.623677 </td><td bgcolor = #F79F81> 0.553561 </td></tr>
+<tr><td>Middlebury_others.Rocks1</td><td bgcolor = #BEF781> 0.891372 </td><td bgcolor = #BEF781> 0.893702 </td><td bgcolor = white> 0.911616 </td><td bgcolor = white> 0.915952 </td><td bgcolor = white> 0.914803 </td><td bgcolor = #F79F81> 0.923038 </td><td bgcolor = white> 0.904109 </td><td bgcolor = white> 0.913870 </td><td bgcolor = #F79F81> 0.918479 </td><td bgcolor = white> 0.914150 </td></tr>
+<tr><td>Middlebury_others.Rocks2</td><td bgcolor = #BEF781> 0.919064 </td><td bgcolor = #BEF781> 0.916537 </td><td bgcolor = white> 0.928888 </td><td bgcolor = white> 0.944103 </td><td bgcolor = #F79F81> 0.942512 </td><td bgcolor = white> 0.951668 </td><td bgcolor = white> 0.935667 </td><td bgcolor = white> 0.944198 </td><td bgcolor = white> 0.939181 </td><td bgcolor = #F79F81> 0.957726 </td></tr>
+<tr><td>Middlebury_others.Wood1</td><td bgcolor = #BEF781> 0.798866 </td><td bgcolor = #BEF781> 0.753053 </td><td bgcolor = white> 0.837750 </td><td bgcolor = white> 0.841207 </td><td bgcolor = #F79F81> 0.888649 </td><td bgcolor = #F79F81> 0.877478 </td><td bgcolor = white> 0.876054 </td><td bgcolor = white> 0.832169 </td><td bgcolor = white> 0.865069 </td><td bgcolor = white> 0.844518 </td></tr>
+<tr><td>Middlebury_others.Wood2</td><td bgcolor = white> 0.910550 </td><td bgcolor = white> 0.893247 </td><td bgcolor = #BEF781> 0.889725 </td><td bgcolor = #BEF781> 0.876745 </td><td bgcolor = white> 0.922433 </td><td bgcolor = white> 0.903405 </td><td bgcolor = #F79F81> 0.931663 </td><td bgcolor = #F79F81> 0.918073 </td><td bgcolor = white> 0.906212 </td><td bgcolor = white> 0.886778 </td></tr>
 </html>
