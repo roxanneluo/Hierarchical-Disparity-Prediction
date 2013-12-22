@@ -23,7 +23,7 @@ def check_results(path, dataset) :
   with open(path + 'spec.txt', 'r') as f :
     para = f.read().split()
   res = subprocess.check_output(['bin/checker1.out',
-      'bin/qx/' + dataset + '_disparity.pgm',
+      'bin/QX_MST_halfsize/' + dataset + '_disparity.pgm',
 			path + 'displeft.pgm',
 			'1',
 			para[1],])
