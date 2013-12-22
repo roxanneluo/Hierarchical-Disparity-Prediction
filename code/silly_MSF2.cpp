@@ -174,7 +174,6 @@ int main(int args, char ** argv) {
     Array3<double> cost_left, cost_right;
 
     // disparity prediction model
-    printf("Before generate interval.\n");fflush(stdout);
     if (is_highest_layer) { 
 			interval.reset(max_disparity / pi[i + 1]/* + 1*/, 2);
 			
@@ -189,11 +188,9 @@ int main(int args, char ** argv) {
 			disparity_right[level].zero();
 		} else {
 			// left vector.
-            printf("XXXXXXXXXXXXXXX\n"); fflush(stdout);
 	    SupportMatch sm(rgb_left[i], rgb_right[i], rgb_left[i].width, rgb_left[i].height);
 	    	  
             sm.FindSupportMatch();
-            printf("XXXXXXXXXXXX\n"); fflush(stdout);
     	support_prob.reset(max_disparity / pi[i] /*+ 1*/); 
 	    gen_support_prob(sm.support_left_map, sm.support_right_map, support_prob, max_disparity / pi[i]); 
 			initial_prob.reset(max_disparity / pi[i + 1] /*+ 1*/);
@@ -220,7 +217,6 @@ int main(int args, char ** argv) {
     }
      // if (is_highest_layer) {
       // (@xuejiaobai) have no idea but the results are different.
-	printf("After generate interval.\n"); fflush(stdout);	
 			Array3<unsigned char> copy_rgb_left, copy_rgb_right;
 			copy_rgb_left.copy(rgb_left[i]);
 			copy_rgb_right.copy(rgb_right[i]);
@@ -230,7 +226,7 @@ int main(int args, char ** argv) {
 			build_tree_with_interval(rgb_left[i], rgb_right[i], graph_left[i], graph_right[i],
           forest_left[i], forest_right[i],
 					disparity_left[i + 1], disparity_right[i + 1], interval,
-					0.95, /*true,*/ !is_lowest_layer, !is_highest_layer);
+					0.95, /*true,*/ !is_lowest_layer, false);
 	
 		  compute_first_matching_cost(copy_rgb_left, copy_rgb_right, cost_left, cost_right, forest_left[i], forest_right[i], max_disparity / pi[i]);	
 			disparity_computation(forest_left[i], forest_right[i],
