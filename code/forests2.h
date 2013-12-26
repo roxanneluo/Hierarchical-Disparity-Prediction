@@ -202,9 +202,11 @@ public :
         if (!boundary) {
           std::random_shuffle(edges + 1, edges + m + 1);
 				} else {
-          std::random_shuffle(edges + 1, edges + boundary_m - 1);
-          std::sort(edges + boundary_m, edges + m + 1, smaller_edge);
-          // std::random_shuffle(edges + boundary_m, edges + m + 1);
+          // std::random_shuffle(edges + 1, edges + boundary_m - 1);
+          m = boundary_m;
+					// std::sort(edges + boundary_m, edges + m + 1, smaller_edge);
+          
+					// std::random_shuffle(edges + boundary_m, edges + m + 1);
           // std::sort(edges + 1, edges + m + 1, smaller_edge);
 				}
         mset.init(n); ts = 0;
