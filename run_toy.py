@@ -10,7 +10,7 @@ DATASETS = (
 )
 ALGORITHMS = (
 	'Filter_RAND',
-	'Filter_MST',
+	# 'Filter_MST',
 )
 
 alg_name=''
