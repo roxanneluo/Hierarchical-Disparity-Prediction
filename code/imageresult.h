@@ -105,7 +105,7 @@ void draw_image(Grid<type> &img, Grid<type> origin, int times) {
 }
 
 template<class type>
-void draw_RGBimage(Array3<unsigned char> &img, Grid<type> origin, int times, int channel,int scale) {
+void draw_RGBimage(Array3<unsigned char> &img, Grid<type> origin, int times, int channel,double scale) {
     int H = origin.height, W = origin.width;
     //printf("H = %d, W = %d\n", H, W);
     for (int i = 0; i < H*(1+times); ++i)
@@ -189,7 +189,7 @@ void compute_support(Grid<type> &support, Forest &forest, int x, int y, int W, d
 
 template<class type, class type2>
 void draw_tree_and_image_RGB(Array3<type> &img, Grid<type2> &origin1,Grid<type>&disp,
-                         Edge *trees, int n, int times, int dispScale, int color = -1) {
+                         Edge *trees, int n, int times, double dispScale, int color = -1) {
     int H = origin1.height, W = origin1.width;
     img.reset(3, H*(1+times), W*(1+times));
     draw_RGBimage(img, origin1, times, 0, 1);
@@ -199,7 +199,7 @@ void draw_tree_and_image_RGB(Array3<type> &img, Grid<type2> &origin1,Grid<type>&
 
 template <class type>
 void draw_support_map(Array3<type> &output_support, Grid<type>&disp, Forest &support_forest, Graph &g,
-                      int x, int y, int times, int scale, double sigma = 0.1*255) {
+                      int x, int y, int times, double scale, double sigma = 0.1*255) {
     Grid<double> small_support;
     small_support.reset(g.H, g.W);
     compute_support(small_support, support_forest, x, y, g.W, sigma);
@@ -221,7 +221,7 @@ void show_stable_pixels(Grid<unsigned char> &disp,
 
 
 void draw_support_map(int x, int y, const char* file_name, int cnt, const char *alg_name, Forest &forest,
-                     Array3<unsigned char> &support_map, Grid<unsigned char>&disp, Graph &graph, int scale, int times = 2) {
+                     Array3<unsigned char> &support_map, Grid<unsigned char>&disp, Graph &graph, double scale, int times = 2) {
   forest.init(graph);
 
   draw_support_map(support_map, disp,forest, graph, x, y, times, scale);
