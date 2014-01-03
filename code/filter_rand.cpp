@@ -32,11 +32,24 @@ Array3<unsigned char> left_support_map, right_support_map;
 Grid<unsigned char> left_tree_img, right_tree_img;
 Grid<unsigned char> left_gray_img, right_occ_img;
 
+Grid<double> support_ratio;
 // for input x, y
 const int MAX_NUM = 20;
 int num = 9;
 int x[MAX_NUM]={25,25,25,40,40,40,50,50,50}, y[MAX_NUM] = {10,50,90,10,50,90,10,50,90};
 
+int findBorder(int * border) {
+  int W = rgb_left.width, H = rgb_left.height;
+  int num = 0;
+  int lastcolor = rgb_left[0][0][0];
+  for (int j = 0; j < W; ++j) {
+    if (rgb_left[0][0][j] != lastcolor) {
+      border[num++] = j;
+      lastcolor = rgb_left[0][0][j];
+    }
+  }
+  return num;
+}
 
 int main(int args, char ** argv) {
   if (args > 1) {
@@ -65,13 +78,34 @@ int main(int args, char ** argv) {
   left_graph.build_RandTree();
 
   int cnt = 0;
-  for (int i = 0; i < num; ++i) {
-   // if (bad_point(x,y,occlusion_left)) {
-      draw_support_map(x[i],y[i],file_name[1],++cnt,"RAND",left_support_forest, left_support_map, left_gray_img,left_graph, scale);
-    //}
+  // for (int i = 0; i < num; ++i) {
+  //  // if (bad_point(x,y,occlusion_left)) {
+  //     draw_support_map(x[i],y[i],file_name[1],++cnt,"RAND",left_support_forest, left_support_map, left_gray_img,left_graph, scale);
+  //   //}
+  // }
+  // printf("%d\n", cnt);
+
+  left_support_forest.init(left_graph);
+  // int border[10], bordernum=0;
+  // bordernum = findBorder(border);
+  printf("%d,%d\n", rgb_left[0][50][49], rgb_left[0][50][50]);
+  int border[2]={25, 75}, bordernum = 2;
+
+  int sum = 0;
+  int H = rgb_left.height, W = rgb_left.width;
+  draw_support_map(49,0,file_name[1],++cnt,"RAND",left_support_forest, left_support_map, left_gray_img,left_graph, scale);
+  draw_support_map(50,0,file_name[1],++cnt,"RAND",left_support_forest, left_support_map, left_gray_img,left_graph, scale);
+  for (int n = 0; n < bordernum; ++n) {
+    int j = border[n];
+    for (int i = 0; i < rgb_left.height; ++i) {
+       printf("%d\n", left_support_forest.findSupportSize(i,j, support_ratio, H, W));
+       printf("%d\n", left_support_forest.findSupportSize(i,j-1, support_ratio, H, W));
+
+
+      sum += left_support_forest.findSupportSize(i,j, support_ratio, H, W);
+      sum += left_support_forest.findSupportSize(i,j-1, support_ratio, H, W);
+    }
   }
-  printf("%d\n", cnt);
-
-
+  printf("avg bordersize = %f\n", double(sum)/(2*bordernum*rgb_left.height));
   return 0;
 }

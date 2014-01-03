@@ -269,6 +269,36 @@ public :
             }
         }
     }
+
+    template <class type>
+    int findSupportSize(int starti, int startj, Grid<type> &support, int H, int W, double threshold = 0.5, double sigma = 255 * 0.1) {
+        update_table(sigma);
+        order_of_visit(startj, starti, W);
+        support.reset(H,W);
+        // update_table(sigma);
+
+        support[nodes[order[1]].x][nodes[order[1]].y]=1;
+        // support[nodes[order[1]].x][nodes[order[1]].y]=backup[0][nodes[order[1]].x][nodes[order[1]].y] = 255;
+        int size = 0;
+        for (int i = 1; i <= n; ++i) {
+            int p = order[i];
+            if (support[nodes[p].x][nodes[p].y] > threshold)
+                    ++size;
+
+            for (int j = 0; j < nodes[p].degree; ++j) {
+                int q = nodes[p].next_node[j];
+                if (nodes[q].ord < nodes[p].ord) continue;
+
+                // support[nodes[q].x][nodes[q].y] = backup[0][nodes[q].x][nodes[q].y]
+                //                                 = backup[0][nodes[p].x][nodes[p].y]*table[nodes[q].up_weight];
+                support[nodes[q].x][nodes[q].y] = support[nodes[p].x][nodes[p].y]*table[nodes[q].up_weight];
+               
+            }
+        }
+        return size;
+    }
+
+    
 };
 
 #endif
