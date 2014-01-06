@@ -10,14 +10,14 @@ DATASETS = (
 )
 ALGORITHMS = (
 	'Filter_RAND',
-	# 'Filter_MST',
+	'Filter_MST',
 )
 
 alg_name=''
 
 def run(path,picture) :
 	names = picture.split('.')
-	subprocess.check_output([
+	ans = subprocess.check_output([
 		'bin/'+alg_name+'.out',
 		path,
 		'toy/output/'+names[0],
@@ -33,7 +33,8 @@ def run(path,picture) :
 		'49','10',
 		'49','50',
 		'49','90',
-		]) 
+		])
+	print ans 
 
 
 for dataset in DATASETS :

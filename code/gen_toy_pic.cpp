@@ -17,18 +17,17 @@ int main(int args, char ** argv) {
 		W = atoi(argv[4]);
 	if (args > 5)
 		H = atoi(argv[5]);
-
+	// printf("%d,%d\n", W,H);
 	pic.reset(3, H,W);
 	for (int d = 0; d < 3; ++d) 
 		for (int i = 0; i < H; ++i) {
-			int c = 255;
 			for (int n = 0; n < num; ++n) {
-				c = mylib::max(0, c-step);
+				int c = mylib::max(0, 255-n*step);
 				for (int j = n*W/num; j<(n+1)*W/num; ++j)
 					pic[d][i][j] = c;
 			}
 		}
 	char save_name[100];
-	save_image_rgb(get_file_name(save_name, file_name, num,step,".ppm"), pic);
+	save_image_rgb(get_file_name(save_name, file_name, num,step,W,".ppm"), pic);
 	return 0;
 }

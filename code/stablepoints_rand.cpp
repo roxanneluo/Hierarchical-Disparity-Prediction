@@ -121,16 +121,16 @@ int main(int args, char ** argv) {
   compute_disparity(cost_right, disparity_right);
   median_filter(disparity_left);
   median_filter(disparity_right);
-  find_stable_pixels(disparity_left, disparity_right, occlusion_left, occlusion_right);
+  /*find_stable_pixels(disparity_left, disparity_right, occlusion_left, occlusion_right);
   show_stable_pixels(disparity_left, occlusion_left, left_occ_img);
-  show_stable_pixels(disparity_right, occlusion_right, right_occ_img);
-  save_image(file_name[2], left_occ_img, scale);
-  save_image(file_name[3], right_occ_img, scale);
+  show_stable_pixels(disparity_right, occlusion_right, right_occ_img);*/
+  save_image(file_name[2], disparity_left, scale);
+  save_image(file_name[3], disparity_right, scale);
 
   int cnt = 0;
   for (int i = 0; i < num; ++i) {
    // if (bad_point(x,y,occlusion_left)) {
-      draw_support_map(x[i],y[i],file_name[4],++cnt,file_name[5],left_support_forest, left_support_map, left_occ_img,left_graph, scale);
+      draw_support_map(x[i],y[i],file_name[4],++cnt,file_name[5],left_support_forest, left_support_map, disparity_left,left_graph, scale);
     //}
   }
   printf("%d\n", cnt);

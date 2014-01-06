@@ -6,7 +6,7 @@
 #include <cctype>
 #include "gridcode.h"
 
-const int BUF_LEN = 3030303;
+const int BUF_LEN = 5500303;
 char buff[BUF_LEN];
 
 template <class type>
