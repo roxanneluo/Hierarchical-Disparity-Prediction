@@ -85,11 +85,11 @@ public :
       for (int i = 0; i < H; ++i)
         for (int j = 0; j < W; ++j) {
           a = b = -1;
-					weight = weight_tmp = 1e10;
-					for (int p = 0; p < 2; ++p)
-            for (int q = 0; q < 2; ++q) {
-							if (p + q == 1) {
-                if (i + p < H && j + q < W) {
+					weight = weight_tmp = 256;
+					for (int p = -1; p < 1; ++p)
+            for (int q = -1; q < 1; ++q) {
+							if (mylib::ABS(p + q) == 1) {
+                if (i + p < H && j + q < W && i + p >= 0 && j + q >= 0) {
                   weight_tmp = mylib::max3abs(
 											rgb[0][i][j] - rgb[0][i+p][j+q],
                       rgb[1][i][j] - rgb[1][i+p][j+q],
