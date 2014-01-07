@@ -62,12 +62,12 @@ typedef vector<int> VI;
 class Graph {
 
     MergeSet mset; // for buiding mst
-    Edge* edges; // all candidate edges  1-based
+    Edge* edges = NULL; // all candidate edges  1-based
 
 public :
 		Graph() {}
 		Graph(const Graph& g) {}
-    Edge* trees; // collected tree edges 1-based
+    Edge* trees = NULL; // collected tree edges 1-based
     int n, m; // number of nodes and edges 1-based
     int ts; // number of tree edges
     int H, W; // graph info
@@ -76,10 +76,13 @@ public :
 
 		template<class type>
 		void collect_edges_edgeaware(Array3<type>& rgb) {
-		  H = rgb.height;
+		  printf("before collect edges\n");fflush(stdout);
+			H = rgb.height;
 			W = rgb.width;
-	    edges = (Edge *) malloc((m + 2) * sizeof(Edge));
-      trees = (Edge *) malloc((n + 2) * sizeof(Edge));
+	    if (edges == NULL)
+				edges = (Edge *) malloc((m + 2) * sizeof(Edge));
+      if (trees == NULL)
+				trees = (Edge *) malloc((n + 2) * sizeof(Edge));
       int k = 0;
 			int a, b, weight, weight_tmp;
       for (int i = 0; i < H; ++i)
@@ -110,6 +113,7 @@ public :
 					 }
 				}
         m = k;
+				printf("after collect edges\n");fflush(stdout);
 		}
 
 	  template <class type>
@@ -117,8 +121,10 @@ public :
         H = rgb.height; W = rgb.width;
         n = H * W;
         m = 2 * H * W - H - W;
-        edges = (Edge *) malloc((m + 2) * sizeof(Edge));
-        trees = (Edge *) malloc((n + 2) * sizeof(Edge));
+        if (edges == NULL)
+					edges = (Edge *) malloc((m + 2) * sizeof(Edge));
+        if (trees == NULL)
+					trees = (Edge *) malloc((n + 2) * sizeof(Edge));
         int k = 0;
         for (int i = 0; i < H; ++i)
         for (int j = 0; j < W; ++j)
@@ -135,11 +141,11 @@ public :
         m = k;
     }
 
-    int **listing; // the linked list of the graph; linked_list[i][j] = j-th edge of node i, [i][0] = number of edges;
-    int * randord;
-    bool * wilson; //check if the node is visited
-    int * last;
-    bool * blocks; // mark if this area has at least one point
+    int **listing = NULL; // the linked list of the graph; linked_list[i][j] = j-th edge of node i, [i][0] = number of edges;
+    int * randord = NULL;
+    bool * wilson = NULL; //check if the node is visited
+    int * last = NULL;
+    bool * blocks = NULL; // mark if this area has at least one point
     vector<int> path, through; // vector is used, for i really don't know how large path could be. compile with -O2 would be faster
     // path : the nodes walked, through : the edges walked, lerw : the loop erase random walk
     void build_RandTree() {
@@ -147,22 +153,29 @@ public :
 			  srand(time(NULL));
         // if you want to delete any edges, put your code in collect_edges()
         // here will assume that the graph is connected with the set of edges in edges[]
-        listing = (int **) malloc((n + 2) * sizeof(int *));
-        randord = (int *) malloc((n + 2) * sizeof (int));
+        if (listing == NULL) {
+					listing = (int **) malloc((n + 2) * sizeof(int *));
+				  for (int i = 0; i < n + 2; ++i) {
+					  listing[i] = (int*) malloc(5 * sizeof(int));
+					}
+				}
+        if (randord == NULL)
+					randord = (int *) malloc((n + 2) * sizeof (int));
         for (int i = 1; i <= n; ++i) randord[i] = i;
-        wilson = (bool *) malloc((n + 2) * sizeof (bool));
+        if (wilson == NULL)
+					wilson = (bool *) malloc((n + 2) * sizeof (bool));
         for (int i = 0; i < n + 2; ++i) wilson [i] = 0;
-        last = (int *) malloc((n + 2) * sizeof (int));
-        blocks = (bool *) malloc((n + 2) * sizeof (bool));
+        if (last == NULL)
+					last = (int *) malloc((n + 2) * sizeof (int));
+        if (blocks == NULL)
+					blocks = (bool *) malloc((n + 2) * sizeof (bool));
         memset(blocks, 0, sizeof(bool) * (n + 2));
         mset.init(n);
         for (int i = 1; i <= m; ++i) 
             mset.merge(edges[i].a, edges[i].b);
         for (int i = 0; i < n + 2; ++i) {
-            listing[i] = (int *) malloc(5 * sizeof (int));
             listing[i][0] = 0;
         }
-
         for (int i = 1, t; i <= m; ++i) {
             int x = edges[i].a, y = edges[i].b;
 						t = ++listing[x][0];
@@ -170,6 +183,8 @@ public :
             t = ++listing[y][0];
             listing[y][t] = i;
         }
+
+		  printf("build_RandTree\n");fflush(stdout);
         random_shuffle(randord + 1, randord + 1 + n);
         ts = 0;
         for (int i = 1; i <= n; ++i) {
@@ -205,7 +220,7 @@ public :
                 le = rw;
             }
         }
-        printf("tree --- %d %d\n", ts, n);
+        printf("tree --- %d %d\n", ts, n);fflush(stdout);
         /*
         sort(trees + 1, trees + 1 + ts);
         int x00 = unique(trees + 1, trees + 1 + ts) - trees;
