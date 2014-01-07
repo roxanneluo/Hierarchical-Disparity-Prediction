@@ -21,21 +21,8 @@ public :
     bool connect(int x, int y) { 
         return (x == a && y == b) || (x == b && y == a);
     }
-/*
-    bool operator > (const Edge &e) {
-        //if (e.a > e.b)  {int temp = e.a; e.a = e.b; e.b = temp;}
-
-        if (weight > e.weight) return true;
-        else if (weight < e.weight) return false;
-
-        if (a > e.a) return true;
-        else if (a < e.a) return false;
-
-        if (b > e.b) return true;
-        else return false;
-    }
-*/
 };
+
 bool operator < (const Edge &d, const Edge &e) {
     if (d.weight < e.weight) return true;
     if (d.weight > e.weight) return false;
@@ -52,12 +39,12 @@ bool operator == (const Edge &d, Edge &e) {
 
 
 class MergeSet {
+public :
     int n;  int *f;
     int find(int x) {
         if (x != f[x]) f[x] = find(f[x]);
         return f[x];
     }
-public :
     void init(int x) {
         n = x; f = (int*) malloc((n + 2) * sizeof(int));
         for (int i = 0; i <= n; ++i) f[i] = i;
@@ -74,7 +61,7 @@ typedef vector<int> VI;
 
 class Graph {
 
-//    MergeSet mset; // for buiding mst
+    MergeSet mset; // for buiding mst
     Edge* edges; // all candidate edges  1-based
 
 public :
@@ -114,6 +101,7 @@ public :
     int * randord;
     bool * wilson; //check if the node is visited
     int * last;
+    bool * blocks; // mark if this area has at least one point
     vector<int> path, through; // vector is used, for i really don't know how large path could be. compile with -O2 would be faster
     // path : the nodes walked, through : the edges walked, lerw : the loop erase random walk
     void build_RandTree() {
@@ -126,6 +114,11 @@ public :
         wilson = (bool *) malloc((n + 2) * sizeof (bool));
         for (int i = 0; i < n + 2; ++i) wilson [i] = 0;
         last = (int *) malloc((n + 2) * sizeof (int));
+        blocks = (bool *) malloc((n + 2) * sizeof (bool));
+        memset(blocks, 0, sizeof(bool) * (n + 2));
+        mset.init(n);
+        for (int i = 1; i <= m; ++i) 
+            mset.merge(edges[i].a, edges[i].b);
         for (int i = 0; i < n + 2; ++i) {
             listing[i] = (int *) malloc(5 * sizeof (int));
             listing[i][0] = 0;
@@ -138,11 +131,16 @@ public :
             listing[y][t] = i;
         }
         random_shuffle(randord + 1, randord + 1 + n);
-        wilson[randord[1]] = 1;
         ts = 0;
-        for (int i = 2; i <= n; ++i) {
+        for (int i = 1; i <= n; ++i) {
             int p = randord[i];
             if (wilson[p]) continue;
+            int blk = mset.find(p);
+            if (!blocks[blk]) {
+                wilson[p] = 1;
+                blocks[blk] = 1;
+                continue;
+            }
             path.clear();
             path.push_back(p);
             while (!wilson[p]) {
@@ -167,8 +165,8 @@ public :
                 le = rw;
             }
         }
-        /*
         printf("tree --- %d %d\n", ts, n);
+        /*
         sort(trees + 1, trees + 1 + ts);
         int x00 = unique(trees + 1, trees + 1 + ts) - trees;
         printf("%d %d\n", x00, ts);
