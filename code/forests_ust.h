@@ -101,10 +101,12 @@ public :
 								}
 							}	
            }
-           ++k;
-					 edges[k].a = a;
-					 edges[k].b = b;
-					 edges[k].weight = weight;
+					 if (a != -1 && b != -1 && weight != -1) {
+             ++k;
+					   edges[k].a = a;
+					   edges[k].b = b;
+					   edges[k].weight = weight;
+					 }
 				}
         m = k;
 		}
@@ -140,7 +142,8 @@ public :
     vector<int> path, through; // vector is used, for i really don't know how large path could be. compile with -O2 would be faster
     // path : the nodes walked, through : the edges walked, lerw : the loop erase random walk
     void build_RandTree() {
-        srand(time(NULL));
+        
+			  srand(time(NULL));
         // if you want to delete any edges, put your code in collect_edges()
         // here will assume that the graph is connected with the set of edges in edges[]
         listing = (int **) malloc((n + 2) * sizeof(int *));
@@ -158,9 +161,10 @@ public :
             listing[i] = (int *) malloc(5 * sizeof (int));
             listing[i][0] = 0;
         }
+
         for (int i = 1, t; i <= m; ++i) {
             int x = edges[i].a, y = edges[i].b;
-            t = ++listing[x][0];
+						t = ++listing[x][0];
             listing[x][t] = i;
             t = ++listing[y][0];
             listing[y][t] = i;
