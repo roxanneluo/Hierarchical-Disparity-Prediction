@@ -56,6 +56,16 @@ void refinement(Grid<type>& d_left, Grid<type>& d_right) {
   find_stable_pixels(d_left, d_right, occlusion_left, occlusion_right);
   update_matching_cost(cost_left, cost_right, d_left, d_right,
       occlusion_left, occlusion_right);
+  
+	left_graph.collect_edges_edgeaware(rgb_left);
+	right_graph.collect_edges_edgeaware(rgb_right);
+	left_graph.build_RandTree();
+	right_graph.build_RandTree();
+
+	forest_left.init(left_graph);
+	forest_right.init(right_graph);
+	forest_left.order_of_visit();
+	forest_right.order_of_visit();
 
   forest_left.compute_cost_on_tree(cost_left, 255 * 0.05);
   forest_right.compute_cost_on_tree(cost_right, 255 * 0.05);

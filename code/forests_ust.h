@@ -74,7 +74,42 @@ public :
     int node_number(int x, int y) { return x * W + y + 1; }
     void node_location(int p, int &x, int &y) {--p; x = p / W; y = p % W; }
 
-	template <class type>
+		template<class type>
+		void collect_edges_edgeaware(Array3<type>& rgb) {
+		  H = rgb.height;
+			W = rgb.width;
+	    edges = (Edge *) malloc((m + 2) * sizeof(Edge));
+      trees = (Edge *) malloc((n + 2) * sizeof(Edge));
+      int k = 0;
+			int a, b, weight, weight_tmp;
+      for (int i = 0; i < H; ++i)
+        for (int j = 0; j < W; ++j) {
+          a = b = weight = weight_tmp = -1;
+					for (int p = 0; p < 2; ++p)
+            for (int q = 0; q < 2; ++q) {
+							if (p + q == 1) {
+                if (i + p < H && j + q < W) {
+                  weight_tmp = mylib::max3abs(
+											rgb[0][i][j] - rgb[0][i+p][j+q],
+                      rgb[1][i][j] - rgb[1][i+p][j+q],
+                      rgb[2][i][j] - rgb[2][i+p][j+q]);
+								  if (weight_tmp > weight) {
+									  a = node_number(i, j);
+                    b = node_number(i+p, j+q);
+										weight = weight_tmp;
+                  }
+								}
+							}	
+           }
+           ++k;
+					 edges[k].a = a;
+					 edges[k].b = b;
+					 edges[k].weight = weight;
+				}
+        m = k;
+		}
+
+	  template <class type>
     void collect_edges(Array3<type> & rgb) {
         H = rgb.height; W = rgb.width;
         n = H * W;
