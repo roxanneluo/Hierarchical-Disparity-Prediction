@@ -1,7 +1,7 @@
 /* silly for forest4.h */
 // the uniform random spanning tree
 #include "gridcode.h"
-#include "forests4.h"
+#include "forests_ust.h"
 #include "arithmetics.h"
 #include "iomanager.h"
 #include "timekeeper.h"
@@ -108,12 +108,10 @@ int main(int args, char ** argv) {
   forest_left.init(left_graph);
   forest_right.init(right_graph);
 
-puts("????"); fflush(stdout);
 
   forest_left.order_of_visit();
   forest_right.order_of_visit();
 
-puts("????"); fflush(stdout);
   
   // draw_tree();
   

@@ -18,8 +18,11 @@ class Edge {
 public :
     int a, b; // Node ID
     int weight;
-
-    bool operator > (Edge &e) {
+    bool connect(int x, int y) { 
+        return (x == a && y == b) || (x == b && y == a);
+    }
+/*
+    bool operator > (const Edge &e) {
         //if (e.a > e.b)  {int temp = e.a; e.a = e.b; e.b = temp;}
 
         if (weight > e.weight) return true;
@@ -31,13 +34,21 @@ public :
         if (b > e.b) return true;
         else return false;
     }
-
-    bool operator == (Edge &e) {
-        //if (e.a > e.b)  {int temp = e.a; e.a = e.b; e.b = temp;}
-        return (weight == e.weight) && (a == e.a) && (b == e.b);
-    }
+*/
 };
-bool smaller_edge(const Edge & a, const Edge &b) {return a.weight < b.weight;}
+bool operator < (const Edge &d, const Edge &e) {
+    if (d.weight < e.weight) return true;
+    if (d.weight > e.weight) return false;
+    if (d.a < e.a) return true;
+    if (d.a > e.a) return false;
+    return d.b < e.b;
+}
+//    bool operator > (const Edge &e) { return e < *this;  }
+
+bool operator == (const Edge &d, Edge &e) {
+    //if (e.a > e.b)  {int temp = e.a; e.a = e.b; e.b = temp;}
+    return (d.weight == e.weight) && (d.a == e.a) && (d.b == e.b);
+}
 
 
 class MergeSet {
@@ -94,7 +105,7 @@ public :
                 edges[k].b = node_number(i+p, j+q);
                 edges[k].weight = mylib::max3abs(rgb[0][i][j] - rgb[0][i+p][j+q],
                                      rgb[1][i][j] - rgb[1][i+p][j+q],
-                                     rgb[2][i][j] - rgb[2][i+p][j+q]); // ERROR: max not min
+                                     rgb[2][i][j] - rgb[2][i+p][j+q]); 
             }
         m = k;
     }
@@ -119,9 +130,9 @@ public :
             listing[i] = (int *) malloc(5 * sizeof (int));
             listing[i][0] = 0;
         }
-        for (int i = 1; i <= m; ++i) {
+        for (int i = 1, t; i <= m; ++i) {
             int x = edges[i].a, y = edges[i].b;
-            int t = ++listing[x][0];
+            t = ++listing[x][0];
             listing[x][t] = i;
             t = ++listing[y][0];
             listing[y][t] = i;
@@ -143,14 +154,28 @@ public :
             }
             for (size_t i = 0; i < path.size(); ++i)
                 last[path[i]] = i;
-            int le = path[0];
+            int le = path[0], rw;
             while (le != p) {
                 wilson[le] = 1;
-                trees[++ts] = edges[through[le]];
-                le = path[last[le] + 1];
+                //trees[++ts] = edges[through[le]];
+                rw = path[last[le] + 1];
+                for (int j = listing[le][0]; j > 0; --j) {
+                    int e = listing[le][j];
+                    if (edges[e].connect(le, rw)) 
+                        trees[++ts] = edges[e];
+                }
+                le = rw;
             }
         }
+        /*
         printf("tree --- %d %d\n", ts, n);
+        sort(trees + 1, trees + 1 + ts);
+        int x00 = unique(trees + 1, trees + 1 + ts) - trees;
+        printf("%d %d\n", x00, ts);
+        sort(edges + 1, edges + 1 + m);
+        x00 = unique(edges + 1, edges + 1 + m) - edges;
+        printf("%d %d\n", x00, m);
+        */
     }
 };
 
@@ -197,6 +222,7 @@ public :
             nodes[aa].add_edge(bb, zz);
             nodes[bb].add_edge(aa, zz);
         }
+//        for (int i = 1; i <= n; ++i) printf("%d ", nodes[i].degree);
     }
 
 	void order_of_visit() {
