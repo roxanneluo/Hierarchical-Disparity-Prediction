@@ -139,6 +139,7 @@ public :
                                      rgb[2][i][j] - rgb[2][i+p][j+q]); 
             }
         m = k;
+				printf("%d\n", m);fflush(stdout);
     }
 
     int **listing = NULL; // the linked list of the graph; linked_list[i][j] = j-th edge of node i, [i][0] = number of edges;
@@ -185,6 +186,8 @@ public :
         }
 
 		  printf("build_RandTree\n");fflush(stdout);
+			// This part is very slow in the refinement. Probably it is
+			// becase of the value of "m" is too small.
         random_shuffle(randord + 1, randord + 1 + n);
         ts = 0;
         for (int i = 1; i <= n; ++i) {
