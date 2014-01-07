@@ -84,7 +84,8 @@ public :
 			int a, b, weight, weight_tmp;
       for (int i = 0; i < H; ++i)
         for (int j = 0; j < W; ++j) {
-          a = b = weight = weight_tmp = -1;
+          a = b = -1;
+					weight = weight_tmp = 1e10;
 					for (int p = 0; p < 2; ++p)
             for (int q = 0; q < 2; ++q) {
 							if (p + q == 1) {
@@ -93,7 +94,7 @@ public :
 											rgb[0][i][j] - rgb[0][i+p][j+q],
                       rgb[1][i][j] - rgb[1][i+p][j+q],
                       rgb[2][i][j] - rgb[2][i+p][j+q]);
-								  if (weight_tmp > weight) {
+								  if (weight_tmp < weight) {
 									  a = node_number(i, j);
                     b = node_number(i+p, j+q);
 										weight = weight_tmp;
@@ -101,7 +102,7 @@ public :
 								}
 							}	
            }
-					 if (a != -1 && b != -1 && weight != -1) {
+					 if (a != -1 && b != -1) {
              ++k;
 					   edges[k].a = a;
 					   edges[k].b = b;
