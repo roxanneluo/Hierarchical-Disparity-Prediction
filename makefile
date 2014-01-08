@@ -1,4 +1,4 @@
-all : silly0 silly1 checke0 checke1 checke2 checker_print_err MST_blind silly_MSF Prob_Gen cnt_Gen SgL_Gen gen_interval_test MSF2 stable_RAND stable_MST silly2 sillyust
+all : silly0 silly1 checke0 checke1 checke2 checke_nonocc checker_print_err MST_blind silly_MSF Prob_Gen cnt_Gen SgL_Gen gen_interval_test MSF2 stable_RAND stable_MST silly2 sillyust
 silly0 :
 	g++ code/silly.cpp -o bin/Original.out -O2 -Wall -std=c++0x
 checke0 :

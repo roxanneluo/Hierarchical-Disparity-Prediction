@@ -141,7 +141,80 @@ public :
         m = k;
 				printf("%d\n", m);fflush(stdout);
     }
+	  template <class type>
+    void collect_edges_edgeaware2 (Array3<type> & rgb) {
+        H = rgb.height; W = rgb.width;
+        n = H * W;
+        m = 2 * H * W - H - W;
+        if (edges == NULL)
+					edges = (Edge *) malloc((m + 2) * sizeof(Edge));
+        if (trees == NULL)
+					trees = (Edge *) malloc((n + 2) * sizeof(Edge));
+        int k = 0;
+        for (int i = 0; i < H; ++i)
+        for (int j = 0; j < W; ++j)
+            for (int p = 0; p < 2; ++p)
+            for (int q = 0; q < 2; ++q) if (p + q == 1)
+            if (i + p < H && j + q < W) {
+                ++k;
+                edges[k].a = node_number(i, j);
+                edges[k].b = node_number(i+p, j+q);
+                edges[k].weight = mylib::max3abs(rgb[0][i][j] - rgb[0][i+p][j+q],
+                                     rgb[1][i][j] - rgb[1][i+p][j+q],
+                                     rgb[2][i][j] - rgb[2][i+p][j+q]); 
+            }
+				std::sort(edges + 1, edges + k + 1);
+				m = int(0.7 * k);
+    }
 
+		template<class type>
+		void collect_edges_edgeaware(Array3<type>& rgb, Grid<type>& occ) {
+		  printf("before collect edges\n");fflush(stdout);
+			H = rgb.height;
+			W = rgb.width;
+	    if (edges == NULL)
+				edges = (Edge *) malloc((m + 2) * sizeof(Edge));
+      if (trees == NULL)
+				trees = (Edge *) malloc((n + 2) * sizeof(Edge));
+      int k = 0;
+			int a, b, weight, weight_tmp;
+      for (int i = 0; i < H; ++i)
+        for (int j = 0; j < W; ++j) {
+          a = b = -1;
+					weight = weight_tmp = 256;
+					for (int p = -1; p < 1; ++p)
+            for (int q = -1; q < 1; ++q) {
+							if (mylib::ABS(p + q) == 1) {
+                if (i + p < H && j + q < W && i + p >= 0 && j + q >= 0) {
+									weight_tmp = mylib::max3abs(
+											rgb[0][i][j] - rgb[0][i+p][j+q],
+                      rgb[1][i][j] - rgb[1][i+p][j+q],
+                      rgb[2][i][j] - rgb[2][i+p][j+q]);
+								  if (occ[i][j] == 0) {
+									  ++k;
+										edges[k].a = node_number(i, j);
+										edges[k].b = node_number(i + p, j + q);
+										edges[k].weight = weight_tmp;
+										continue;
+									}
+									if (weight_tmp < weight) {
+									  a = node_number(i, j);
+                    b = node_number(i+p, j+q);
+										weight = weight_tmp;
+                  }
+								}
+							}	
+           }
+					 if (a != -1 && b != -1) {
+             ++k;
+					   edges[k].a = a;
+					   edges[k].b = b;
+					   edges[k].weight = weight;
+					 }
+				}
+        m = k;
+				printf("after collect edges %d\n", m);fflush(stdout);
+		}
     int **listing = NULL; // the linked list of the graph; linked_list[i][j] = j-th edge of node i, [i][0] = number of edges;
     int * randord = NULL;
     bool * wilson = NULL; //check if the node is visited

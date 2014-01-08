@@ -57,8 +57,10 @@ void refinement(Grid<type>& d_left, Grid<type>& d_right) {
   update_matching_cost(cost_left, cost_right, d_left, d_right,
       occlusion_left, occlusion_right);
   
-	left_graph.collect_edges_edgeaware(rgb_left);
-	right_graph.collect_edges_edgeaware(rgb_right);
+	left_graph.collect_edges_edgeaware(rgb_left, occlusion_left);
+	right_graph.collect_edges_edgeaware(rgb_right, occlusion_right);
+	// left_graph.collect_edges(rgb_left);
+	// right_graph.collect_edges(rgb_right);
 	left_graph.build_RandTree();
 	right_graph.build_RandTree();
 
