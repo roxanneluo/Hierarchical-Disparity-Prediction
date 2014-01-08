@@ -9,6 +9,8 @@ checke1 :
 	g++ code/checker1.cpp -o bin/checker1.out -O2 -Wall -std=c++0x
 checke2 :
 	g++ code/checker_supportmap.cpp -o bin/checker_support.out -O2 -Wall -std=c++0x
+checke_nonocc :
+	g++ code/checker_nonocc.cpp -o bin/checker_nonocc.out -O2 -Wall -std=c++0x
 checker_print_err :
 	g++ code/checker2.cpp -o bin/checker_print_err.out -O2 -Wall -std=c++0x
 MST_blind :
