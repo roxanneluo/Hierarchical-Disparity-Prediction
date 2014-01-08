@@ -224,7 +224,9 @@ void draw_support_map(int x, int y, const char* file_name, int cnt, const char *
                      Array3<unsigned char> &support_map, Grid<unsigned char>&disp, Graph &graph, double scale, int times = 2) {
   forest.init(graph);
 
+  printf("before inner draw\n");
   draw_support_map(support_map, disp,forest, graph, x, y, times, scale);
+  printf("after inner draw\n");
   char file[100];
   int I = y*(1+times), J = x*(1+times);
   for (int c = 0; c < 3; ++c) {

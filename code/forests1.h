@@ -271,7 +271,7 @@ public :
     }
 
     template <class type>
-    int findSupportSize(int starti, int startj, Grid<type> &support, int H, int W, double threshold = 0.5, double sigma = 255 * 0.1) {
+    int findSupportSize(int starti, int startj, Grid<type> &support, int H, int W, double threshold = 0.8, double sigma = 255 * 0.1) {
         update_table(sigma);
         order_of_visit(startj, starti, W);
         support.reset(H,W);
@@ -298,7 +298,14 @@ public :
         return size;
     }
 
-    
+    bool connected(int i1,int j1, int i2, int j2, Graph &g) {
+        int n1 = g.node_number(i1,j1);
+        int n2 = g.node_number(i2,j2);
+        for (int i = 0; i < nodes[n1].degree; ++i) 
+            if (nodes[n1].next_node[i] == n2)
+                return true;
+        return false;
+    }
 };
 
 #endif

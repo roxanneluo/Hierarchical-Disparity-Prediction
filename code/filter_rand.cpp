@@ -51,6 +51,13 @@ int findBorder(int * border) {
   return num;
 }
 
+void add(int size, int *sizeItv, int N) {
+  for (int i = 2; i >=0; --i)
+    if (size <= N>>i) {
+      ++sizeItv[i];
+      return;
+    }
+}
 int main(int args, char ** argv) {
   if (args > 1) {
     strcpy(file_name[0], argv[1]);
@@ -86,26 +93,56 @@ int main(int args, char ** argv) {
   // printf("%d\n", cnt);
 
   left_support_forest.init(left_graph);
-  // int border[10], bordernum=0;
-  // bordernum = findBorder(border);
-  printf("%d,%d\n", rgb_left[0][50][49], rgb_left[0][50][50]);
-  int border[2]={25, 75}, bordernum = 2;
+  int border[10], bordernum=0;
+  bordernum = findBorder(border);
+  // printf("%d,%d\n", rgb_left[0][50][49], rgb_left[0][50][50]);
+  // int border[2]={25, 75}, bordernum = 2;
 
   int sum = 0;
+  int insidesum = 0;
+  int connect = 0;
+  int sizeItv[3]={0,0,0};
   int H = rgb_left.height, W = rgb_left.width;
-  draw_support_map(49,0,file_name[1],++cnt,"RAND",left_support_forest, left_support_map, left_gray_img,left_graph, scale);
-  draw_support_map(50,0,file_name[1],++cnt,"RAND",left_support_forest, left_support_map, left_gray_img,left_graph, scale);
+  int monoSize = H*W/(bordernum+1);
   for (int n = 0; n < bordernum; ++n) {
     int j = border[n];
+    draw_support_map(j-1,H/2,file_name[1],++cnt,"RAND",left_support_forest, left_support_map, left_gray_img,left_graph, scale);
+    draw_support_map(j,H/2,file_name[1],++cnt,"RAND",left_support_forest, left_support_map, left_gray_img,left_graph, scale);
+    
+    for (int i = 0; i < H; ++i)
+      if (left_support_forest.connected(i,j-1,i,j, left_graph))
+        ++connect;
+
+    int jj;
+    if (n == 0) jj = j/2;
+    else jj = (j+border[n-1]-1)/2;
+    draw_support_map(jj,H/2,file_name[1],++cnt,"RAND",left_support_forest, left_support_map, left_gray_img,left_graph, scale);
+    if (n == bordernum-1) 
+      draw_support_map((j+W-1)/2,H/2,file_name[1],++cnt,"RAND",left_support_forest, left_support_map, left_gray_img,left_graph, scale);
+    
     for (int i = 0; i < rgb_left.height; ++i) {
-       printf("%d\n", left_support_forest.findSupportSize(i,j, support_ratio, H, W));
-       printf("%d\n", left_support_forest.findSupportSize(i,j-1, support_ratio, H, W));
-
-
-      sum += left_support_forest.findSupportSize(i,j, support_ratio, H, W);
-      sum += left_support_forest.findSupportSize(i,j-1, support_ratio, H, W);
+      int size = left_support_forest.findSupportSize(i,j, support_ratio, H, W);
+      add(size,sizeItv, monoSize);
+      sum += size;
+      size = left_support_forest.findSupportSize(i,j-1, support_ratio, H, W);
+      add(size, sizeItv, monoSize);
+      sum += size;
     }
+    for (int i = 0; i < rgb_left.height; ++i) {
+      insidesum += left_support_forest.findSupportSize(i,jj, support_ratio, H, W);
+    }
+    if (n == bordernum-1) 
+      for (int i = 0; i < rgb_left.height; ++i) {
+        insidesum += left_support_forest.findSupportSize(i,(j+W-1)/2, support_ratio, H, W);
+      }
   }
   printf("avg bordersize = %f\n", double(sum)/(2*bordernum*rgb_left.height));
+  printf("avg inside size = %f\n", double(insidesum)/((1+bordernum)*rgb_left.height));
+  printf("avg connect ratio on boundary=%f\n",double(connect)/(bordernum*rgb_left.height));
+  printf("support block prob:\n");
+  for (int i = 0; i < 3; ++i)
+    printf("%d:%f\n",i,double(sizeItv[i])/(2*bordernum*rgb_left.height));
+  printf("%d\n", cnt);
+
   return 0;
 }
