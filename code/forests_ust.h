@@ -18,35 +18,33 @@ class Edge {
 public :
     int a, b; // Node ID
     int weight;
-
-    bool operator > (Edge &e) {
-        //if (e.a > e.b)  {int temp = e.a; e.a = e.b; e.b = temp;}
-
-        if (weight > e.weight) return true;
-        else if (weight < e.weight) return false;
-
-        if (a > e.a) return true;
-        else if (a < e.a) return false;
-
-        if (b > e.b) return true;
-        else return false;
-    }
-
-    bool operator == (Edge &e) {
-        //if (e.a > e.b)  {int temp = e.a; e.a = e.b; e.b = temp;}
-        return (weight == e.weight) && (a == e.a) && (b == e.b);
+    bool connect(int x, int y) { 
+        return (x == a && y == b) || (x == b && y == a);
     }
 };
-bool smaller_edge(const Edge & a, const Edge &b) {return a.weight < b.weight;}
+
+bool operator < (const Edge &d, const Edge &e) {
+    if (d.weight < e.weight) return true;
+    if (d.weight > e.weight) return false;
+    if (d.a < e.a) return true;
+    if (d.a > e.a) return false;
+    return d.b < e.b;
+}
+//    bool operator > (const Edge &e) { return e < *this;  }
+
+bool operator == (const Edge &d, Edge &e) {
+    //if (e.a > e.b)  {int temp = e.a; e.a = e.b; e.b = temp;}
+    return (d.weight == e.weight) && (d.a == e.a) && (d.b == e.b);
+}
 
 
 class MergeSet {
+public :
     int n;  int *f;
     int find(int x) {
         if (x != f[x]) f[x] = find(f[x]);
         return f[x];
     }
-public :
     void init(int x) {
         n = x; f = (int*) malloc((n + 2) * sizeof(int));
         for (int i = 0; i <= n; ++i) f[i] = i;
@@ -63,26 +61,70 @@ typedef vector<int> VI;
 
 class Graph {
 
-//    MergeSet mset; // for buiding mst
-    Edge* edges; // all candidate edges  1-based
+    MergeSet mset; // for buiding mst
+    Edge* edges = NULL; // all candidate edges  1-based
 
 public :
 		Graph() {}
 		Graph(const Graph& g) {}
-    Edge* trees; // collected tree edges 1-based
+    Edge* trees = NULL; // collected tree edges 1-based
     int n, m; // number of nodes and edges 1-based
     int ts; // number of tree edges
     int H, W; // graph info
     int node_number(int x, int y) { return x * W + y + 1; }
     void node_location(int p, int &x, int &y) {--p; x = p / W; y = p % W; }
 
-	template <class type>
+		template<class type>
+		void collect_edges_edgeaware(Array3<type>& rgb) {
+		  printf("before collect edges\n");fflush(stdout);
+			H = rgb.height;
+			W = rgb.width;
+	    if (edges == NULL)
+				edges = (Edge *) malloc((m + 2) * sizeof(Edge));
+      if (trees == NULL)
+				trees = (Edge *) malloc((n + 2) * sizeof(Edge));
+      int k = 0;
+			int a, b, weight, weight_tmp;
+      for (int i = 0; i < H; ++i)
+        for (int j = 0; j < W; ++j) {
+          a = b = -1;
+					weight = weight_tmp = 256;
+					for (int p = -1; p < 1; ++p)
+            for (int q = -1; q < 1; ++q) {
+							if (mylib::ABS(p + q) == 1) {
+                if (i + p < H && j + q < W && i + p >= 0 && j + q >= 0) {
+                  weight_tmp = mylib::max3abs(
+											rgb[0][i][j] - rgb[0][i+p][j+q],
+                      rgb[1][i][j] - rgb[1][i+p][j+q],
+                      rgb[2][i][j] - rgb[2][i+p][j+q]);
+								  if (weight_tmp < weight) {
+									  a = node_number(i, j);
+                    b = node_number(i+p, j+q);
+										weight = weight_tmp;
+                  }
+								}
+							}	
+           }
+					 if (a != -1 && b != -1) {
+             ++k;
+					   edges[k].a = a;
+					   edges[k].b = b;
+					   edges[k].weight = weight;
+					 }
+				}
+        m = k;
+				printf("after collect edges\n");fflush(stdout);
+		}
+
+	  template <class type>
     void collect_edges(Array3<type> & rgb) {
         H = rgb.height; W = rgb.width;
         n = H * W;
         m = 2 * H * W - H - W;
-        edges = (Edge *) malloc((m + 2) * sizeof(Edge));
-        trees = (Edge *) malloc((n + 2) * sizeof(Edge));
+        if (edges == NULL)
+					edges = (Edge *) malloc((m + 2) * sizeof(Edge));
+        if (trees == NULL)
+					trees = (Edge *) malloc((n + 2) * sizeof(Edge));
         int k = 0;
         for (int i = 0; i < H; ++i)
         for (int j = 0; j < W; ++j)
@@ -94,44 +136,142 @@ public :
                 edges[k].b = node_number(i+p, j+q);
                 edges[k].weight = mylib::max3abs(rgb[0][i][j] - rgb[0][i+p][j+q],
                                      rgb[1][i][j] - rgb[1][i+p][j+q],
-                                     rgb[2][i][j] - rgb[2][i+p][j+q]); // ERROR: max not min
+                                     rgb[2][i][j] - rgb[2][i+p][j+q]); 
             }
         m = k;
+				printf("%d\n", m);fflush(stdout);
+    }
+	  template <class type>
+    void collect_edges_edgeaware2 (Array3<type> & rgb) {
+        H = rgb.height; W = rgb.width;
+        n = H * W;
+        m = 2 * H * W - H - W;
+        if (edges == NULL)
+					edges = (Edge *) malloc((m + 2) * sizeof(Edge));
+        if (trees == NULL)
+					trees = (Edge *) malloc((n + 2) * sizeof(Edge));
+        int k = 0;
+        for (int i = 0; i < H; ++i)
+        for (int j = 0; j < W; ++j)
+            for (int p = 0; p < 2; ++p)
+            for (int q = 0; q < 2; ++q) if (p + q == 1)
+            if (i + p < H && j + q < W) {
+                ++k;
+                edges[k].a = node_number(i, j);
+                edges[k].b = node_number(i+p, j+q);
+                edges[k].weight = mylib::max3abs(rgb[0][i][j] - rgb[0][i+p][j+q],
+                                     rgb[1][i][j] - rgb[1][i+p][j+q],
+                                     rgb[2][i][j] - rgb[2][i+p][j+q]); 
+            }
+				std::sort(edges + 1, edges + k + 1);
+				m = int(0.7 * k);
     }
 
-    int **listing; // the linked list of the graph; linked_list[i][j] = j-th edge of node i, [i][0] = number of edges;
-    int * randord;
-    bool * wilson; //check if the node is visited
-    int * last;
+		template<class type>
+		void collect_edges_edgeaware(Array3<type>& rgb, Grid<type>& occ) {
+		  printf("before collect edges\n");fflush(stdout);
+			H = rgb.height;
+			W = rgb.width;
+	    if (edges == NULL)
+				edges = (Edge *) malloc((m + 2) * sizeof(Edge));
+      if (trees == NULL)
+				trees = (Edge *) malloc((n + 2) * sizeof(Edge));
+      int k = 0;
+			int a, b, weight, weight_tmp;
+      for (int i = 0; i < H; ++i)
+        for (int j = 0; j < W; ++j) {
+          a = b = -1;
+					weight = weight_tmp = 256;
+					for (int p = -1; p < 1; ++p)
+            for (int q = -1; q < 1; ++q) {
+							if (mylib::ABS(p + q) == 1) {
+                if (i + p < H && j + q < W && i + p >= 0 && j + q >= 0) {
+									weight_tmp = mylib::max3abs(
+											rgb[0][i][j] - rgb[0][i+p][j+q],
+                      rgb[1][i][j] - rgb[1][i+p][j+q],
+                      rgb[2][i][j] - rgb[2][i+p][j+q]);
+								  if (occ[i][j] == 0) {
+									  ++k;
+										edges[k].a = node_number(i, j);
+										edges[k].b = node_number(i + p, j + q);
+										edges[k].weight = weight_tmp;
+										continue;
+									}
+									if (weight_tmp < weight) {
+									  a = node_number(i, j);
+                    b = node_number(i+p, j+q);
+										weight = weight_tmp;
+                  }
+								}
+							}	
+           }
+					 if (a != -1 && b != -1) {
+             ++k;
+					   edges[k].a = a;
+					   edges[k].b = b;
+					   edges[k].weight = weight;
+					 }
+				}
+        m = k;
+				printf("after collect edges %d\n", m);fflush(stdout);
+		}
+    int **listing = NULL; // the linked list of the graph; linked_list[i][j] = j-th edge of node i, [i][0] = number of edges;
+    int * randord = NULL;
+    bool * wilson = NULL; //check if the node is visited
+    int * last = NULL;
+    bool * blocks = NULL; // mark if this area has at least one point
     vector<int> path, through; // vector is used, for i really don't know how large path could be. compile with -O2 would be faster
     // path : the nodes walked, through : the edges walked, lerw : the loop erase random walk
     void build_RandTree() {
-        srand(time(NULL));
+        
+			  srand(time(NULL));
         // if you want to delete any edges, put your code in collect_edges()
         // here will assume that the graph is connected with the set of edges in edges[]
-        listing = (int **) malloc((n + 2) * sizeof(int *));
-        randord = (int *) malloc((n + 2) * sizeof (int));
+        if (listing == NULL) {
+					listing = (int **) malloc((n + 2) * sizeof(int *));
+				  for (int i = 0; i < n + 2; ++i) {
+					  listing[i] = (int*) malloc(5 * sizeof(int));
+					}
+				}
+        if (randord == NULL)
+					randord = (int *) malloc((n + 2) * sizeof (int));
         for (int i = 1; i <= n; ++i) randord[i] = i;
-        wilson = (bool *) malloc((n + 2) * sizeof (bool));
+        if (wilson == NULL)
+					wilson = (bool *) malloc((n + 2) * sizeof (bool));
         for (int i = 0; i < n + 2; ++i) wilson [i] = 0;
-        last = (int *) malloc((n + 2) * sizeof (int));
+        if (last == NULL)
+					last = (int *) malloc((n + 2) * sizeof (int));
+        if (blocks == NULL)
+					blocks = (bool *) malloc((n + 2) * sizeof (bool));
+        memset(blocks, 0, sizeof(bool) * (n + 2));
+        mset.init(n);
+        for (int i = 1; i <= m; ++i) 
+            mset.merge(edges[i].a, edges[i].b);
         for (int i = 0; i < n + 2; ++i) {
-            listing[i] = (int *) malloc(5 * sizeof (int));
             listing[i][0] = 0;
         }
-        for (int i = 1; i <= m; ++i) {
+        for (int i = 1, t; i <= m; ++i) {
             int x = edges[i].a, y = edges[i].b;
-            int t = ++listing[x][0];
+						t = ++listing[x][0];
             listing[x][t] = i;
             t = ++listing[y][0];
             listing[y][t] = i;
         }
+
+		  printf("build_RandTree\n");fflush(stdout);
+			// This part is very slow in the refinement. Probably it is
+			// becase of the value of "m" is too small.
         random_shuffle(randord + 1, randord + 1 + n);
-        wilson[randord[1]] = 1;
         ts = 0;
-        for (int i = 2; i <= n; ++i) {
+        for (int i = 1; i <= n; ++i) {
             int p = randord[i];
             if (wilson[p]) continue;
+            int blk = mset.find(p);
+            if (!blocks[blk]) {
+                wilson[p] = 1;
+                blocks[blk] = 1;
+                continue;
+            }
             path.clear();
             path.push_back(p);
             while (!wilson[p]) {
@@ -143,14 +283,28 @@ public :
             }
             for (size_t i = 0; i < path.size(); ++i)
                 last[path[i]] = i;
-            int le = path[0];
+            int le = path[0], rw;
             while (le != p) {
                 wilson[le] = 1;
-                trees[++ts] = edges[through[le]];
-                le = path[last[le] + 1];
+                //trees[++ts] = edges[through[le]];
+                rw = path[last[le] + 1];
+                for (int j = listing[le][0]; j > 0; --j) {
+                    int e = listing[le][j];
+                    if (edges[e].connect(le, rw)) 
+                        trees[++ts] = edges[e];
+                }
+                le = rw;
             }
         }
-        printf("tree --- %d %d\n", ts, n);
+        printf("tree --- %d %d\n", ts, n);fflush(stdout);
+        /*
+        sort(trees + 1, trees + 1 + ts);
+        int x00 = unique(trees + 1, trees + 1 + ts) - trees;
+        printf("%d %d\n", x00, ts);
+        sort(edges + 1, edges + 1 + m);
+        x00 = unique(edges + 1, edges + 1 + m) - edges;
+        printf("%d %d\n", x00, m);
+        */
     }
 };
 
@@ -197,6 +351,7 @@ public :
             nodes[aa].add_edge(bb, zz);
             nodes[bb].add_edge(aa, zz);
         }
+//        for (int i = 1; i <= n; ++i) printf("%d ", nodes[i].degree);
     }
 
 	void order_of_visit() {
