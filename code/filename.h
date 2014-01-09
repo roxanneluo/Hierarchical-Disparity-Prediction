@@ -13,9 +13,11 @@ char * get_file_name(char *file_name, const char* head, int *a, int n, const cha
             num[len++] = a[i]%10+'0';
             a[i]/=10;
         }
-    	num[len] = '\0';
+        num[len] = '\0';
         for (int j = 0; j < len/2; ++j) {
-            char tmp = num[j]; num[j] = num[len-1-j]; num[len-1-j] = tmp;
+            char tmp = num[j];
+            num[j] = num[len-1-j];
+            num[len-1-j] = tmp;
         }
         strcat(file_name, num);
     }

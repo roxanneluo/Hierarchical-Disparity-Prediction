@@ -69,7 +69,7 @@ class Graph {
 
 public :
     Graph() {
-        edges = NULL;    
+        edges = NULL;
         trees = NULL;
         listing = NULL; // the linked list of the graph; linked_list[i][j] = j-th edge of node i, [i][0] = number of edges;
         randord = NULL;
