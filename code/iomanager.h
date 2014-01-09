@@ -13,7 +13,8 @@ template <class type>
 void load_image(const char * filename, Array3<type> & rgb) {
     // return if it is successfull
     FILE * f = fopen(filename, "rb");
-    fread(buff, 1, BUF_LEN, f);
+    int bytesread = fread(buff, 1, BUF_LEN, f);
+    if (bytesread < 0) ;
     fclose(f);
     int i = 0;
     while (buff[i]) {
@@ -52,7 +53,8 @@ template <class type>
 void load_image_gray(const char * filename, Grid<type> & gray) {
     // return if it is successfull
     FILE * f = fopen(filename, "rb");
-    fread(buff, 1, BUF_LEN, f);
+    int bytesread = fread(buff, 1, BUF_LEN, f);
+    if (bytesread < 0);
     fclose(f);
     int i = 0;
     while (buff[i]) {
