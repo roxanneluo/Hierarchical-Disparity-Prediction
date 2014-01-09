@@ -1,4 +1,4 @@
-all : silly0 silly1 checke0 checke1 checke2 checke_nonocc checker_print_err MST_blind silly_MSF Prob_Gen cnt_Gen SgL_Gen gen_interval_test MSF2 stable_RAND stable_MST silly2 sillyust
+all : silly0 silly1 checke0 checke1 checke2 checke_nonocc checker_print_err MST_blind silly_MSF Prob_Gen cnt_Gen SgL_Gen gen_interval_test MSF2 stable_RAND stable_MST silly2 sillyust checker_nonocc_red
 silly0 :
 	g++ code/silly.cpp -o bin/Original.out -O2 -std=c++0x 
 checke0 :
@@ -35,3 +35,5 @@ silly2 :
 	g++ code/silly2.cpp -o bin/RandTreeEdgeAware.out -O2 -std=c++0x
 sillyust :
 	g++ code/silly_ust.cpp -o bin/RandTree_ust.out -O2 -std=c++0x
+checker_nonocc_red :
+	g++ code/checker_nonocc_red.cpp -o bin/checker_nonocc_red.out -O2 -std=c++0x
