@@ -4,7 +4,7 @@
 Grid<int> out, ref, disparity_errormap;
 int pad1 = 10, pad2 = 10;
 char errormap[80];
-// the area that is not compared 
+// the area that is not compared
 // pad1 is on top and bottom,
 // pad2 is on left and right.
 
@@ -16,7 +16,10 @@ int main(int args, char ** argv) {
     // argv[3] is the maximum error allowed at the same time.
     // argv[4] is the scale of the disparity map. This should
     // be read from spec.txt
-    if (args <= 3) { puts("Insufficient parameters"); return 0;}
+    if (args <= 3) {
+        puts("Insufficient parameters");
+        return 0;
+    }
     int tolerance = atoi(argv[3]);
     int scale = atoi(argv[4]);
 
@@ -25,26 +28,29 @@ int main(int args, char ** argv) {
 
     int h = out.height, w = out.width;
     if (h != ref.height || w != ref.width)
-        { puts("Not even same size"); return 0;}
+    {
+        puts("Not even same size");
+        return 0;
+    }
 
     // Update the errormap.
     disparity_errormap.reset(h, w);
     disparity_errormap.zero();
     int total = 0, correct = 0;
-    for (int i = pad1; i < h - pad1; ++i) 
-    for (int j = pad2; j < w - pad2; ++j) {
-        if (ref[i][j] == 0) continue;
-        ++total;
-        // the trancated value should be tolerance * scale
-        if (mylib::ABS(ref[i][j] - out[i][j]) < tolerance * scale) {
-            ++correct;
-            disparity_errormap[i][j] = 255;
-        } else if (ref[i][j] - out[i][j] > 0) {
-            disparity_errormap[i][j] = 0;
-        } else {
-            disparity_errormap[i][j] = 127;
+    for (int i = pad1; i < h - pad1; ++i)
+        for (int j = pad2; j < w - pad2; ++j) {
+            if (ref[i][j] == 0) continue;
+            ++total;
+            // the trancated value should be tolerance * scale
+            if (mylib::ABS(ref[i][j] - out[i][j]) < tolerance * scale) {
+                ++correct;
+                disparity_errormap[i][j] = 255;
+            } else if (ref[i][j] - out[i][j] > 0) {
+                disparity_errormap[i][j] = 0;
+            } else {
+                disparity_errormap[i][j] = 127;
+            }
         }
-    }
 
     double result = correct * 100;
     puts(argv[1]);

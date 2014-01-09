@@ -35,13 +35,16 @@ void rgb2gray(Grid<type> &gray, Array3<type> &rgb, float offset = 0, float scale
 
 template<class type>
 /*img is the output image*/
-void draw_tree(Grid<type> &img, Edge *trees, int n, int times, int color = -1){
+void draw_tree(Grid<type> &img, Edge *trees, int n, int times, int color = -1) {
     int H = img.height/(1+times), W = img.width/(1+times);
-    Edge e; int temp, edge_color;
+    Edge e;
+    int temp, edge_color;
     for (int k = 1; k <= n; ++k) {
         e = trees[k];
         if (e.a > e.b) {
-            temp = e.a; e.a = e.b; e.b = temp;
+            temp = e.a;
+            e.a = e.b;
+            e.b = temp;
         }
 
         int i = (e.a-1)/W, j = (e.a-1)%W;
@@ -50,25 +53,28 @@ void draw_tree(Grid<type> &img, Edge *trees, int n, int times, int color = -1){
         if (e.b == e.a+1)
             for (int ii = 0; ii < times; ++ii)
                 img[I+ii][J+times] = edge_color;
-            //img[I+times/2][J+times] = 0;   //addLeftEdge
+        //img[I+times/2][J+times] = 0;   //addLeftEdge
         else
             for (int jj = 0; jj < times; ++jj)
                 img[I+times][J+jj] = edge_color;
-            //img[I+times][J+times/2] = 0;//addBottomEdge(e.a,e.b);
+        //img[I+times][J+times/2] = 0;//addBottomEdge(e.a,e.b);
     }
 }
 
 
 template<class type>
 /*img is the output image*/
-void draw_RGBtree(Array3<type> &img, Edge *trees, int n, int times, int color = -1){
+void draw_RGBtree(Array3<type> &img, Edge *trees, int n, int times, int color = -1) {
     int H = img.height/(1+times), W = img.width/(1+times);
-    Edge e; int temp, edge_color;
+    Edge e;
+    int temp, edge_color;
     for (int channel = 0; channel < 3; ++channel)
         for (int k = 1; k <= n; ++k) {
             e = trees[k];
             if (e.a > e.b) {
-                temp = e.a; e.a = e.b; e.b = temp;
+                temp = e.a;
+                e.a = e.b;
+                e.b = temp;
             }
 
             int i = (e.a-1)/W, j = (e.a-1)%W;
@@ -78,11 +84,11 @@ void draw_RGBtree(Array3<type> &img, Edge *trees, int n, int times, int color = 
             if (e.b == e.a+1)
                 for (int ii = 0; ii < times; ++ii)
                     img[channel][I+ii][J+times] = edge_color;
-                //img[I+times/2][J+times] = 0;   //addLeftEdge
+            //img[I+times/2][J+times] = 0;   //addLeftEdge
             else
                 for (int jj = 0; jj < times; ++jj)
                     img[channel][I+times][J+jj] = edge_color;
-                //img[I+times][J+times/2] = 0;//addBottomEdge(e.a,e.b);
+            //img[I+times][J+times/2] = 0;//addBottomEdge(e.a,e.b);
         }
 }
 
@@ -148,7 +154,7 @@ void draw_tree_difference(Grid<type> &img, Grid<type> &origin, Edge *tree1, int 
     while (true) {
         while(i <= n1 && j <= n2 && tree1[i]>tree2[j]) only2[++cnt2] = tree2[j++];
         if (j > n2) break;
-        else if (tree1[i] == tree2[j]){
+        else if (tree1[i] == tree2[j]) {
             inter[++cnti] = tree1[i++];
             ++j;
         }
@@ -161,7 +167,7 @@ void draw_tree_difference(Grid<type> &img, Grid<type> &origin, Edge *tree1, int 
     }
     while (i <= n1) only1[++cnt1] = tree1[i++];
     while (j <= n2) only2[++
-        cnt2] = tree2[j++];
+                              cnt2] = tree2[j++];
 
     draw_image(img, origin, times);
     draw_tree(img, inter, cnti, times);
@@ -189,7 +195,7 @@ void compute_support(Grid<type> &support, Forest &forest, int x, int y, int W, d
 
 template<class type, class type2>
 void draw_tree_and_image_RGB(Array3<type> &img, Grid<type2> &origin1,Grid<type>&disp,
-                         Edge *trees, int n, int times, double dispScale, int color = -1) {
+                             Edge *trees, int n, int times, double dispScale, int color = -1) {
     int H = origin1.height, W = origin1.width;
     img.reset(3, H*(1+times), W*(1+times));
     draw_RGBimage(img, origin1, times, 0, 1);
@@ -207,7 +213,7 @@ void draw_support_map(Array3<type> &output_support, Grid<type>&disp, Forest &sup
 }
 
 
-void show_stable_pixels(Grid<unsigned char> &disp, 
+void show_stable_pixels(Grid<unsigned char> &disp,
                         Grid<unsigned char> &occ,
                         Grid<unsigned char> &occ_img) {
     occ_img.reset(occ.height, occ.width);
@@ -221,27 +227,27 @@ void show_stable_pixels(Grid<unsigned char> &disp,
 
 
 void draw_support_map(int x, int y, const char* file_name, int cnt, const char *alg_name, Forest &forest,
-                     Array3<unsigned char> &support_map, Grid<unsigned char>&disp, Graph &graph, double scale, int times = 2) {
-  forest.init(graph);
+                      Array3<unsigned char> &support_map, Grid<unsigned char>&disp, Graph &graph, double scale, int times = 2) {
+    forest.init(graph);
 
-  draw_support_map(support_map, disp,forest, graph, x, y, times, scale);
-  char file[100];
-  int I = y*(1+times), J = x*(1+times);
-  for (int c = 0; c < 3; ++c) {
-    for (int ii = 0; ii < times; ++ii)
-        for (int jj = 0; jj < times; ++jj)
-            support_map[c][I+ii][J+jj] = 255;
-  }
-  get_file_name(file, file_name,cnt,alg_name);
-  strcat(file, ".ppm");
-  save_image_rgb(file, support_map);
+    draw_support_map(support_map, disp,forest, graph, x, y, times, scale);
+    char file[100];
+    int I = y*(1+times), J = x*(1+times);
+    for (int c = 0; c < 3; ++c) {
+        for (int ii = 0; ii < times; ++ii)
+            for (int jj = 0; jj < times; ++jj)
+                support_map[c][I+ii][J+jj] = 255;
+    }
+    get_file_name(file, file_name,cnt,alg_name);
+    strcat(file, ".ppm");
+    save_image_rgb(file, support_map);
 }
 
 bool bad_point(int x, int y,Grid<unsigned char> &occ, int radius = 1) {
     int W = occ.width, H = occ.height;
     if (x-radius<0 || x+radius>=W || y-radius<0 || y+radius>=H) return false;
 
-    for (int i = y-radius; i <= y+radius; ++i) 
+    for (int i = y-radius; i <= y+radius; ++i)
         for (int j = x-radius; j <= x+radius; ++j) {
             if (occ[i][j]==0) return false;
         }

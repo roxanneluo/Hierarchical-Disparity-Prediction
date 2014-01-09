@@ -7,30 +7,48 @@ namespace mylib {
 
 int randint(int a, int b) {
     // uniformly random integer int [a, b]
-	int k = b - a + 1;
-	if (k < 1) return a;
-	int p = rand() * rand() + rand();
-	p = p % k;   if (p < 0) p += k;
-	return p + a;
+    int k = b - a + 1;
+    if (k < 1) return a;
+    int p = rand() * rand() + rand();
+    p = p % k;
+    if (p < 0) p += k;
+    return p + a;
 }
 
 template <class type>
-type ABS(type x) { if (x < 0) x=-x; return x; }
+type ABS(type x) {
+    if (x < 0) x=-x;
+    return x;
+}
 
 template <class type>
-type min(type a, type b) { if (a < b) return a; return b; }
+type min(type a, type b) {
+    if (a < b) return a;
+    return b;
+}
 
 template <class type>
-type max(type a, type b) { if (a > b) return a; return b; }
+type max(type a, type b) {
+    if (a > b) return a;
+    return b;
+}
 
-int min3abs(int a, int b, int c) { 
-    if (a < 0) a = -a; if (b < 0) b = -b; if (c < 0) c = -c;
-    if (b < a) a = b; if (c < a) a = c; return a; 
+int min3abs(int a, int b, int c) {
+    if (a < 0) a = -a;
+    if (b < 0) b = -b;
+    if (c < 0) c = -c;
+    if (b < a) a = b;
+    if (c < a) a = c;
+    return a;
 }
 
 int max3abs(int a, int b, int c) {
-	if (a < 0) a = -a; if (b < 0) b = -b; if (c < 0) c = -c;
-	if (b > a) a = b; if (c > a) a = c; return a;
+    if (a < 0) a = -a;
+    if (b < 0) b = -b;
+    if (c < 0) c = -c;
+    if (b > a) a = b;
+    if (c > a) a = c;
+    return a;
 }
 
 }

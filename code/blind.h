@@ -3,7 +3,8 @@
 #include "algorithm"
 #include "gridcode.h"
 class Point {
-    public: int x, y;
+public:
+    int x, y;
 
     bool operator < (const Point &p) const {
         if (x < p.x) return true;
@@ -53,7 +54,7 @@ void find_blind(Grid<type> &blind, Grid<type> &disp, bool left) {
             while (j < W && points[j].x == x) ++j;
         }
         //for (int j = 0; j < W; ++j)
-          //  if (!v[j]) printf("%d,", j);
+        //  if (!v[j]) printf("%d,", j);
         //printf("\n");
     }
 

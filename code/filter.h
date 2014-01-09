@@ -12,7 +12,7 @@ Grid<unsigned char> tmp;
 void median_filter(Grid<unsigned char>& a, int radius = 2) {
     tmp.copy(a);
     int w = a.width, h = a.height;
-	ctmf(tmp[0], a[0], w, h, w, w, radius, 1, w * h);
+    ctmf(tmp[0], a[0], w, h, w, w, radius, 1, w * h);
 }
 
 #endif
