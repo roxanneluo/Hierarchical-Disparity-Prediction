@@ -159,8 +159,8 @@ public :
                                                                  rgb[2][i][j] - rgb[2][i+p][j+q]);
                             }
         m = k;
-        printf("%d\n", m);
-        fflush(stdout);
+        // printf("%d\n", m);
+        // fflush(stdout);
     }
     template <class type>
     void collect_edges_edgeaware2 (Array3<type> & rgb) {
@@ -246,6 +246,16 @@ public :
     bool * blocks ; // mark if this area has at least one point
     vector<int> path, through; // vector is used, for i really don't know how large path could be. compile with -O2 would be faster
     // path : the nodes walked, through : the edges walked, lerw : the loop erase random walk
+    void build_MST() {
+      std::sort(edges + 1, edges + m + 1);
+      mset.init(n);
+      ts = 0;
+      for (int i = 1; i <= m; ++i) {
+        if (mset.merge(edges[i].a, edges[i].b)) {
+          trees[++ts] = edges[i];
+        }
+      }
+    }
     void build_RandTree() {
 
         srand(time(NULL));
