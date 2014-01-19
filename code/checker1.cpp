@@ -49,7 +49,7 @@ int main(int args, char ** argv) {
             if (ref[i][j] == 0) continue;
             ++total;
             // the trancated value should be tolerance * scale
-            if (mylib::ABS(ref[i][j] - out[i][j]) < tolerance * scale) {
+            if (mylib::ABS(ref[i][j] - out[i][j]) <= tolerance * scale) {
                 ++correct;
                 disparity_errormap[i][j] = 255;
             } else if (ref[i][j] - out[i][j] > 0) {

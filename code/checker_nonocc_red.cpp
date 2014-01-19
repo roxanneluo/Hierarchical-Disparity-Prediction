@@ -1,6 +1,5 @@
 #include "mylib.h"
 #include "iomanager.h"
-
 /******************************************
 
 This checker is used when running multiple tests.
@@ -58,12 +57,12 @@ int main(int args, char ** argv) {
     for (int i = 0; i < h; ++i)
         for (int j = 0; j < w; ++j) {
             if (left_or_right == 0) {
-                int d = ref_left[i][j] / scale;
-                if (j - d >= 0 && ref_left[i][j] == ref_right[i][j -d])
+                int d = ref_left[i][j] * 1.0 / scale;
+                if (j - d >= 0 && mylib::ABS(ref_left[i][j] - ref_right[i][j - d]) < scale)
                     occ[i][j] = 255;
             } else {
-                int d = ref_right[i][j] / scale;
-                if (j + d < w && ref_left[i][j + d] == ref_right[i][j])
+                int d = ref_right[i][j] * 1.0/ scale;
+								if (j + d < w && mylib::ABS(ref_left[i][j + d] - ref_right[i][j]) < scale)
                     occ[i][j] = 255;
             }
         }
@@ -73,8 +72,11 @@ int main(int args, char ** argv) {
         for (int j = 0; j < w; ++j) {
             for (int k = 0; k < 3; ++k) 
                 disparity_errormap[k][i][j] = out[i][j];
-            if (occ[i][j] == 0) 
-                continue;
+            if (occ[i][j] == 0) {
+							for (int k = 0; k < 3; ++k)
+                disparity_errormap[k][i][j] = 0;  
+							continue;
+						}
             ++total;
             // the trancated value should be tolerance * scale
             if (mylib::ABS(ref[i][j] - out[i][j]) < tolerance * scale) {
