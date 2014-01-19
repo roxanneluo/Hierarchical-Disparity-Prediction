@@ -23,6 +23,19 @@ public :
     }
 };
 
+/*bool operator > (Edge &e) {
+    //if (e.a > e.b)  {int temp = e.a; e.a = e.b; e.b = temp;}
+
+    if (weight > e.weight) return true;
+    else if (weight < e.weight) return false;
+
+    if (a > e.a) return true;
+    else if (a < e.a) return false;
+
+    if (b > e.b) return true;
+    else return false;
+}*/
+
 bool operator < (const Edge &d, const Edge &e) {
     if (d.weight < e.weight) return true;
     if (d.weight > e.weight) return false;
@@ -380,7 +393,30 @@ public :
         }
 //        for (int i = 1; i <= n; ++i) printf("%d ", nodes[i].degree);
     }
+    void order_of_visit(int rootx, int rooty, int W) {
+        order = (int * ) malloc((n + 2) * sizeof(int));
+        for (int i = 1; i <= n; ++i) visited[i] = false;
+        int num = 0;
 
+        int root = rooty*W+rootx+1;
+//            cout << root << endl;
+        order[++num] = root;
+        nodes[root].ord = num;
+        nodes[root].up_weight = 0;
+        visited[root] = true;
+        for (int i = num; i <= num; ++i) { // this is a bfs
+            int t = order[i];
+            for (int j = 0; j < nodes[t].degree; ++j) {
+                int p = nodes[t].next_node[j];
+                if (!visited[p]) {
+                    order[++num] = p;
+                    nodes[p].ord = num;
+                    nodes[p].up_weight = nodes[t].edge_weight[j];
+                    visited[p] = true;
+                }
+            }
+        } // end for bfs
+    }
     void order_of_visit() {
         order = (int * ) malloc((n + 2) * sizeof(int));
         for (int i = 1; i <= n; ++i)
@@ -456,6 +492,64 @@ public :
         }
     } // compute cost on tree
 
+
+    template <class type>
+    void compute_support(Grid<type> &support, double sigma = 255 * 0.1) {
+        update_table(sigma);
+        backup.reset(1, support.height, support.width);
+
+        support[nodes[order[1]].x][nodes[order[1]].y]=255;
+        // support[nodes[order[1]].x][nodes[order[1]].y]=backup[0][nodes[order[1]].x][nodes[order[1]].y] = 255;
+
+        for (int i = 1; i <= n; ++i) {
+            int p = order[i];
+            for (int j = 0; j < nodes[p].degree; ++j) {
+                int q = nodes[p].next_node[j];
+                if (nodes[q].ord < nodes[p].ord) continue;
+
+                // support[nodes[q].x][nodes[q].y] = backup[0][nodes[q].x][nodes[q].y]
+                //                                 = backup[0][nodes[p].x][nodes[p].y]*table[nodes[q].up_weight];
+                support[nodes[q].x][nodes[q].y] = support[nodes[p].x][nodes[p].y]*table[nodes[q].up_weight];
+            }
+        }
+    }
+
+    template <class type>
+    int findSupportSize(int starti, int startj, Grid<type> &support, int H, int W, double threshold = 0.8, double sigma = 255 * 0.1) {
+        update_table(sigma);
+        order_of_visit(startj, starti, W);
+        support.reset(H,W);
+        // update_table(sigma);
+
+        support[nodes[order[1]].x][nodes[order[1]].y]=1;
+        // support[nodes[order[1]].x][nodes[order[1]].y]=backup[0][nodes[order[1]].x][nodes[order[1]].y] = 255;
+        int size = 0;
+        for (int i = 1; i <= n; ++i) {
+            int p = order[i];
+            if (support[nodes[p].x][nodes[p].y] > threshold)
+                    ++size;
+
+            for (int j = 0; j < nodes[p].degree; ++j) {
+                int q = nodes[p].next_node[j];
+                if (nodes[q].ord < nodes[p].ord) continue;
+
+                // support[nodes[q].x][nodes[q].y] = backup[0][nodes[q].x][nodes[q].y]
+                //                                 = backup[0][nodes[p].x][nodes[p].y]*table[nodes[q].up_weight];
+                support[nodes[q].x][nodes[q].y] = support[nodes[p].x][nodes[p].y]*table[nodes[q].up_weight];
+               
+            }
+        }
+        return size;
+    }
+
+    bool connected(int i1,int j1, int i2, int j2, Graph &g) {
+        int n1 = g.node_number(i1,j1);
+        int n2 = g.node_number(i2,j2);
+        for (int i = 0; i < nodes[n1].degree; ++i) 
+            if (nodes[n1].next_node[i] == n2)
+                return true;
+        return false;
+    }
 
 };
 

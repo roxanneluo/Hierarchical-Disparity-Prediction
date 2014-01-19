@@ -137,7 +137,7 @@ void draw_tree_and_RGBimage(Grid<type> &img, Array3<type> &rgb, Edge *trees, int
 }
 
 
-template <class type>
+/*template <class type>
 void draw_tree_difference(Grid<type> &img, Grid<type> &origin, Edge *tree1, int n1, Edge *tree2, int n2, int times) {
     Edge *only1 = (Edge *) malloc((n1+2) * sizeof(Edge));   // edges in tree1 only
     Edge *only2 = (Edge *) malloc((n2+2) * sizeof(Edge));   // edges in tree2 only
@@ -167,7 +167,7 @@ void draw_tree_difference(Grid<type> &img, Grid<type> &origin, Edge *tree1, int 
     draw_tree(img, inter, cnti, times);
     draw_tree(img, only1, cnt1, times, 255);
     draw_tree(img, only2, cnt2, times, 0);
-}
+}*/
 
 template <class type>
 void draw(type img, bool rgb) {

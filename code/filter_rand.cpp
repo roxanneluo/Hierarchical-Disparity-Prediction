@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include "gridcode.h"
-#include "forests1.h"
+#include "forests_ust.h"
 #include "arithmetics.h"
 #include "iomanager.h"
 #include "timekeeper.h"
@@ -104,7 +104,7 @@ int main(int args, char ** argv) {
   int sizeItv[3]={0,0,0};
   int H = rgb_left.height, W = rgb_left.width;
   int monoSize = H*W/(bordernum+1);
-  for (int n = 0; n < bordernum; ++n) {
+  /*for (int n = 0; n < bordernum; ++n) {
     int j = border[n];
     draw_support_map(j-1,H/2,file_name[1],++cnt,"RAND",left_support_forest, left_support_map, left_gray_img,left_graph, scale);
     draw_support_map(j,H/2,file_name[1],++cnt,"RAND",left_support_forest, left_support_map, left_gray_img,left_graph, scale);
@@ -143,6 +143,22 @@ int main(int args, char ** argv) {
   for (int i = 0; i < 3; ++i)
     printf("%d:%f\n",i,double(sizeItv[i])/(2*bordernum*rgb_left.height));
   printf("%d\n", cnt);
+*/
+  srand(time(NULL));
+  int times = 10;
+  for (int n = 0; n < bordernum; ++n) {
+    int j = border[n];
+    if (n == 1) j -= 1;
+    for (int i = 0; i < times; ++i) {
+      int y = rand()%H;
+      draw_support_map(j,y, file_name[1],++cnt,"RAND",left_support_forest, left_support_map, left_gray_img,left_graph, scale);
+    }
+  }
 
+  int j = (border[0]+border[1])/2;
+  for (int i = 0; i < times; ++i) {
+      int y = rand()%H;
+      draw_support_map(j,y, file_name[1],++cnt,"RAND",left_support_forest, left_support_map, left_gray_img,left_graph, scale);
+  }
   return 0;
 }
