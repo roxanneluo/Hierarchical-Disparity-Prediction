@@ -239,6 +239,41 @@ void draw_support_map(int x, int y, const char* file_name, int cnt, const char *
   save_image_rgb(file, support_map);
 }
 
+template <class type>
+void addIfNotZero(Array3<unsigned char> &output, Grid<type> &input, int channel) {
+    for (int i = 0; i < input.height; ++i)
+        for (int j = 0; j < input.width; ++j) {
+            // if (int(input[i][j]) != 0)
+                output[channel][i][j] = mylib::min(255,int(input[i][j]+output[channel][i][j]));
+        }
+}
+void draw_support_map_no_tree(int x, int y, const char* file_name, int cnt, const char *alg_name, Forest &forest,
+                     Array3<unsigned char> &support_map, Grid<unsigned char>&disp, Graph &graph,
+                     double scale, int times = 2, double sigma = 0.1*255) {
+    forest.init(graph);
+
+    printf("before inner draw\n");
+    support_map.reset(3, graph.H, graph.W);
+    // support_map.zero();
+    for (int i = 0; i < 3; ++i)
+        support_map.copy(disp,i, scale-1);
+
+    Grid<double> small_support;
+    small_support.reset(graph.H, graph.W);
+    compute_support(small_support, forest, x, y, graph.W, sigma);
+    addIfNotZero(support_map, small_support,0);
+    
+    printf("after inner draw\n");
+    char file[100];
+    // int I = y*(1+times), J = x*(1+times);
+    for (int c = 0; c < 3; ++c) {
+        support_map[c][y][x] = 255;
+    }
+    get_file_name(file, file_name,cnt,alg_name);
+    strcat(file, ".ppm");
+    save_image_rgb(file, support_map);
+}
+
 bool bad_point(int x, int y,Grid<unsigned char> &occ, int radius = 1) {
     int W = occ.width, H = occ.height;
     if (x-radius<0 || x+radius>=W || y-radius<0 || y+radius>=H) return false;

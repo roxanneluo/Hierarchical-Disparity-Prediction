@@ -253,6 +253,21 @@ public :
         for (int i = 0; i < array; ++i)
             mat[i]->copy(other[i]);
     }
+    void copy(Grid<type> &grid, int channel, double scale = 1, int arr = 3) {
+        if (grid.height != height || grid.width != width)
+            reset(arr, grid.height, grid.width);
+        if (scale == 1)
+            mat[channel]->copy(grid);
+        else {
+            // printf("scale = %f\n",scale);
+            Grid<type> *g = mat[channel];
+            for (int i = 0; i < height; ++i) 
+                for (int j = 0; j < width; ++j) {
+                    (*g)[i][j] = grid[i][j]*scale;
+                    // printf("%d\n",g[i][j]);
+                }
+        }
+    }
     void zero() {
         //reset(array, height, width);
         for (int a = 0; a < array; ++a) {
