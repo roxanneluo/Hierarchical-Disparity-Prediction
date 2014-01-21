@@ -250,13 +250,13 @@ void addIfNotZero(Array3<unsigned char> &output, Grid<type> &input, int channel)
 void draw_support_map_no_tree(int x, int y, const char* file_name, int cnt, const char *alg_name, Forest &forest,
                      Array3<unsigned char> &support_map, Grid<unsigned char>&disp, Graph &graph,
                      double scale, int times = 2, double sigma = 0.1*255) {
-    forest.init(graph);
+    // forest.init(graph);mak
 
     printf("before inner draw\n");
     support_map.reset(3, graph.H, graph.W);
     // support_map.zero();
     for (int i = 0; i < 3; ++i)
-        support_map.copy(disp,i, scale-1);
+        support_map.copy(disp,i, 1);
 
     Grid<double> small_support;
     small_support.reset(graph.H, graph.W);

@@ -1,0 +1,5 @@
+all : support_UST support_MST
+support_UST :
+	g++ code/support_map_UST.cpp -o bin/Support_UST.out -O2 -std=c++0x
+support_MST :
+	g++ code/support_map_MST.cpp -o bin/Support_MST.out -O2 -std=c++0x

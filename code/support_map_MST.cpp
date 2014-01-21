@@ -37,7 +37,6 @@ const int MAX_NUM = 20;
 int num = 0;
 int x[MAX_NUM], y[MAX_NUM];
 
-
 template <class type>
 void refinement(Grid<type>& d_left, Grid<type>& d_right) {
     // find stable pixels by using left-right consisty check
@@ -47,10 +46,10 @@ void refinement(Grid<type>& d_left, Grid<type>& d_right) {
 
     forest_left.compute_cost_on_tree(cost_left, 255 * 0.05);
     forest_right.compute_cost_on_tree(cost_right, 255 * 0.05);
+    //timer.check("refinement   ");
     compute_disparity(cost_left, d_left);
     compute_disparity(cost_right, d_right);
 }
-
 
 int main(int args, char ** argv) {
     if (args > 2) {
@@ -123,12 +122,15 @@ int main(int args, char ** argv) {
     show_stable_pixels(disparity_right, occlusion_right, right_occ_img);*/
     // save_image(file_name[2], disparity_left, scale);
     // save_image(file_name[3], disparity_right, scale);
-
+    refinement(disparity_left, disparity_right);
+    median_filter(disparity_left);
+    median_filter(disparity_right);
+    
     printf("before draw\n");
     int cnt = 0;
     for (int i = 0; i < num; ++i) {
         // if (bad_point(x,y,occlusion_left)) {
-        draw_support_map_no_tree(x[i],y[i],file_name[4],++cnt,file_name[5],left_support_forest, left_support_map, disparity_left,left_graph, scale);
+        draw_support_map_no_tree(x[i],y[i],file_name[4],++cnt,file_name[5],forest_left, left_support_map, disparity_left,left_graph, scale);
         //}
     }
     printf("%d\n", cnt);

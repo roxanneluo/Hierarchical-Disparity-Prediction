@@ -146,13 +146,21 @@ int main(int args, char ** argv) {
     median_filter(disparity_left);
     median_filter(disparity_right);
 
+    rgb_left.freearray3();
+    rgb_right.freearray3(); // int -> unsigned char
+    left_gradient.freegrid();
+    right_gradient.freegrid();
+    cost_left.freearray3(); cost_right.freearray3();
+    occlusion_left.freegrid(); occlusion_right.freegrid();
+
     // save_image(file_name[2], disparity_left, scale);
     // save_image(file_name[3], disparity_right, scale);
 
+    printf("before draw\n");
     int cnt = 0;
     for (int i = 0; i < num; ++i) {
         // if (bad_point(x,y,occlusion_left)) {
-        draw_support_map_no_tree(x[i],y[i],file_name[4],++cnt,file_name[5],left_support_forest, left_support_map, disparity_left,left_graph, scale);
+        draw_support_map_no_tree(x[i],y[i],file_name[4],++cnt,file_name[5],forest_left, left_support_map, disparity_left,left_graph, scale);
         //}
     }
     printf("%d\n", cnt);
