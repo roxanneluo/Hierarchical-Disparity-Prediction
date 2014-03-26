@@ -68,6 +68,8 @@ public:
             reset(other.length);
         memcpy(array, other.array, length * sizeof(type));
     }
+
+/*
     void normalize () {
         double err = 1e-10;
         double sum = 0;
@@ -100,6 +102,7 @@ public:
         }
         normalize();
     }
+*/
 
 };
 
