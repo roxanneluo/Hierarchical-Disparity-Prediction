@@ -1,2 +1,0 @@
-all:
-	g++ silly_ST.cpp -o simple_ST -std=c++0x

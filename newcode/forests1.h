@@ -6,10 +6,10 @@
 #include <ctime>
 #include <cmath>
 
-#include "gridcode.h"
+#include "memman.h"
 #include "mylib.h"
 
-const float sigma_const = 255 * 0.1;
+const double sigma_const = 255 * 0.1;
 
 class Edge {
 public :
@@ -152,30 +152,7 @@ public :
             nodes[bb].add_edge(aa, zz);
         }
     }
-    void order_of_visit(int rootx, int rooty, int W) {
-		order = (int * ) malloc((n + 2) * sizeof(int));
-		for (int i = 1; i <= n; ++i) visited[i] = false;
-		int num = 0;
 
-        int root = rooty*W+rootx+1;
-//            cout << root << endl;
-        order[++num] = root;
-        nodes[root].ord = num;
-        nodes[root].up_weight = 0;
-        visited[root] = true;
-        for (int i = num; i <= num; ++i) { // this is a bfs
-            int t = order[i];
-            for (int j = 0; j < nodes[t].degree; ++j) {
-                int p = nodes[t].next_node[j];
-                if (!visited[p]) {
-                    order[++num] = p;
-                    nodes[p].ord = num;
-                    nodes[p].up_weight = nodes[t].edge_weight[j];
-                    visited[p] = true;
-                }
-            }
-        } // end for bfs
-	}
 	void order_of_visit() {
 		order = (int * ) malloc((n + 2) * sizeof(int));
 		for (int i = 1; i <= n; ++i) 
