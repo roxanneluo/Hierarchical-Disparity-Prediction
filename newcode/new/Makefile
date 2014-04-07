@@ -1,0 +1,2 @@
+one :
+	g++ silly.cpp 
