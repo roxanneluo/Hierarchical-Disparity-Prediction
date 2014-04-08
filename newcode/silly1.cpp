@@ -2,11 +2,8 @@
 #include "forests1.h"
 #include "arithmetics.h"
 #include "iomanager.h"
-//#include "timekeeper.h"
-//#include "refinement.h"
-//#include "imageresult.h"
 
-#include "filter.h"
+//#include "filter.h"
 
 char file_name[4][300] =
 {"left.ppm", "right.ppm", "silly_left.pgm", "silly_right.pgm"};
@@ -20,29 +17,6 @@ Graph left_graph, right_graph;
 Forest forest_left, forest_right;
 int max_disparity = 16;
 int scale = 16;
-
-
-Grid<unsigned char> occlusion_left, occlusion_right;
-
-// for image result
-Forest left_support_forest, right_support_forest;
-Grid<unsigned char> left_support_map, right_support_map;
-Grid<unsigned char> left_tree_img, right_tree_img;
-/*
-template <class type>
-void refinement(Grid<type>& d_left, Grid<type>& d_right) {
-    // find stable pixels by using left-right consisty check
-    find_stable_pixels(d_left, d_right, occlusion_left, occlusion_right);
-    update_matching_cost(cost_left, cost_right, d_left, d_right,
-                         occlusion_left, occlusion_right);
-
-    forest_left.compute_cost_on_tree(cost_left, 255 * 0.05);
-    forest_right.compute_cost_on_tree(cost_right, 255 * 0.05);
-    compute_disparity(cost_left, d_left);
-    compute_disparity(cost_right, d_right);
-}
-*/
-
 int main(int args, char ** argv) {
     if (args > 2) {
         strcpy(file_name[0], argv[1]);

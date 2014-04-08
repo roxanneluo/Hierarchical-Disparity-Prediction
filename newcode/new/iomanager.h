@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cctype>
-#include "memman.h"
+#include "settings.h"
 
 const int BUF_LEN = 6500303;
 char buff[BUF_LEN];

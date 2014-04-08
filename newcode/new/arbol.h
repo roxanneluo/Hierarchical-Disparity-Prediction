@@ -4,7 +4,9 @@
 
 /**************************************************
 
+This code is the schemas.
 Only declarations and single-line functions in this file.
+
 functions are implemented in trunk.cpp and branch.cpp
 
 If you want a new kind of tree, 
@@ -19,8 +21,8 @@ create a new branch.cpp and change the silly.cpp includings.
 #include <ctime>
 #include <cmath>
 
-#include "memman.h"
-#include "mylib.h"
+#include "settings.h"
+#include "misc.cpp"
 
 const double sigma_const = 255 * 0.1;
 
@@ -50,30 +52,35 @@ public :
 
 class BigObject {
 public :
-
-    MergeSet mset; // for buiding the tree
-    Edge edges[NODES * 2]; // all candidate edges  1-based
-    Edge trees[NODES]; // collected tree edges 1-based
     int n, m; // number of nodes and edges
     int ts; // number of tree edges
-    int H, W; // graph info
-    //int node_number(int x, int y) { return x * W + y + 1; }
-    //void node_location(int p, int &x, int &y) {--p; x = p / W; y = p % W; }
-
+    int H, W; // graph size, height and width
+    inline int node_number(int x, int y) { return x * W + y + 1; }
+    inline void node_location(int p, int &x, int &y) {--p; x = p / W; y = p % W; }
+	MergeSet mset; // for buiding the tree
+    Edge edges[NODES * 2]; // all candidate edges  1-based
+    Edge trees[NODES]; // collected tree edges 1-based
     // next three are in trunck.cpp
-    void collect_edges(Picture rgb); // collect all the edges.
+    void collect_edges(); // collect all the edges.
 	void prepare_visit();  // construct the bfs order for the forest
-
     // next three are in branch.cpp
     void build_tree(); // build the tree given all the collected edges.
-	void compute_cost_on_tree(FloArray cost, double sigma = 255 * 0.1 );
 
-    TreeNode * nodes;
-    bool * visited;
-	int * order; // the sequence of index, the visiting order of the tree
-//Array3<double> backup; // used in calculate cost on tree
+	void compute_cost_on_tree();
+    void compute_first_cost(int d, Picture rgb_r, FloArray gradient); 
+    void compute_gradient();
+
+    TreeNode nodes[NODES];
+    bool visited[NODES];
+	int order[NODES]; // the sequence of index, the visiting order of the tree
+
 	double table[256]; // weight table
 
+    void getDisparity(BigObject & ref, bool left);
+
+	FloArray cost, gradient;
+	IntArray disparity;
+    Picture rgb;
 };
 
 #endif
