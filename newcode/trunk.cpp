@@ -35,9 +35,8 @@ void BigObject::compute_gradient () {
     }
 }
 
-void BigObject::compute_first_cost (int d, Picture rgb_r, FloArray gradient_r) { 
+void BigObject::computeFirstCost (int d, BigObject & right) { 
 	// only the cost for disparity d.
-	// assume left and right rgb image has the exact same size;
     double max_gradient_color_difference= 2.0;
     double max_color_difference = 10.0;
     double weight_on_color = 0.11;
@@ -45,9 +44,9 @@ void BigObject::compute_first_cost (int d, Picture rgb_r, FloArray gradient_r) {
         for (int y = 0; y < W; ++y) {
             double cost1 = 0;
             for (int c = 0; c < 3; ++c)
-                cost1 += abs(rgb[x][y][c] - rgb_r[x][misc::max(y - d,0)][c]);
+                cost1 += abs(rgb[x][y][c] - right.rgb[x][misc::max(y - d,0)][c]);
             cost1 = misc::min(cost1 / 3.0, max_color_difference); // here is weired
-            double cost_gradient = misc::abs(gradient[x][y] - gradient_r[x][misc::max(0, y - d)]);
+            double cost_gradient = misc::abs(gradient[x][y] - right.gradient[x][misc::max(0, y - d)]);
             cost_gradient = misc::min(cost_gradient, max_gradient_color_difference);
             cost[x][y] = weight_on_color * cost1 + (1 - weight_on_color) * cost_gradient;
         }
@@ -111,6 +110,12 @@ void BigObject::prepare_visit() {
             }
         } // end for bfs
     }// end for the while
+}
+
+void BigObject::updateTable(double sigma) {
+    table[0] = 1;
+    for(int i = 1; i <= 255; i++)
+        table[i] = table[i-1] * exp(-1.0 / sigma);
 }
 
 #endif

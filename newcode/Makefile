@@ -1,2 +1,3 @@
-base:
-	g++ silly1.cpp -std=c++0x
+one :
+	g++ silly.cpp -O2
+	time ./a.out
