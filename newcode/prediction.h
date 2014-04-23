@@ -50,17 +50,15 @@ void getSupportProb(Picture left_rgb, Picture right_rgb, int h, int w, int lengt
 
 void getProbMatrix(int layer, int h, int w) {
     height = h; width = w;
-    //gmm::genGMM_layer(layer,height);
-		gmm::genGMM_layer(layer);
-		int length = gmm::length;
-		for (int j = 0; j < width; ++j) {
+    gmm::genGMM_layer(layer,height);
+	for (int j = 0; j <= width; ++j) {
         for (int i = 1; j / 2 - i >= 0; ++i) 
-            prob_matrix[j / 2 - i][j] = gmm::gmm[length / 2 - i];
+            prob_matrix[j / 2 - i][j] = gmm::gmm[height - i];
         for (int i = 0; j / 2 + i < height; ++i) 
-            prob_matrix[j / 2 + i][j] = gmm::gmm[length / 2 + i];
+            prob_matrix[j / 2 + i][j] = gmm::gmm[height+ i];
     }
-    for (int i = 0; i < height; ++i) {
-        for (int j = 0; j < width; ++j)
+    for (int i = 0; i <= height; ++i) {
+        for (int j = 0; j <= width; ++j)
             prob_matrix[i][j] *= support_prob[j];
      //   normalize(prob_matrix[i], width);
     }
@@ -82,10 +80,10 @@ void getProbMatrix(int layer, int h, int w) {
 void getInterval(double threshold) {
     double highest;
     int highest_index;
-    for (int i = 0; i < height; ++i) {
+    for (int i = 0; i <= height; ++i) {
         highest = prob_matrix[i][0];
         highest_index = 0;
-        for (int j = 1; j < width; ++j) {
+        for (int j = 1; j <= width; ++j) {
             if (highest < prob_matrix[i][j]) {
                 highest = prob_matrix[i][j];
                 highest_index = j;
@@ -97,10 +95,11 @@ void getInterval(double threshold) {
             continue;
         }
         int ll, rr;
-        ll = rr = highest_index;
-        double total = 0.0;
+        ll = highest_index-1;
+        rr = highest_index+1;
+        double total = prob_matrix[i][highest_index];
         bool mark = true;
-        while(mark && (ll >= 0 && rr < width - 1)) {
+        while(mark && (ll >= 0 || rr <= width)) {
             mark = false;
             if (dcmp(prob_matrix[i][ll] / (prob_matrix[i][ll] + total), threshold) == 1) {
                 total += prob_matrix[i][ll];
