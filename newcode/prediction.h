@@ -50,12 +50,14 @@ void getSupportProb(Picture left_rgb, Picture right_rgb, int h, int w, int lengt
 
 void getProbMatrix(int layer, int h, int w) {
     height = h; width = w;
-    gmm::genGMM_layer(layer,height);
-    for (int j = 0; j < width; ++j) {
+    //gmm::genGMM_layer(layer,height);
+		gmm::genGMM_layer(layer);
+		int length = gmm::length;
+		for (int j = 0; j < width; ++j) {
         for (int i = 1; j / 2 - i >= 0; ++i) 
-            prob_matrix[j / 2 - i][j] = gmm::gmm[height - i];
+            prob_matrix[j / 2 - i][j] = gmm::gmm[length / 2 - i];
         for (int i = 0; j / 2 + i < height; ++i) 
-            prob_matrix[j / 2 + i][j] = gmm::gmm[height + i];
+            prob_matrix[j / 2 + i][j] = gmm::gmm[length / 2 + i];
     }
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j)
@@ -98,7 +100,7 @@ void getInterval(double threshold) {
         ll = rr = highest_index;
         double total = 0.0;
         bool mark = true;
-        while(mark && (ll >= 0 || rr < width - 1)) {
+        while(mark && (ll >= 0 && rr < width - 1)) {
             mark = false;
             if (dcmp(prob_matrix[i][ll] / (prob_matrix[i][ll] + total), threshold) == 1) {
                 total += prob_matrix[i][ll];
