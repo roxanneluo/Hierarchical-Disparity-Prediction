@@ -94,7 +94,9 @@ struct parameters {
 
 namespace supportmatch {
 
-BytArray I1, I2, left_gray, right_gray;
+unsigned char* I1;
+unsigned char* I2;
+BytArray left_gray, right_gray;
 int width, height, bpl;
 parameters para;
 
@@ -130,10 +132,14 @@ void makeSupportMatch (Picture left, Picture right,
     rgb2gray(left_gray, left);
     rgb2gray(right_gray, right);
     // make I1 I2 zero
+
+		I1 = (unsigned char*)_mm_malloc(bpl * height * sizeof(unsigned char), 16);
+		I2 = (unsigned char*)_mm_malloc(bpl * height * sizeof(unsigned char), 16);
+
     for (int i = 0; i < height; ++i) 
         for (int j = 0; j < width; ++j) {
-            I1[i][j] = left_gray[i][j];
-            I2[i][j] = right_gray[i][j];
+            I1[i * bpl + j] = left_gray[i][j];
+            I2[i * bpl + j] = right_gray[i][j];
         }
 
     for (int i = 0; i < height; ++i)
@@ -360,8 +366,8 @@ void ComputeSupportMatches(unsigned char* I1_desc,
 }
 
 void findSupportMatch() {
-    Descriptor desc1(I1[0], width, height, bpl, para.subsampling);
-    Descriptor desc2(I2[0], width, height, bpl, para.subsampling);
+    Descriptor desc1(I1, width, height, bpl, para.subsampling);
+    Descriptor desc2(I2, width, height, bpl, para.subsampling);
     ComputeSupportMatches(desc1.I_desc, desc2.I_desc);
 }
 
