@@ -38,25 +38,56 @@ Pi	0.111202599	0.727640398	0.161157002
 sigma	5.680955165	0.543865616
 Pi	0.225260819	0.774739181
 **/
-void genGMM_layer(Array1<double> &gmm, int large_layer) {
-    if (large_layer == 0) {
-        /*double mu[2] = {0.2071,-2.2668};
-        double pi[2] = {0.7719,0.2281};
-        double sigma[2] = {0.6446, 9.6012};
-        int k = 2;
-        genGMM(gmm,k,mu,sigma,pi);*/
-        const int k = 3;
-        double mu[k] = {0.990587103,0.187743358,-4.048706689};
-        double pi[k] = {0.111202599,0.727640398,0.161157002};
-        double sigma[k] = {2.912734757, 0.606497154,11.087372705};
-        genGMM(gmm,k,mu,sigma,pi);
-    } else {
-        double mu[2] = {-1.086022171,0.184231375};
-        double pi[2] = {0.225260819,0.774739181};
-        double sigma[2] = {5.680955165, 0.543865616};
-        int k = 2;
-        genGMM(gmm,k,mu,sigma,pi);
-    }
+void genGMM_layer(Array1<double> &gmm, int large_layer, double datasetRatio =  0.5) {
+    if (datasetRatio == 1)
+        if (large_layer == 0) {
+            /*double mu[2] = {0.2071,-2.2668};
+            double pi[2] = {0.7719,0.2281};
+            double sigma[2] = {0.6446, 9.6012};
+            int k = 2;
+            genGMM(gmm,k,mu,sigma,pi);*/
+
+            // gmm when gnd vs. MST 
+            // const int k = 3;
+            // double mu[k] = {0.990587103,0.187743358,-4.048706689};
+            // double pi[k] = {0.111202599,0.727640398,0.161157002};
+            // double sigma[k] = {2.912734757, 0.606497154,11.087372705};
+
+            /*=========gmm gnd vs. MSF2=========*/
+            const int k = 3;
+            double mu[k] = {0.187744, -4.049134, 0.990802};
+            double pi[k] = {0.727650, 0.161147, 0.111203};
+            double sigma[k] = {0.606504, 11.087519, 2.913190};
+            genGMM(gmm,k,mu,sigma,pi);
+        } else {
+            /*==========gmm when k=2, gnd vs. MST and gnd vs. MSF2 share the same GMM(k=2)===============*/
+            // double mu[2] = {-1.086022171,0.184231375};
+            // double pi[2] = {0.225260819,0.774739181};
+            // double sigma[2] = {5.680955165, 0.543865616};
+            // int k = 2;
+            /*==============gmm when k=3, gnd vs. MSF2=========*/
+            const int k = 3;
+            double mu[k] = {-2.133305, 1.058262, 0.177772};
+            double pi[k] = {0.157178, 0.094915, 0.747907};
+            double sigma[k] = {6.284264, 2.368275, 0.525036};
+            genGMM(gmm,k,mu,sigma,pi);
+        }
+    else if (large_layer == 0) { //datasetRatio=0.5
+            /*=========gmm gnd vs. MSF2==========*/
+            const int k = 3;
+            double mu[k] = {1.049875, 0.176738, -5.205266};
+            double pi[k] = {0.123876, 0.705882, 0.170241};
+            double sigma[k] = {2.700242, 0.594091, 10.932382};
+            genGMM(gmm,k,mu,sigma,pi);
+        } else {
+            /*==========gmm when k=2, gnd vs. MSF2===============*/
+            double mu[2] = {-0.838225, 0.174887};
+            double pi[2] = {0.218403, 0.781597};
+            double sigma[2] = {5.652754, 0.543740};
+            int k = 2;
+            genGMM(gmm,k,mu,sigma,pi);
+
+        }
 }
 /**
 %     mu = [0.2071;-2.2668];

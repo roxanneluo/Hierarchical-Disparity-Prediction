@@ -2,7 +2,7 @@
 #define GEN_INTERVAL_H
 #include <vector>
 #include "gridcode.h"
-//#include "forests2.h" this is too dangerous
+#include "forests2.h"
 #include "arithmetics.h"
 #include "iomanager.h"
 #include "timekeeper.h"

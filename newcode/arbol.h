@@ -22,15 +22,16 @@ create a new branch.cpp and change the silly.cpp includings.
 #include <cmath>
 
 #include "settings.h"
-#include "misc.cpp"
-
-const double sigma_const = 255 * 0.1;
+#include "misc.cpp" 
 
 class Edge {
 public :
     int a, b; // Node ID
     int weight;
 };
+
+bool smaller_edge(const Edge & a, const Edge & b) 
+    { return a.weight < b.weight; }
 
 class MergeSet {
 public :
@@ -66,21 +67,23 @@ public :
     // next three are in branch.cpp
     void build_tree(); // build the tree given all the collected edges.
 
-	void compute_cost_on_tree();
-    void compute_first_cost(int d, Picture rgb_r, FloArray gradient); 
+	double table[259]; // weight table
+    void updateTable(double sigma);
+	void compute_cost_on_tree(double sigma);
     void compute_gradient();
 
     TreeNode nodes[NODES];
     bool visited[NODES];
 	int order[NODES]; // the sequence of index, the visiting order of the tree
 
-	double table[256]; // weight table
+    void computeFirstCost (int d, BigObject & right) ;
 
     void getDisparity(BigObject & ref, bool left);
 
-	FloArray cost, gradient;
-	IntArray disparity;
-    Picture rgb;
-};
+	FloArray cost, gradient, backup, best_cost; // no idea 
+	BytArray disparity; 
+    Picture rgb;     // can be 8-bit unsigned
+    IntArray stable; // can be 16-bit signed
+} left, right;
 
 #endif

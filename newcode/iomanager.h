@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cctype>
-#include "memman.h"
+#include "settings.h"
 
 const int BUF_LEN = 6500303;
 char buff[BUF_LEN];
@@ -86,7 +86,7 @@ void load_image_gray(const char * filename, IntArray gray, int &H, int &W) {
             gray[x][y] = (unsigned char) (buff[++i]);
 }
 
-void save_image(const char * filename, IntArray gray, int H, int W, int scale = 1) {
+void save_image(const char * filename, BytArray gray, int H, int W, int scale = 1) {
     FILE * f = fopen(filename, "wb");
     fprintf(f, "P5\n");
     fprintf(f, "#Produced by my silly program\n");
