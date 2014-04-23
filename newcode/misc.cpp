@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include "ctmf.h"
 
-#include <cstdio>
+//#include <cstdio>
 
 namespace misc {
 
@@ -23,15 +23,12 @@ void process_args(int args, char ** argv) {
     if (args > 3) { max_disparity = atoi(argv[3]); scale = 256 / max_disparity;  }
     if (args > 4) { scale = atoi(argv[4]);  }
     if (args > 6) { strcpy(file_name[2], argv[5]); strcpy(file_name[3], argv[6]);  }
-    if (args > 7) { strcpy(file_name[4], argv[7]);  }
+    //if (args > 7) { strcpy(file_name[4], argv[7]);  }
 }
 
 BytArray tmp4ctmf;
 void median_filter(BytArray a, int h, int w, int radius = 2) {
-    //printf("%d %d\n", h, w);
-    memset(tmp4ctmf, 0, sizeof(BytArray));
     for (int i = 0; i < h; ++i) for (int j = 0; j < w; ++j) tmp4ctmf[i][j] = a[i][j];
-//    memcpy(tmp4ctmf, a, sizeof(BytArray));
     int step = &a[1][1] - &a[0][1];
     ctmf(tmp4ctmf[0], a[0], w, h, step, step, radius, 1, 1024*512);
 }
