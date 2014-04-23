@@ -61,7 +61,7 @@ timer.reset();
         } else {
             // between two layers now, do the prediction
             dpf::getSupportProb(left[lvl].rgb, right[lvl].rgb, 
-                                left[lvl].W, left[lvl].H, max_disparity / (1 << lvl));
+                                left[lvl].H, left[lvl].W, max_disparity / (1 << lvl));
             dpf::getProbMatrix(lvl, max_disparity / (1 << (lvl + 1)), max_disparity / (1 << lvl));
             dpf::getInterval(0.001 * (1 << lvl));
             printf("# %d\n", dpf::height);
