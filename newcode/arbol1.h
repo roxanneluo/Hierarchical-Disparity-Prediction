@@ -90,8 +90,9 @@ private :
     Interval itv[NODES];
 
 
-	FloArray cost, gradient, backup, best_cost; // no idea 
-    IntArray stable; // can be 16-bit signed
+	FloArray gradient;
+    double best_cost[NODES], backup[NODES], cost[NODES];  
+    int stable[NODES]; // can be 16-bit signed
    
 public :
     int H, W; // graph size, height and width

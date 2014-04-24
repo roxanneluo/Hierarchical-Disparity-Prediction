@@ -54,15 +54,15 @@ void BigObject::computeFirstCost (int d, BigObject & right, int low, int high) {
 	// printf("%d %d\n", low, high);
      for (int i = low; i <= high; ++i) {
         // int x = nodes[order[i]].x, y = nodes[order[i]].y;
-	      int x = orderX[i], y = orderY[i];
-			  int where = y - d; if (where < 0) where = 0; if (where >= right.W) where = right.W - 1;
+        int x = orderX[i], y = orderY[i];
+        int where = y - d; if (where < 0) where = 0; if (where >= right.W) where = right.W - 1;
         double cost1 = 0;
         for (int c = 0; c < 3; ++c)
             cost1 += misc::abs(rgb[x][y][c] - right.rgb[x][where][c]);
         cost1 = misc::min(cost1 / 3.0, max_color_difference); // here is weired
         double cost_gradient = misc::abs(gradient[x][y] - right.gradient[x][where]);
         cost_gradient = misc::min(cost_gradient, max_gradient_color_difference);
-        cost[x][y] = weight_on_color * cost1 + (1 - weight_on_color) * cost_gradient;
+        cost[order[i]] = weight_on_color * cost1 + (1 - weight_on_color) * cost_gradient;
     }
 }
 
@@ -171,37 +171,29 @@ void BigObject::build_tree(double threshold) {
 void BigObject::compute_cost_on_tree(int low, int high) {
     // order[low .. high] is a connected tree.
 
-    for (int u = low; u <= high; ++u) {
-        // int i = nodes[order[u]].x;
-        // int j = nodes[order[u]].y;
-        int i = orderX[u], j = orderY[u];
-			  backup[i][j] = cost[i][j];
-    }
+    for (int u = low; u <= high; ++u) 
+        backup[order[u]] = cost[order[u]];
 
     for (int i = high; i >= low; --i) {
         int p = order[i];
         for (int j = 0; j < nodes[p].degree; ++j) {
             int q = nodes[p].next_node[j];
-            if (nodes[q].ord < nodes[p].ord) continue; 
-            double w = table[nodes[q].up_weight];
-            double value_p = backup[nodes[p].x][nodes[p].y];
-            double value_q = backup[nodes[q].x][nodes[q].y];
-            value_p += w * value_q;
-            backup[nodes[p].x][nodes[p].y] = value_p;
+            if (nodes[q].ord > nodes[p].ord) 
+                backup[p] += backup[q] * table[nodes[q].up_weight];
         }
     }
 
-    cost[nodes[order[low]].x][nodes[order[low]].y] = backup[nodes[order[low]].x][nodes[order[low]].y];
-    // cost[orderX[low]][orderY[low]] = backup[orderX[low]][orderY[low]];
-		for (int i = low; i <= high; ++i) {
+    cost[order[low]] = backup[order[low]];
+    for (int i = low; i <= high; ++i) {
         int p = order[i];
         for (int j = 0; j < nodes[p].degree; ++j) {
             int q =  nodes[p].next_node[j];
-            if (nodes[q].ord < nodes[p].ord) continue; 
-            double w = table[nodes[q].up_weight];
-            double value_q_current = backup[nodes[q].x][nodes[q].y];
-            double value_p = cost[nodes[p].x][nodes[p].y];
-            cost[nodes[q].x][nodes[q].y] = w * (value_p - w* value_q_current) + value_q_current;
+            if (nodes[q].ord > nodes[p].ord) {
+                double w = table[nodes[q].up_weight];
+                double value_q_current = backup[q];
+                double value_p = cost[p];
+                cost[q] = w * (value_p - w* value_q_current) + value_q_current;
+            }
         }
     }
 } // compute cost on a little tree
@@ -211,10 +203,10 @@ void BigObject::updateDisparity(int d, int low, int high) {
     for (int u = low; u <= high; ++u) {
         // int i = nodes[order[u]].x;
         // int j = nodes[order[u]].y;
-        int i = orderX[u], j = orderY[u];
-        if (cost[i][j] < best_cost[i][j]) {
-            best_cost[i][j] = cost[i][j];
-            disparity[i][j] = d;
+        int t = order[u];
+        if (cost[t] < best_cost[t]) {
+            best_cost[t] = cost[t];
+            disparity[nodes[t].x][nodes[t].y] = d;
         }
     }
 }
@@ -226,36 +218,32 @@ void BigObject::updateMatchingCost(int disp, int low, int high) {
     for (int u = low; u <= high; ++u) {
         // int i = nodes[order[u]].x;
         // int j = nodes[order[u]].y;
-        int i = orderX[u], j = orderY[u];
-
-        if (stable[i][j] >= 0) 
-           cost[i][j] = misc::abs(disp - stable[i][j]);
-        else cost[i][j] = 0;
+        int t = order[u];
+        if (stable[t] >= 0) 
+           cost[t] = misc::abs(disp - stable[t]);
+        else cost[t] = 0;
     }
 }
 
 
 void initDisparity(BigObject & left, BigObject & right) {
-    for (int i = 0; i < right.H; ++i)
-        for (int j = 0; j < right.W; ++j) {
-            //left.disparity[i][j] = 255;
-            //right.disparity[i][j] = 255; 
-            left.best_cost[i][j] =  1e100;
-            right.best_cost[i][j] = 1e100;
-        }
+    for (int i = 0; i <= left.n; ++i) {
+        left.best_cost[i] = 1e30;
+        right.best_cost[i] = 1e30;
+    }
 }
 
 void findStablePixels(BigObject &left, BigObject & right) {
     for (int i = 0; i < left.H; ++i)
         for (int j = 0; j < right.W; ++j) {
             int d = left.disparity[i][j];
-            left.stable[i][j] = left.disparity[i][j]; // if stable[i][j] = -1, then it is not stable
+            left.stable[left.node_number(i, j)] = left.disparity[i][j]; // if stable[i][j] = -1, then it is not stable
             if (j - d < 0 || d == 0 || misc::abs(right.disparity[i][j - d] - d) >= 1) 
-                left.stable[i][j] = -1;
+                left.stable[left.node_number(i, j)] = -1;
             d = right.disparity[i][j];
-            right.stable[i][j] = right.disparity[i][j];
+            right.stable[right.node_number(i, j)] = right.disparity[i][j];
             if (j + d >= left.W || d == 0 || misc::abs(left.disparity[i][j + d] - d) >= 1) 
-                right.stable[i][j] = -1;
+                right.stable[right.node_number(i, j)] = -1;
         }
 }
             
@@ -275,10 +263,10 @@ void BigObject::readPrediction(BytArray disp) {
 }
 
 void BigObject::buildForest(double threshold) {
-	collect_edges();
-	build_tree(threshold);
-	prepare_visit();
-  compute_gradient();
+    collect_edges();
+    build_tree(threshold);
+    prepare_visit();
+    compute_gradient();
 }
 
 void BigObject::steroMatch(BigObject &ref, int sign) {
@@ -287,11 +275,11 @@ void BigObject::steroMatch(BigObject &ref, int sign) {
         Interval treeInterval = itv[mset.find(order[oneTree[i][0]])];
         int low = oneTree[i][0], high = oneTree[i][1];
         // printf("treeInterval %d %d\n", treeInterval.l, treeInterval.r);
-				for (int d = treeInterval.l; d <= treeInterval.r; ++d) {
+        for (int d = treeInterval.l; d <= treeInterval.r; ++d) {
             computeFirstCost(d * sign, ref, low, high); // sign is used here
             // timer.check("first cost"); 
-						compute_cost_on_tree(low, high);
-						// timer.check("cost on tree");
+            compute_cost_on_tree(low, high);
+            // timer.check("cost on tree");
             updateDisparity(d, low, high);
         }
     }
