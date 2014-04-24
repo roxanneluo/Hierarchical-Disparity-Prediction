@@ -206,7 +206,8 @@ void BigObject::updateDisparity(int d, int low, int high) {
         int t = order[u];
         if (cost[t] < best_cost[t]) {
             best_cost[t] = cost[t];
-            disparity[nodes[t].x][nodes[t].y] = d;
+            // disparity[/*nodes[t].x*/orderX[u]][/*nodes[t].y*/orderY[u]] = d;
+            disparity[orderX[u]][orderY[u]] = d;
         }
     }
 }
