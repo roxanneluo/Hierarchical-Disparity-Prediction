@@ -6,22 +6,25 @@ from subprocess import CalledProcessError
 DATASETS = ( 
 #    'Middlebury_1',
 #    'Middlebury_4',
-    'Middlebury_others',
-#    'halfsize',
+#    'Middlebury_others',
+    'halfsize',
 #    'Middlebury_bad',
 )
 ALGORITHMS = (
 #    'STCostAggre',
-    'Original',
-		'RandTreeEdgeAware',
+#    'Original',
+    'MSF_ALL_MST',
+#		'RandTreeEdgeAware',
+#    'ST',    
+#    'MSF_ALL_ST',
 #    'RandTree',
 #		'RandTree_ust',
 #    'MST_blind',
 #       'MSF2',
 #     'MSF2_TEST',
-#     'MSF2_ALL_MST',
 #     'MSF2_LAST_RAND',
 #    'silly',
+    'a',
 )
 
 data_path = ''
@@ -31,6 +34,7 @@ right_result = ''
 total = 0
 correct = 0
 table = {}
+html_name = 'bin/SuperReport.html'
 
 def run_ST_with_path(path, output) :
     """ path should end with a / """
@@ -117,7 +121,8 @@ for algoritm in ALGORITHMS :
 
 print '\nDone.'
 
-report = open('bin/SuperReport.html', 'w')
+html_name = sys.argv[1]
+report = open(html_name, 'w')
 report.write('<!DOCTYPE html>\n<html>\n<body>\n')
 
 report.write('<h1>Algorithm Overview</h1>\n')
