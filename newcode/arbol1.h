@@ -85,6 +85,7 @@ private :
     TreeNode nodes[NODES];
     bool visited[NODES];
 	int order[NODES]; // the sequence of index, the visiting order of the tree
+	int orderX[NODES], orderY[NODES];
     int numOT, oneTree[NODES][2];
     Interval itv[NODES];
 
