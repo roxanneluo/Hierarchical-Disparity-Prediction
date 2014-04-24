@@ -29,11 +29,13 @@ testdata*
 *.zip
 *.ppm
 *.pgm
+newcode/Aloe/*
+newcode/Baby2/*
 
 # image result
 *.PNG
 bin/prob_image*
-/bin/results of generated small Given Large*
+bin/results of generated small Given Large*
 
 # statistical results
-/code/code-probability/matlab/data*
+code/code-probability/matlab/data*
