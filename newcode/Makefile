@@ -3,16 +3,22 @@ all :
 
 compile-mst :
 	g++ silly0.cpp -O2
-
+	g++ silly0.cpp -O2 -o ../bin/mst.out
 compile-dpf-mst :
 	g++ silly1.cpp -O2 -msse3 -std=c++0x
-	
+	g++ silly1.cpp -O2 -msse3 -std=c++0x ../bin/dpf-mst.out
 compile-st :
 	g++ silly2.cpp -O2
-	
+	g++ silly2.cpp -O2 -o ../bin/st.out
 compile-dpf-st :
 	g++ silly3.cpp -O2 -msse3 -std=c++0x
-
+	g++ silly3.cpp -O2 -msse3 -std=c++0x -o ../bin/dpf-st.out
+compile-rt :
+	g++ silly4.cpp -O2 -msse3 -std=c++0x
+	g++ silly4.cpp -O2 -msse3 -std=c++0x -o ../bin/rt.out
+compile-dpf-rt:
+	g++ silly5.cpp -O2 -msse3 -std=c++0x
+	g++ silly5.cpp -O2 -msse3 -std=c++0x -o ../bin/dpf-rt.out
 run-default :
 	time ./a.out	
 
@@ -24,7 +30,8 @@ run-aloe :
 
 run-baby2 :
 	time ./a.out Baby2/left.ppm Baby2/right.ppm 150 2 left_baby2.pgm right_baby2.pgm
-
+run-baby1 :
+	time ./a.out Baby1/left.ppm Baby1/right.ppm 300 1 left_baby1.pgm right_baby1.pgm
 run-old :
 	time ./old.out Aloe/left.ppm Aloe/right.ppm 135 2 left_aloe.pgm right_aloe.pgm
 

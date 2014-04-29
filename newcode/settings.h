@@ -3,8 +3,8 @@
 
 
 
-#define MAX_HEIGHT 600
-#define MAX_WIDTH 700
+#define MAX_HEIGHT 1200
+#define MAX_WIDTH 1400
 
 // types
 

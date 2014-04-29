@@ -1,18 +1,19 @@
-// This is the simple ST
+// This code is for RT
 
 #include "settings.h" // the global variables, the constants, the array size 
 #include "misc.cpp" // misc. 
 #include "iomanager.h" // read and write pictures.
-#include "arbol2.h" // the declaration of 'BigObject'
-#include "tree2.cpp"
+#include "arbol0.h" // the declaration of 'BigObject'
+#include "tree4.cpp"
 
 #include "timekeeper.h"
 
 BigObject left, right;
 
+TimeKeeper timer;
 
 // consider merging trunk and branch pal
-TimeKeeper timer;
+
 int main(int args, char ** argv) {
     misc::process_args(args, argv);
     load_image(file_name[0], left.rgb, left.H, left.W);
@@ -32,16 +33,18 @@ int main(int args, char ** argv) {
     // next part : compute disparity
     initDisparity(left, right);
     updateTable(255 * 0.1);
+// timer.check("build forest");
     for (int d = 0; d <= max_disparity; ++d) {
         left.computeFirstCost(d, right);
         right.computeFirstCost(-d, left); // improvement can be done here
+				// timer.check("first cost");
         left.compute_cost_on_tree();
         right.compute_cost_on_tree();
+				// timer.check("cost on tree");
         updateDisparity(d, left, right);
-    }
-
+		}
+//    timer.check("steroMatch");
     // next part : refinement 
-
     misc::median_filter(left.disparity, left.H, left.W);
     misc::median_filter(right.disparity, right.H, right.W); 
     initDisparity(left, right);
@@ -55,9 +58,12 @@ int main(int args, char ** argv) {
     }
     misc::median_filter(left.disparity, left.H, left.W);
     misc::median_filter(right.disparity, right.H, right.W); 
-    timer.check("all");
+
+timer.check("all");
 	//save
     save_image(file_name[2], left.disparity, left.H, left.W, scale);
     save_image(file_name[3], right.disparity, right.H, right.W, scale);
-    return 0;
+
+
+		return 0;
 }

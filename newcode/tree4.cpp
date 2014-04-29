@@ -3,6 +3,8 @@
 
 #include <algorithm>
 
+// This is for a simple random tree.
+
 double table[333];
 void updateTable(double sigma) {
     table[0] = 1;
@@ -140,7 +142,8 @@ bool MergeSet::merge(int a, int b) {
 
 
 void BigObject::build_tree() {
-    std::sort(edges + 1, edges + m + 1, smaller_edge);
+    // std::sort(edges + 1, edges + m + 1, smaller_edge);
+    std::random_shuffle(edges + 1, edges + m + 1);
     mset.init(n); ts = 0;
     for (int i = 1; i <= m; ++i)
         if (mset.merge(edges[i].a, edges[i].b)) {
