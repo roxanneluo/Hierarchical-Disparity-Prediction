@@ -1,11 +1,11 @@
 all :
-	echo compile or run
+	echo hehe
 
 compile-mst :
 	g++ silly0.cpp -O2
 
 compile-dpf-mst :
-	g++ sillydpf.cpp -O2 -msse3 -std=c++0x
+	g++ silly1.cpp -O2 -msse3 -std=c++0x
 	
 compile-st :
 	g++ silly2.cpp -O2
