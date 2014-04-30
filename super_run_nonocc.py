@@ -13,7 +13,7 @@ DATASETS = (
 ALGORITHMS = (
 #    'STCostAggre',
 #    'Original',
-    'MSF_ALL_MST',
+#    'MSF_ALL_MST',
 #		'RandTreeEdgeAware',
 #    'ST',    
 #    'MSF_ALL_ST',
@@ -24,7 +24,12 @@ ALGORITHMS = (
 #     'MSF2_TEST',
 #     'MSF2_LAST_RAND',
 #    'silly',
-    'a',
+#    'mst',
+#    'dpf-mst',
+#    'st',
+#    'dpf-st',
+    'rt',
+    'dpf-rt',	
 )
 
 data_path = ''
