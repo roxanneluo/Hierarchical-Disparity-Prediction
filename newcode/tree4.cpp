@@ -142,6 +142,7 @@ bool MergeSet::merge(int a, int b) {
 
 
 void BigObject::build_tree() {
+	  srand(time(NULL));
     // std::sort(edges + 1, edges + m + 1, smaller_edge);
     std::random_shuffle(edges + 1, edges + m + 1);
     mset.init(n); ts = 0;
