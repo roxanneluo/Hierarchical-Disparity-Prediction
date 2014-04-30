@@ -30,9 +30,9 @@ BytArray tmp4ctmf;
 void median_filter(BytArray a, int h, int w, int radius = 2) {
     for (int i = 0; i < h; ++i) for (int j = 0; j < w; ++j) tmp4ctmf[i][j] = a[i][j];
     int step = &a[1][1] - &a[0][1];
-    ctmf(tmp4ctmf[0], a[0], w, h, step, step, radius, 1, 1024*512);
+    //ctmf(tmp4ctmf[0], a[0], w, h, step, step, radius, 1, 1024*512);
+		ctmf(tmp4ctmf[0], a[0], w, h, step, step, radius, 1, w * h);
 }
-
 }
 
 #endif

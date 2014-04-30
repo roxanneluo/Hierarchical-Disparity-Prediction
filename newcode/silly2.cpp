@@ -19,15 +19,37 @@ int main(int args, char ** argv) {
     load_image(file_name[1], right.rgb, right.H, right.W);
   timer.reset();
 	// next part build the trees
+	for (int i = 0; i < left.H; ++i) {
+	  for (int j = 0; j < left.W; ++j) {
+		  for (int c = 0; c < 3; ++c) {
+			  left.rgb_[c][i][j] = left.rgb[i][j][c];
+				right.rgb_[c][i][j] = right.rgb[i][j][c];
+			}
+		}
+	}
+	for (int c = 0; c < 3; ++c)
+	  misc::median_filter(left.rgb_[c], left.H, left.W, 1);
+  for (int i = 0; i < left.H; ++i) {
+	  for (int j = 0; j < left.W; ++j) {
+		  for (int c = 0; c < 3; ++c) {
+			  left.rgb[i][j][c] = left.rgb_[c][i][j];
+				right.rgb[i][j][c] = right.rgb_[c][i][j];
+			}
+		}
+	}
 	left.collect_edges();
 	left.build_tree();
 	left.prepare_visit();;
-    left.compute_gradient();
 	
 	right.collect_edges();
 	right.build_tree();
 	right.prepare_visit();
-    right.compute_gradient();
+  
+	load_image(file_name[0], left.rgb, left.H, left.W);
+  load_image(file_name[1], right.rgb, right.H, right.W); 
+  
+  left.compute_gradient();
+  right.compute_gradient();
 	
     // next part : compute disparity
     initDisparity(left, right);

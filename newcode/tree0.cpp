@@ -63,6 +63,16 @@ void BigObject::computeFirstCost (int d, BigObject & right) {
     }
 }
 
+void BigObject::copyLeftCostToRight(int d, BigObject & left) {
+  for (int x = 0; x < H; ++x) {
+	  for (int y = 0; y < W; ++y) {
+		  int where = y + d;
+      if (where < W) cost[x][y] = left.cost[x][y];
+			else cost[x][y] = cost[x][y - 1];
+		}
+	}
+}
+
 void BigObject::collect_edges() {
     n = H * W;
     m = 2 * H * W - H - W;

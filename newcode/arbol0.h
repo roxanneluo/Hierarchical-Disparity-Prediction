@@ -77,12 +77,15 @@ public :
 
     void computeFirstCost (int d, BigObject & right) ;
 
+    void copyLeftCostToRight (int d, BigObject & left);
+
     void getDisparity(BigObject & ref, bool left);
 
 	FloArray cost, gradient, backup, best_cost; // no idea 
 	BytArray disparity; 
     Picture rgb;     // can be 8-bit unsigned
-    IntArray stable; // can be 16-bit signed
+  BytArray rgb_[3];
+		IntArray stable; // can be 16-bit signed
 
 };
 
