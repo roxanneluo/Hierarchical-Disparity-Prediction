@@ -6,7 +6,7 @@ compile-mst :
 	g++ silly0.cpp -O2 -o ../bin/mst.out
 compile-dpf-mst :
 	g++ silly1.cpp -O2 -msse3 -std=c++0x
-	g++ silly1.cpp -O2 -msse3 -std=c++0x ../bin/dpf-mst.out
+	g++ silly1.cpp -O2 -msse3 -std=c++0x -o ../bin/dpf-mst.out
 compile-st :
 	g++ silly2.cpp -O2
 	g++ silly2.cpp -O2 -o ../bin/st.out
@@ -14,8 +14,8 @@ compile-dpf-st :
 	g++ silly3.cpp -O2 -msse3 -std=c++0x
 	g++ silly3.cpp -O2 -msse3 -std=c++0x -o ../bin/dpf-st.out
 compile-rt :
-	g++ silly4.cpp -O2 -msse3 -std=c++0x
-	g++ silly4.cpp -O2 -msse3 -std=c++0x -o ../bin/rt.out
+	g++ silly4.cpp -O2 
+	g++ silly4.cpp -O2 -o ../bin/rt.out
 compile-dpf-rt:
 	g++ silly5.cpp -O2 -msse3 -std=c++0x
 	g++ silly5.cpp -O2 -msse3 -std=c++0x -o ../bin/dpf-rt.out
