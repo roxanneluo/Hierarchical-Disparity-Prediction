@@ -16,8 +16,8 @@ int main(int args, char ** argv) {
     misc::process_args(args, argv);
     load_image(file_name[0], left.rgb, left.H, left.W);
     load_image(file_name[1], right.rgb, right.H, right.W);
-  timer.reset();
-  //unsigned char**
+    timer.reset();
+  /*
   for (int i = 0; i < left.H; ++i) {
 	  for (int j = 0; j < left.W; ++j) {
 		  for (int c = 0; c < 3; ++c) {
@@ -36,6 +36,9 @@ int main(int args, char ** argv) {
 			}
 		}
 	}
+    */
+    misc::median_filter_rgb(left.rgb, left.H, left.W, 1);
+    misc::median_filter_rgb(right.rgb, right.H, right.W, 1);
 	// next part build the trees
 	left.collect_edges();
 	left.build_tree();
@@ -45,9 +48,10 @@ int main(int args, char ** argv) {
 	right.build_tree();
 	right.prepare_visit();
     
-	load_image(file_name[0], left.rgb, left.H, left.W);
-  load_image(file_name[1], right.rgb, right.H, right.W);
-  left.compute_gradient();
+    load_image(file_name[0], left.rgb, left.H, left.W);
+    load_image(file_name[1], right.rgb, right.H, right.W);
+
+    left.compute_gradient();
 	right.compute_gradient();
 	
     // next part : compute disparity
@@ -57,15 +61,15 @@ int main(int args, char ** argv) {
     for (int d = 0; d <= max_disparity; ++d) {
         left.computeFirstCost(d, right);
         // right.copyLeftCostToRight(d, left);
-				right.computeFirstCost(-d, left); // improvement can be done here
-				// timer.check("first cost");
+        right.computeFirstCost(-d, left); // improvement can be done here
+// timer.check("first cost");
         left.compute_cost_on_tree();
         right.compute_cost_on_tree();
-				// timer.check("cost on tree");
+// timer.check("cost on tree");
         updateDisparity(d, left, right);
-		}
+    }
 //    timer.check("steroMatch");
-    // next part : refinement 
+//    next part : refinement 
     misc::median_filter(left.disparity, left.H, left.W);
     misc::median_filter(right.disparity, right.H, right.W); 
     initDisparity(left, right);
@@ -84,7 +88,5 @@ timer.check("all");
 	//save
     save_image(file_name[2], left.disparity, left.H, left.W, scale);
     save_image(file_name[3], right.disparity, right.H, right.W, scale);
-
-
-		return 0;
+    return 0;
 }
