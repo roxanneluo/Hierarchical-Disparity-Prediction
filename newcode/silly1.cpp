@@ -52,7 +52,6 @@ int main(int args, char ** argv) {
     }
 
 timer.reset();
-    misc::process_args(args, argv);
     for (int lvl = levels - 1; lvl >= 0; -- lvl) {
 
         if (lvl == levels - 1) {
