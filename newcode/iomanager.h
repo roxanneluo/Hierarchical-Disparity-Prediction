@@ -6,7 +6,7 @@
 #include <cctype>
 #include "settings.h"
 
-const int BUF_LEN = MAX_WIDTH * MAX_HEIGHT + 2;
+const int BUF_LEN = MAX_WIDTH * MAX_HEIGHT * 3 + 2;
 char buff[BUF_LEN];
 
 void load_image(const char * filename, Picture rgb, int &H, int &W) {
