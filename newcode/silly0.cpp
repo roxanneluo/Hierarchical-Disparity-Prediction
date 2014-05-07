@@ -19,7 +19,7 @@ int main(int args, char ** argv) {
     timer.reset();
 
     misc::median_filter_rgb(left.rgb, left.H, left.W, 1);
-    misc::median_filter_rgb(right.rgb, right.H, right.W, 1);
+    //misc::median_filter_rgb(right.rgb, right.H, right.W, 1);
 	// next part build the trees
 	left.collect_edges();
 	left.build_tree();
@@ -30,10 +30,10 @@ int main(int args, char ** argv) {
 	//right.prepare_visit();
     
     load_image(file_name[0], left.rgb, left.H, left.W);
-    load_image(file_name[1], right.rgb, right.H, right.W);
+    //load_image(file_name[1], right.rgb, right.H, right.W);
 
     left.compute_gradient();
-	//right.compute_gradient();
+	right.compute_gradient();
 	
     // next part : compute disparity
     initDisparity(left, right);
@@ -52,7 +52,7 @@ int main(int args, char ** argv) {
 //    timer.check("steroMatch");
 //    next part : refinement 
     misc::median_filter(left.disparity, left.H, left.W);
-    misc::median_filter(right.disparity, right.H, right.W); 
+    //misc::median_filter(right.disparity, right.H, right.W); 
     /*
     initDisparity(left, right);
     findStablePixels(left, right);
@@ -70,6 +70,6 @@ int main(int args, char ** argv) {
 timer.check("all");
 	//save
     save_image(file_name[2], left.disparity, left.H, left.W, scale);
-    save_image(file_name[3], right.disparity, right.H, right.W, scale);
+    //save_image(file_name[3], right.disparity, right.H, right.W, scale);
     return 0;
 }

@@ -69,6 +69,7 @@ timer.reset();
         // Now use the INTERVAL to find the new disparities.
 
         left[lvl].buildForest(0.95);
+        right[lvl].compute_gradient();
         //right[lvl].buildForest(0.95);
         initDisparity(left[lvl], right[lvl]);
         updateTable(255 * 0.1);

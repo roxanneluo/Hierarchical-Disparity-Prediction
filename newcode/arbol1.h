@@ -73,7 +73,6 @@ private :
     void collect_edges(); // collect all the edges.
 	void prepare_visit();  // construct the bfs order for the forest
     void build_tree(double threshold); // build the tree given all the collected edges.
-    void compute_gradient();
 
     void computeFirstCost (int d, BigObject & right, int low, int high) ;
 	void compute_cost_on_tree(int low, int high);
@@ -99,6 +98,7 @@ public :
     Picture rgb;     // can be 8-bit unsigned
 	BytArray disparity; 
 
+    void compute_gradient();
     void buildForest(double threshold);
     void steroMatch(BigObject &ref, int sign);
     void refinement();
