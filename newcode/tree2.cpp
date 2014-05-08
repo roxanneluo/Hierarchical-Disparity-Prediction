@@ -206,9 +206,25 @@ void BigObject::compute_cost_on_tree( ) {
     }
 } // compute cost on tree
 
+void initDisparity(BigObject &who) {
+    for (int i = 0; i < who.H; ++i)
+        for (int j = 0; j < who.W; ++j) {
+            who.best_cost[i][j] =  1e100;
+        }
+}
+void updateDisparity(int d, BigObject & who) {
+    for (int i = 0; i < who.H; ++i)
+        for (int j = 0; j < who.W; ++j) {
+            if (who.cost[i][j] < who.best_cost[i][j]) {
+                who.best_cost[i][j] = who.cost[i][j];
+                who.disparity[i][j] = d;
+            }
+        }
+}
 // In the following functions, 
 // I put left and right together to save the ij iterations.
 // this is inside the 0-maxdisparity iteration, so I need to save it.
+
 void initDisparity(BigObject & left, BigObject & right) {
     for (int i = 0; i < right.H; ++i)
         for (int j = 0; j < right.W; ++j) {

@@ -240,27 +240,11 @@ void BigObject::updateMatchingCost(int disp, int low, int high) {
 }
 
 
-void initDisparity(BigObject & left, BigObject & right) {
-    for (int i = 0; i <= left.n; ++i) {
-        left.best_cost[i] = 1e30;
-        right.best_cost[i] = 1e30;
-    }
+void BigObject::initDisparity() {
+    for (int i = 0; i <= n; ++i) 
+        best_cost[i] = 1e30;
 }
 
-void findStablePixels(BigObject &left, BigObject & right) {
-    for (int i = 0; i < left.H; ++i)
-        for (int j = 0; j < right.W; ++j) {
-            int d = left.disparity[i][j];
-            left.stable[left.node_number(i, j)] = left.disparity[i][j]; // if stable[i][j] = -1, then it is not stable
-            if (j - d < 0 || d == 0 || misc::abs(right.disparity[i][j - d] - d) >= 1) 
-                left.stable[left.node_number(i, j)] = -1;
-            d = right.disparity[i][j];
-            right.stable[right.node_number(i, j)] = right.disparity[i][j];
-            if (j + d >= left.W || d == 0 || misc::abs(left.disparity[i][j + d] - d) >= 1) 
-                right.stable[right.node_number(i, j)] = -1;
-        }
-}
-            
 void BigObject::noPrediction(int max_disp) {
     for (int i = H * W; i >= 0; --i) {
         itv[i].l = 0;
@@ -288,26 +272,11 @@ void BigObject::steroMatch(BigObject &ref, int sign) {
     for (int i = 1; i <= numOT; ++i) {
         Interval treeInterval = itv[mset.find(order[oneTree[i][0]])];
         int low = oneTree[i][0], high = oneTree[i][1];
-        // printf("treeInterval %d %d\n", treeInterval.l, treeInterval.r);
         for (int d = treeInterval.l; d <= treeInterval.r; ++d) {
             computeFirstCost(d * sign, ref, low, high); // sign is used here
-            // timer.check("first cost"); 
             compute_cost_on_tree(low, high);
-            // timer.check("cost on tree");
             updateDisparity(d, low, high);
         }
-    }
-}
-
-void BigObject::refinement() {
-    for (int i = 1; i <= numOT; ++i) {
-         Interval treeInterval = itv[mset.find(order[oneTree[i][0]])];
-         int low = oneTree[i][0], high = oneTree[i][1];
-         for (int d = treeInterval.l; d <= treeInterval.r; ++d) {
-             updateMatchingCost(d, low, high);
-             compute_cost_on_tree(low, high);
-             updateDisparity(d, low, high);
-         }
     }
 }
 

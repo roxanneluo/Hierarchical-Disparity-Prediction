@@ -217,8 +217,6 @@ void BigObject::updateMatchingCost(int disp, int low, int high) {
     // If (i,j) is an unstable pixel, cost is 0 for all disparities.
     // Otherwise update it.
     for (int u = low; u <= high; ++u) {
-        // int i = nodes[order[u]].x;
-        // int j = nodes[order[u]].y;
         int t = order[u];
         if (stable[t] >= 0) 
            cost[t] = misc::abs(disp - stable[t]);
@@ -227,13 +225,12 @@ void BigObject::updateMatchingCost(int disp, int low, int high) {
 }
 
 
-void initDisparity(BigObject & left, BigObject & right) {
-    for (int i = 0; i <= left.n; ++i) {
-        left.best_cost[i] = 1e30;
-        right.best_cost[i] = 1e30;
-    }
+void BigObject::initDisparity() {
+    for (int i = 0; i <= n; ++i) 
+        best_cost[i] = 1e30;
 }
 
+/*
 void findStablePixels(BigObject &left, BigObject & right) {
     for (int i = 0; i < left.H; ++i)
         for (int j = 0; j < right.W; ++j) {
@@ -247,6 +244,7 @@ void findStablePixels(BigObject &left, BigObject & right) {
                 right.stable[right.node_number(i, j)] = -1;
         }
 }
+*/
             
 void BigObject::noPrediction(int max_disp) {
     for (int i = H * W; i >= 0; --i) {

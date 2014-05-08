@@ -62,7 +62,7 @@ public :
 
 class BigObject {
 private :
-    int n, m; // number of nodes and edges
+    int m; // number of edges
     int ts; // number of tree edges
     inline int node_number(int x, int y) { return x * W + y + 1; }
     inline void node_location(int p, int &x, int &y) {--p; x = p / W; y = p % W; }
@@ -95,6 +95,7 @@ private :
    
 public :
     int H, W; // graph size, height and width
+    int n; // number of nodes
     Picture rgb;     // can be 8-bit unsigned
 	BytArray disparity; 
 
@@ -105,12 +106,9 @@ public :
 
     void readPrediction(BytArray disp);
     void noPrediction(int max_disp);
+    void initDisparity();
 
     void shrinkPicture(BigObject & obj);
-    
-    friend void initDisparity(BigObject & left, BigObject & right) ;
-    friend void findStablePixels(BigObject &left, BigObject & right);
-
 };
 
 

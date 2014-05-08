@@ -64,7 +64,7 @@ public :
 
 class BigObject {
 private :
-    int n, m; // number of nodes and edges
+    int m; // number of edges
     int ts; // number of tree edges
     inline int node_number(int x, int y) { return x * W + y + 1; }
     inline void node_location(int p, int &x, int &y) {--p; x = p / W; y = p % W; }
@@ -75,7 +75,6 @@ private :
     void collect_edges(); // collect all the edges.
 	void prepare_visit();  // construct the bfs order for the forest
     void build_tree(double threshold); // build the tree given all the collected edges.
-    void compute_gradient();
 
     void computeFirstCost (int d, BigObject & right, int low, int high) ;
 	void compute_cost_on_tree(int low, int high);
@@ -98,9 +97,12 @@ private :
    
 public :
     int H, W; // graph size, height and width
+    int n ; //number of node
     Picture rgb;     // can be 8-bit unsigned
 	BytArray disparity; 
 
+    void compute_gradient();
+    void initDisparity();
     void buildForest(double threshold);
     void steroMatch(BigObject &ref, int sign);
     void refinement();
@@ -109,10 +111,6 @@ public :
     void noPrediction(int max_disp);
 
     void shrinkPicture(BigObject & obj);
-    
-    friend void initDisparity(BigObject & left, BigObject & right) ;
-    friend void findStablePixels(BigObject &left, BigObject & right);
-
 };
 
 

@@ -55,7 +55,7 @@ timer.reset();
 
         if (lvl == levels - 1) {
             left[lvl].noPrediction(max_disparity / (1 << lvl));
-            right[lvl].noPrediction(max_disparity / (1 << lvl));
+            //right[lvl].noPrediction(max_disparity / (1 << lvl));
         } else {
             // between two layers now, do the prediction
             dpf::getSupportProb(left[lvl].rgb, right[lvl].rgb, 
@@ -71,7 +71,7 @@ timer.reset();
         left[lvl].buildForest(0.95);
         right[lvl].compute_gradient();
         //right[lvl].buildForest(0.95);
-        initDisparity(left[lvl], right[lvl]);
+        left[lvl].initDisparity();
         updateTable(255 * 0.1);
         left[lvl].steroMatch(right[lvl], 1);
         //right[lvl].steroMatch(left[lvl], -1);
