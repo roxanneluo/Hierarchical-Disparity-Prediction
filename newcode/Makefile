@@ -1,5 +1,7 @@
-all : compile-mst compile-dpf-mst compile-st compile-dpf-st compile-rt compile-dpf-rt
+all : compile-mst compile-dpf-mst compile-st compile-dpf-st compile-rt compile-dpf-rt checker0
 
+compile-checker:
+	g++ checker_nonocc.cpp -O2 -o ../bin/checker.out 
 compile-mst :
 	g++ silly0.cpp -O2
 	cp a.out ../bin/mst.out
