@@ -4,15 +4,15 @@ import subprocess
 from subprocess import CalledProcessError
 
 DATASETS = ( 
-#    'Middlebury_1',
+    'Middlebury_1',
 #    'Middlebury_4',
-#    'Middlebury_others',
-    'halfsize',
+    'Middlebury_others',
+#    'halfsize',
 #    'Middlebury_bad',
 )
 ALGORITHMS = (
-    'rt',
-    'dpf-rt',	
+    'dpf-mst',
+    'dpf-st',	
 )
 CHECKER = 'checker.out'
 
@@ -22,6 +22,9 @@ total = 0
 correct = 0
 table = {}
 html_name = 'bin/SuperReport.html'
+
+def ratio(x) :
+    return float(x[0]) / float(x[1])
 
 def check_results(algo, path) : #, left_result = 'leftdisp.pgm', right_result = 'rightdisp.pgm') :
     global correct
@@ -40,7 +43,7 @@ def check_results(algo, path) : #, left_result = 'leftdisp.pgm', right_result = 
     ])
 
     tolerance = '1'
-    command = ['bin/'+CHECKER, 
+    command = ['bin/'+CHECKER, output[0],
         path + 'displeft.pgm', path + 'dispright.pgm',
         tolerance, para[1]]
 
@@ -69,9 +72,11 @@ for algoritm in ALGORITHMS :
         table[algoritm][dataset]['Overall'] = [correct - temp[0], total - temp[1]]
     table[algoritm]['Overall'] = [correct - temp0[0], total - temp0[1]]
 
-print '\nDone.'
+print '\nDone.\n'
 
-html_name = sys.argv[1]
+if len(sys.argv) > 1 :
+    html_name = sys.argv[1]
+print "Saving result to " + html_name
 report = open(html_name, 'w')
 report.write('<!DOCTYPE html>\n<html>\n<body>\n')
 
@@ -109,27 +114,23 @@ for algoritm in ALGORITHMS :
     report.write('<td>'+algoritm+'</td>')
 report.write('</tr>\n')
 
+COLOR_RED =   "#F79F81"
+COLOR_GREEN = "#BEF781"
 for dataset in DATASETS :
     pic_names = subprocess.check_output(['ls', 'testdata/' + dataset + '/']).split()
     for picture in pic_names :
         report.write('<tr><td>'+dataset+'.'+picture+'</td>')
-        tmp = {}
-        for i in [0, 1] :
-            tmp[i] = []
-            for algoritm in ALGORITHMS :
-                tmp[i].append(table[algoritm][dataset][picture][i][2])
+        tmp = [table[i][dataset][picture][0] for i in ALGORITHMS]
+
         for algoritm in ALGORITHMS :
             color = []
-            for i in [0, 1] :
-                if table[algoritm][dataset][picture][i][2] == max(tmp[i]) :
-                    color.append("#F79F81")
-                elif table[algoritm][dataset][picture][i][2] == min(tmp[i]) :
-                    color.append("#BEF781")
-                else :
-                    color.append("white")
-
-            for i in [0, 1] :
-                report.write('<td bgcolor = ' + color[i] + '>'+table[algoritm][dataset][picture][i][2]+'</td>')
+            if table[algoritm][dataset][picture][0] == min(tmp) :
+                color = COLOR_RED
+            elif table[algoritm][dataset][picture][0] == max(tmp) :
+                color = COLOR_GREEN
+            else :
+                color = "white"
+            report.write('<td bgcolor = ' + color + '>'+str(1-ratio(table[algoritm][dataset][picture]))+'</td>')
         report.write('</tr>\n')
 
 report.write('</html>')
