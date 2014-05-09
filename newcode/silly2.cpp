@@ -4,6 +4,7 @@
 #include "misc.cpp" // misc. 
 #include "iomanager.h" // read and write pictures.
 #include "arbol2.h" // the declaration of 'BigObject'
+#include "extra.cpp"
 #include "tree2.cpp"
 
 #include "timekeeper.h"

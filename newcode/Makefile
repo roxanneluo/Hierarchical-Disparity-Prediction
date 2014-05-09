@@ -1,4 +1,4 @@
-all : compile-mst compile-dpf-mst compile-st compile-dpf-st compile-rt compile-dpf-rt checker0
+all : compile-mst compile-dpf-mst compile-st compile-dpf-st compile-checker
 
 compile-checker:
 	g++ checker_nonocc.cpp -O2 -o ../bin/checker.out 

@@ -152,7 +152,8 @@ void BigObject::prepare_visit() {
 
 void BigObject::build_tree() {
 
-    std::sort(edges + 1, edges + m + 1, smaller_edge);
+    //std::sort(edges + 1, edges + m + 1, smaller_edge);
+    extra::sort(edges, 1, m);
     mset.init(n); ts = 0;
     
     for (int i = 1; i <= m; ++i) {

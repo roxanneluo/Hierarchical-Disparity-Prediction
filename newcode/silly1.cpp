@@ -7,6 +7,7 @@
 #include "prediction.h" // the prediction model
 
 #include "arbol1.h" // the declaration of 'BigObject'
+#include "extra.cpp"
 #include "tree1.cpp"
 
 #include "timekeeper.h"

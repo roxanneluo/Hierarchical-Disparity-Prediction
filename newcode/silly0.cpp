@@ -2,6 +2,7 @@
 #include "misc.cpp" // misc. 
 #include "iomanager.h" // read and write pictures.
 #include "arbol0.h" // the declaration of 'BigObject'
+#include "extra.cpp"
 #include "tree0.cpp"
 #include "ctmf.h"
 #include "timekeeper.h"
@@ -11,7 +12,6 @@ BigObject left, right;
 TimeKeeper timer;
 
 // consider merging trunk and branch pal
-
 int main(int args, char ** argv) {
     misc::process_args(args, argv);
     load_image(file_name[0], left.rgb, left.H, left.W);

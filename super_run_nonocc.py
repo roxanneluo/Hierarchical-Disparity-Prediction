@@ -4,15 +4,17 @@ import subprocess
 from subprocess import CalledProcessError
 
 DATASETS = ( 
-    'Middlebury_1',
+#    'Middlebury_1',
 #    'Middlebury_4',
     'Middlebury_others',
 #    'halfsize',
 #    'Middlebury_bad',
 )
 ALGORITHMS = (
-    'dpf-mst',
-    'dpf-st',	
+    'mst',
+    'dpf-mst',	
+    'st',
+    'dpf-st',
 )
 CHECKER = 'checker.out'
 
