@@ -40,7 +40,7 @@ int main(int args, char ** argv) {
         updateDisparity(d, left);
     }
 
-    misc::median_filter(left.disparity, left.H, left.W);
+    misc::median_filter(left.disparity, left.H, left.W, 3);
     //misc::median_filter(right.disparity, right.H, right.W); 
     
     timer.check("all");

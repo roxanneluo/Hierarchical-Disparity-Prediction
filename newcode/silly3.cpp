@@ -68,7 +68,7 @@ timer.reset();
         left[lvl].initDisparity();
         updateTable(255 * 0.1);
         left[lvl].steroMatch(right[lvl], 1);
-        misc::median_filter(left[lvl].disparity, left[lvl].H, left[lvl].W);
+        misc::median_filter(left[lvl].disparity, left[lvl].H, left[lvl].W, 3);
         //save_image(layername[lvl][0], left[lvl].disparity, left[lvl].H, left[lvl].W, scale * (1 << lvl));
     } // end of layer iteration.
 
