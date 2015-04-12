@@ -6,17 +6,18 @@ from subprocess import CalledProcessError
 DATASETS = ( 
 #    'Middlebury_1',
 #    'Middlebury_4',
-    'Middlebury_others',
+#    'Middlebury_others',
 #    'halfsize',
 #    'Middlebury_bad',
+    'fullsize',
 )
 ALGORITHMS = (
-    'mst',
     'dpf-mst',	
-    'st',
+    'mst',
     'dpf-st',
+    'st',
 )
-CHECKER = 'checker.out'
+CHECKER = 'ppm-checker.out'
 
 data_path = ''
 pic_names = '' 
@@ -28,25 +29,26 @@ html_name = 'bin/SuperReport.html'
 def ratio(x) :
     return float(x[0]) / float(x[1])
 
-def check_results(algo, path) : #, left_result = 'leftdisp.pgm', right_result = 'rightdisp.pgm') :
+def check_results(algo, path, picture) : #, left_result = 'leftdisp.pgm', right_result = 'rightdisp.pgm') :
     global correct
     global total
     para = 0
     with open(path + 'spec.txt','r') as f :
         para = f.read().split()
-    output = ('bin/left.pgm', 'bin/right.pgm')
+    output = ('results/' + picture + '_left_' + algo + '.pgm',
+        'results/' + picture + '_left_' + algo + '.pgm')
 
     #run the algorithm
-    subprocess.check_output([
+    print subprocess.check_output([
         'bin/' + algo + '.out', 
         path + 'left.ppm', path + 'right.ppm', 
         para[0], para[1],
         output[0], output[1],
     ])
 
-    tolerance = '1'
+    tolerance = '2'
     command = ['bin/'+CHECKER, output[0],
-        path + 'displeft.pgm', path + 'dispright.pgm',
+        path + 'displeft.ppm', path + 'dispright.ppm',
         tolerance, para[1]]
 
     res = subprocess.check_output(command)
@@ -69,7 +71,7 @@ for algoritm in ALGORITHMS :
         for picture in pic_names :
             print "~~~ "+ algoritm + '@' + dataset + '/' + picture +" ~~~"
             thepath = 'testdata/' + dataset + '/' + picture + '/'
-            results = check_results(algoritm, thepath)
+            results = check_results(algoritm, thepath, picture)
             table[algoritm][dataset][picture] = results
         table[algoritm][dataset]['Overall'] = [correct - temp[0], total - temp[1]]
     table[algoritm]['Overall'] = [correct - temp0[0], total - temp0[1]]
