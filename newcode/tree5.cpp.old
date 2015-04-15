@@ -77,6 +77,7 @@ void BigObject::collect_edges() {
         if (i + p < H && j + q < W) {
             int xx = node_number(i, j), yy = node_number(i+p, j+q), ww = 0;
             for (int c = 0; c < 3; ++c) 
+              // TODO: lab
                 ww = misc::max(ww, misc::abs(rgb[i][j][c] - rgb[i+p][j+q][c]));
             if (itv[xx].cap(itv[yy]).length() > 0 || ww <= MAX_TOLERANCE) {
                 edges[++k].a = xx;
@@ -149,10 +150,9 @@ bool MergeSet::merge(int a, int b) {
 }
 
 void BigObject::build_tree(double threshold) {
-
-    //std::sort(edges + 1, edges + m + 1, smaller_edge); 
-    extra::sort(edges, 1, m);
-    //std::random_shuffle(edges + 1, edges + m + 1);
+    srand(time(NULL));
+    // std::sort(edges + 1, edges + m + 1, smaller_edge); 
+    std::random_shuffle(edges + 1, edges + m + 1);
     mset.init(n); ts = 0;
     for (int i = 1; i <= m; ++i) {
         Interval t1 = itv[mset.find(edges[i].a)];
@@ -218,6 +218,8 @@ void BigObject::updateMatchingCost(int disp, int low, int high) {
     // If (i,j) is an unstable pixel, cost is 0 for all disparities.
     // Otherwise update it.
     for (int u = low; u <= high; ++u) {
+        // int i = nodes[order[u]].x;
+        // int j = nodes[order[u]].y;
         int t = order[u];
         if (stable[t] >= 0) 
            cost[t] = misc::abs(disp - stable[t]);
@@ -244,8 +246,7 @@ void findStablePixels(BigObject &left, BigObject & right) {
             if (j + d >= left.W || d == 0 || misc::abs(left.disparity[i][j + d] - d) >= 1) 
                 right.stable[right.node_number(i, j)] = -1;
         }
-}
-*/
+}*/
             
 void BigObject::noPrediction(int max_disp) {
     for (int i = H * W; i >= 0; --i) {

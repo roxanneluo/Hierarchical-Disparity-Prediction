@@ -8,9 +8,9 @@
 
 #include "prediction.h" // the prediction model
 
-#include "arbol3.h" // the declaration of 'BigObject'
+#include "arbol6.h" // the declaration of 'BigObject'
 #include "extra.cpp"
-#include "tree3.cpp"
+#include "tree6.cpp"
 
 #include "timekeeper.h"
 
@@ -48,10 +48,23 @@ int main(int args, char ** argv) {
         return 0;
     }
 
+    left[0].computeLab();
+    right[0].computeLab();
+/*
+    for (int i = 0; i + 1 < levels; ++i) {
+      left[i+1].shrinkPicture(left[i+1].rgb, left[i].rgb, left[i].H, left[i].W);
+      right[i+1].shrinkPicture(right[i+1].rgb, right[i].rgb, right[i].H, right[i].W);
+      left[i+1].shrinkPicture(left[i+1].lab, left[i].lab, left[i].H, left[i].W);
+      right[i+1].shrinkPicture(right[i+1].lab, right[i].lab, right[i].H, right[i].W);
+    }
+    */
     for (int i = 0; i + 1 < levels; ++i) {
         left[i].shrinkPicture(left[i + 1]);
         right[i].shrinkPicture(right[i + 1]);
+        left[i+1].computeLab();
+        right[i+1].computeLab();
     }
+
 
 timer.reset();
     for (int lvl = levels - 1; lvl >= 0; -- lvl) {

@@ -89,7 +89,6 @@ void BigObject::computeFirstCost (int d, BigObject & right, int low, int high) {
     }
 }
 
-
 void BigObject::collect_edges() {
     n = H * W;
     int k = 0;
@@ -109,6 +108,8 @@ void BigObject::collect_edges() {
         }
     m = k;
 }
+
+
 
 void BigObject::prepare_visit() {
     //next part would reorganize the tree
@@ -162,7 +163,7 @@ void BigObject::build_tree(double threshold) {
 
     //std::sort(edges + 1, edges + m + 1, smaller_edge); 
     extra::sort(edges, 1, m);
-    //std::random_shuffle(edges + 1, edges + m + 1);
+    // std::random_shuffle(edges + 1, edges + m + 1);
     mset.init(n); ts = 0;
     for (int i = 1; i <= m; ++i) {
         int a = edges[i].a, b = edges[i].b;
@@ -261,6 +262,33 @@ void BigObject::readPrediction(BytArray disp) {
         }
 }
 
+// iou
+void BigObject::intersectInterval(const BigObject & small, double iou = 0.5) {
+  Interval intersect, uni,  small_itv;
+  int index;
+  int cnt = 0;
+  for (int i = 0; i < H; ++i)
+  for (int j = 0; j < W; ++j) {
+    index = node_number(i,j);
+    small_itv = small.itv[small.node_number(i/2, j/2)];
+    small_itv.l *= 2; small_itv.r *= 2;
+    intersect = itv[index].cap(small_itv);
+    uni = itv[index].cup(small_itv);
+    if (intersect.length() / (double) misc::min(itv[index].length(), small_itv.length()) >= iou)
+      itv[index] = intersect;
+    else {
+      itv[index] = uni; 
+      ++cnt;
+      /*
+      printf("large itv[%d][%d] = [%d, %d]; small itv[%d][%d] = [%d,%d]\n",
+          i, j, itv[index].l, itv[index].r, 
+          i/2, j/2, small_itv.l, small_itv.r);
+          */
+    }
+  }
+  printf("%d/%d = %f\n", cnt, H * W, cnt/double(H*W));
+}
+
 void BigObject::buildForest(double threshold) {
     collect_edges();
     build_tree(threshold);
@@ -281,6 +309,30 @@ void BigObject::steroMatch(BigObject &ref, int sign) {
     }
 }
 
+// median filter
+void BigObject::shrinkPicture(BigObject & obj) {
+  const int MED_RADIUS = 2;
+
+  obj.H = H/2;
+  obj.W = W/2;
+
+  int x,y;
+  int a[MED_RADIUS * MED_RADIUS];
+  for (int i = 0; i < obj.H; ++i)
+  for (int j = 0; j < obj.W; ++j) 
+  for (int c = 0; c < 3; ++c) {
+    x = 2*i, y = 2*j;
+    int cnt = 0;
+    for (int ii = 0; ii < 2; ++ii)    
+    for (int jj = 0; jj < 2; ++jj)
+      a[cnt++] = rgb[x + ii][y + jj][c];
+    std::sort(a, a + (MED_RADIUS * MED_RADIUS));
+    obj.rgb[i][j][c] = a[1];
+  }
+}
+
+//mean
+/*
 void BigObject::shrinkPicture(BigObject & obj) {
     obj.H = H / 2;
     obj.W = W / 2;
@@ -299,4 +351,5 @@ void BigObject::shrinkPicture(BigObject & obj) {
         obj.rgb[i][j][k] = (rgb[x][y][k]+rgb[x+1][y][k]+rgb[x][y+1][k]+rgb[x+1][y+1][k]) / 4;
     }
 }
+*/
 #endif

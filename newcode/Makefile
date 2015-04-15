@@ -1,25 +1,29 @@
-all : compile-mst compile-dpf-mst compile-st compile-dpf-st compile-checker
+all : compile-mst compile-dpf-mst compile-st compile-dpf-st compile-rt compile-dpf-rt compile-dpf-st-lab compile-checker compile-ppm-checker
 
 compile-checker:
-	g++ checker_nonocc.cpp -O2 -o ../bin/checker.out 
+	g++-4.8 checker_nonocc.cpp -O2 -o ../bin/checker.out 
+compile-ppm-checker:
+	g++-4.8 ppm_checker_nonocc.cpp -O2 -o ../bin/ppm-checker.out 
 compile-mst :
-	g++ silly0.cpp -O2
+	g++-4.8 silly0.cpp -O2
 	cp a.out ../bin/mst.out
 compile-dpf-mst :
-	g++ silly1.cpp -O2 -msse3 -std=c++0x
+	g++-4.8 silly1.cpp -O2 -msse3 -std=c++0x
 	cp a.out ../bin/dpf-mst.out
 compile-st :
-	g++ silly2.cpp -O2
+	g++-4.8 silly2.cpp -O2
 	cp a.out ../bin/st.out
 compile-dpf-st :
-	g++ silly3.cpp -O2 -msse3 -std=c++0x
+	g++-4.8 silly3.cpp -O2 -msse3 -std=c++0x
 	cp a.out ../bin/dpf-st.out
 compile-rt :
-	g++ silly4.cpp -O2 
+	g++-4.8 silly4.cpp -O2 
 	cp a.out ../bin/rt.out
 compile-dpf-rt:
-	g++ silly5.cpp -O2 -msse3 -std=c++0x
+	g++-4.8 silly5.cpp -O2 -msse3 -std=c++0x
 	cp a.out ../bin/dpf-rt.out
+compile-dpf-st-lab :
+	g++-4.8 silly6.cpp -o ../bin/dpf-st-lab.out -O2 -msse3 -std=c++0x
 run-default :
 	time ./a.out	
 

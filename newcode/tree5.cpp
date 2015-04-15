@@ -149,8 +149,9 @@ bool MergeSet::merge(int a, int b) {
 }
 
 void BigObject::build_tree(double threshold) {
-    srand(time(NULL));
-    // std::sort(edges + 1, edges + m + 1, smaller_edge); 
+
+    //std::sort(edges + 1, edges + m + 1, smaller_edge); 
+    //extra::sort(edges, 1, m);
     std::random_shuffle(edges + 1, edges + m + 1);
     mset.init(n); ts = 0;
     for (int i = 1; i <= m; ++i) {
@@ -217,8 +218,6 @@ void BigObject::updateMatchingCost(int disp, int low, int high) {
     // If (i,j) is an unstable pixel, cost is 0 for all disparities.
     // Otherwise update it.
     for (int u = low; u <= high; ++u) {
-        // int i = nodes[order[u]].x;
-        // int j = nodes[order[u]].y;
         int t = order[u];
         if (stable[t] >= 0) 
            cost[t] = misc::abs(disp - stable[t]);
@@ -227,13 +226,12 @@ void BigObject::updateMatchingCost(int disp, int low, int high) {
 }
 
 
-void initDisparity(BigObject & left, BigObject & right) {
-    for (int i = 0; i <= left.n; ++i) {
-        left.best_cost[i] = 1e30;
-        right.best_cost[i] = 1e30;
-    }
+void BigObject::initDisparity() {
+    for (int i = 0; i <= n; ++i) 
+        best_cost[i] = 1e30;
 }
 
+/*
 void findStablePixels(BigObject &left, BigObject & right) {
     for (int i = 0; i < left.H; ++i)
         for (int j = 0; j < right.W; ++j) {
@@ -247,6 +245,7 @@ void findStablePixels(BigObject &left, BigObject & right) {
                 right.stable[right.node_number(i, j)] = -1;
         }
 }
+*/
             
 void BigObject::noPrediction(int max_disp) {
     for (int i = H * W; i >= 0; --i) {
@@ -298,6 +297,29 @@ void BigObject::refinement() {
     }
 }
 
+// median filter
+void BigObject::shrinkPicture(BigObject & obj) {
+  const int MED_RADIUS = 2;
+
+  obj.H = H/2;
+  obj.W = W/2;
+
+  int x,y;
+  int a[MED_RADIUS * MED_RADIUS];
+  for (int i = 0; i < obj.H; ++i)
+  for (int j = 0; j < obj.W; ++j) 
+  for (int c = 0; c < 3; ++c) {
+    x = 2*i, y = 2*j;
+    int cnt = 0;
+    for (int ii = 0; ii < 2; ++ii)    
+    for (int jj = 0; jj < 2; ++jj)
+      a[cnt++] = rgb[x + ii][y + jj][c];
+    std::sort(a, a + (MED_RADIUS * MED_RADIUS));
+    obj.rgb[i][j][c] = a[1];
+  }
+}
+
+/*
 void BigObject::shrinkPicture(BigObject & obj) {
     obj.H = H / 2;
     obj.W = W / 2;
@@ -316,4 +338,5 @@ void BigObject::shrinkPicture(BigObject & obj) {
         obj.rgb[i][j][k] = (rgb[x][y][k]+rgb[x+1][y][k]+rgb[x][y+1][k]+rgb[x+1][y+1][k]) / 4;
     }
 }
+*/
 #endif

@@ -72,10 +72,12 @@ private :
     Edge trees[NODES]; // collected tree edges 1-based
 
     void collect_edges(); // collect all the edges.
+    void collect_lab_edges(); // collect all the edges.
 	void prepare_visit();  // construct the bfs order for the forest
     void build_tree(double threshold); // build the tree given all the collected edges.
 
     void computeFirstCost (int d, BigObject & right, int low, int high) ;
+    void computeFirstLabCost (int d, BigObject & right, int low, int high) ;
 	void compute_cost_on_tree(int low, int high);
 
     void updateDisparity(int d, int low, int high);
@@ -97,13 +99,16 @@ public :
     int H, W; // graph size, height and width
     int n ; //number of node
     Picture rgb;     // can be 8-bit unsigned
+    FloPicture lab; 
     BytArray disparity; 
     Interval itv[NODES];
 
     void compute_gradient();
+    void compute_lab_gradient();
+    void compute_lab_ed_gradient();
     void initDisparity();
-    void buildForest(double threshold);
-    void steroMatch(BigObject &ref, int sign);
+    void buildForest(double threshold, bool lab);
+    void steroMatch(BigObject &ref, int sign, bool lab);
     void refinement();
 
     void readPrediction(BytArray disp);
@@ -111,6 +116,10 @@ public :
     void intersectInterval(const BigObject & small, double iou);
 
     void shrinkPicture(BigObject & obj);
+    template <typename Dtype>
+    //set this's H and W to be half of large H or W
+    void shrinkPicture(Dtype small[][MAX_WIDTH][3], Dtype large[][MAX_WIDTH][3], int large_h, int large_w);
+    void computeLab();
 
     inline int node_number(int x, int y) const { return x * W + y + 1; }
 };

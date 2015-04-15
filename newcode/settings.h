@@ -3,23 +3,25 @@
 
 
 
-#define MAX_HEIGHT 1200
+#define MAX_HEIGHT 1150
 #define MAX_WIDTH 1400
 
 // types
 
 typedef unsigned char BytArray[MAX_HEIGHT][MAX_WIDTH];
+// typedef unsigned short BytArray[MAX_HEIGHT][MAX_WIDTH];
 typedef int IntArray [MAX_HEIGHT][MAX_WIDTH];
 typedef double FloArray [MAX_HEIGHT][MAX_WIDTH];
 typedef bool BooArray [MAX_HEIGHT][MAX_WIDTH];
 
 typedef int Picture [MAX_HEIGHT][MAX_WIDTH][3]; // RGB
+typedef float FloPicture [MAX_HEIGHT][MAX_WIDTH][3]; // Lab color space
 // if this becase 8-bit, be careful. 
 
 // constants
 
 const int NODES = MAX_HEIGHT * MAX_WIDTH + 3;
-const int LEVELS = 3;
+const int LEVELS = 4;
 
 // global variables
 
@@ -29,4 +31,5 @@ int scale = 16;
 char file_name[4][300] =
 {"left.ppm", "right.ppm", "default_left.pgm", "default_right.pgm"};
 
+double tot_threshold = 0.9;
 #endif

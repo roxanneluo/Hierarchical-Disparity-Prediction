@@ -31,7 +31,8 @@ int height, width; // size for prob_matrix
 
 double gmm[MAX_WIDTH];
 
-void getSupportProb(Picture left_rgb, Picture right_rgb, int h, int w, int length) {
+double* getSupportProb(Picture left_rgb, Picture right_rgb, 
+    int h, int w, int length) {
     supportmatch::makeSupportMatch(left_rgb, right_rgb, h, w);
     supportmatch::findSupportMatch();
     
@@ -46,11 +47,12 @@ void getSupportProb(Picture left_rgb, Picture right_rgb, int h, int w, int lengt
                 support_prob[d] += 1;
         }
     //normalize(support_prob, length);
+    return support_prob;
 }
 
-void getProbMatrix(int layer, int h, int w) {
+void getProbMatrix(int layer, int h, int w, bool fullsize = false) {
     height = h; width = w;
-    gmm::genGMM_layer(layer,height);
+    gmm::genGMM_layer(layer,height,fullsize);
 	for (int j = 0; j <= width; ++j) {
         for (int i = 1; j / 2 - i >= 0; ++i) 
             prob_matrix[j / 2 - i][j] = gmm::gmm[height - i];
@@ -76,8 +78,55 @@ void getProbMatrix(int layer, int h, int w) {
 }
 
 
+void getInterval(double threshold, double tot_threshold = 0.9) {
+    double highest;
+    int highest_index;
+    for (int i = 0; i <= height; ++i) {
+        highest = prob_matrix[i][0];
+        highest_index = 0;
+        for (int j = 1; j <= width; ++j) {
+            if (highest < prob_matrix[i][j]) {
+                highest = prob_matrix[i][j];
+                highest_index = j;
+            }
+        }
+        if (dcmp(highest, 0.0) == 0) {
+            interval[i][0] = 0;
+            interval[i][1] = -1;
+            continue;
+        }
+        int ll, rr;
+        ll = highest_index-1;
+        rr = highest_index+1;
+        double total = prob_matrix[i][highest_index];
+        bool mark = true;
+        while((ll >= 0 || rr <= width) 
+            && (mark || total <= tot_threshold)) {
+            mark = false;
+            if (dcmp(prob_matrix[i][ll] / (prob_matrix[i][ll] + total), threshold) == 1) {
+                total += prob_matrix[i][ll];
+                --ll; mark = true;
+            }
+            if (dcmp(prob_matrix[i][rr] / (prob_matrix[i][rr] + total), threshold) == 1) {
+                total += prob_matrix[i][rr];
+                ++rr; mark = true;
+            }
+            if (!mark) {
+                if (rr > width 
+                    || ll >= 0 && prob_matrix[i][ll] > prob_matrix[i][rr]) {
+                    total += prob_matrix[i][ll--];
+                } else {
+                    total += prob_matrix[i][rr++]; 
+                }
+            }
+        }
+        interval[i][0] = ll + 1;
+        interval[i][1] = rr - 1;
+    }
+}
 
-void getInterval(double threshold) {
+/*
+void getInterval(double threshold, double tot_threshold = 0.9) {
     double highest;
     int highest_index;
     for (int i = 0; i <= height; ++i) {
@@ -114,7 +163,7 @@ void getInterval(double threshold) {
         interval[i][1] = rr - 1;
     }
 }
-
+*/
 } // end of namespace dpf
 
 #endif 

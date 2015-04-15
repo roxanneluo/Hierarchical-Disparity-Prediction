@@ -357,7 +357,7 @@ void ComputeSupportMatches(unsigned char* I1_desc,
 
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
-            unsigned char d = support_left_map[y][x];
+            short d = support_left_map[y][x];
             if (x - d >= 0)
                 support_right_map[y][x - d] = d;
         }

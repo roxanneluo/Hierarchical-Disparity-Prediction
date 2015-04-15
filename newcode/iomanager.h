@@ -4,12 +4,15 @@
 #include <cstdio>
 #include <cstring>
 #include <cctype>
+#include <fstream>
+#include <algorithm>
+#include <cassert>
 #include "settings.h"
 
 const int BUF_LEN = MAX_WIDTH * MAX_HEIGHT * 3 + 2;
 char buff[BUF_LEN];
 
-void load_image(const char * filename, Picture rgb, int &H, int &W) {
+void load_image(const char * filename, Picture rgb, int &H, int &W, int scale = 1) {
     // return if it is successfull
     FILE * f = fopen(filename, "rb");
     int bytesread = fread(buff, 1, BUF_LEN, f);
@@ -45,7 +48,7 @@ void load_image(const char * filename, Picture rgb, int &H, int &W) {
     for (int x = 0; x < H; ++x)
         for (int y = 0; y < W; ++y)
             for (int color = 0; color < 3; ++color)
-                rgb[x][y][color] = (unsigned char) (buff[++i]);
+                rgb[x][y][color] = (unsigned char) (buff[++i]/scale);
 }
 
 void load_image_gray(const char * filename, IntArray gray, int &H, int &W) {
@@ -86,6 +89,22 @@ void load_image_gray(const char * filename, IntArray gray, int &H, int &W) {
             gray[x][y] = (unsigned char) (buff[++i]);
 }
 
+/*
+void save_image(const char * filename, BytArray gray, int H, int W, int scale = 1) {
+  std::ofstream fout(filename, std::ofstream::binary);
+  fout << "P5\n" 
+    << "#Produced by my silly program\n"
+    << W << " " <<  H << " " << 255;
+  
+  int cnt = 0;
+  for (int i = 0; i < H; ++i)
+      for (int j = 0; j < W; ++j) 
+          buff[cnt++] = gray[i][j] * scale;
+  fout.write(buff, cnt);
+  fout.close();
+}
+*/
+
 void save_image(const char * filename, BytArray gray, int H, int W, int scale = 1) {
     FILE * f = fopen(filename, "wb");
     fprintf(f, "P5\n");
@@ -93,7 +112,7 @@ void save_image(const char * filename, BytArray gray, int H, int W, int scale = 
     fprintf(f, "%d %d\n255\n", W, H);
     int cnt = 0;
     for (int i = 0; i < H; ++i)
-        for (int j = 0; j < W; ++j)
+        for (int j = 0; j < W; ++j) 
             buff[cnt++] = gray[i][j] * scale;
     fwrite(buff, 1, cnt, f);
     fclose(f);
@@ -108,10 +127,73 @@ void save_image_rgb(const char * filename, Picture rgb, int H, int W, int scale 
     int cnt = 0;
     for (int i = 0; i < H; ++i)
         for (int j = 0; j < W; ++j)
-            for (int c = 0; c < 3; c++)
+            for (int c = 0; c < 3; c++) 
                 buff[cnt++] = rgb[i][j][c] * scale;
+
     fwrite(buff, 1, cnt, f);
     fclose(f);
 }
 
+void rgb2gray(BytArray gray, const Picture rgb, int H, int W) {
+    for (int i = 0; i < H; ++i)
+    for (int j = 0; j < W; ++j) {
+        assert(rgb[i][j][0] == rgb[i][j][1] && rgb[i][j][1] == rgb[i][j][2]);
+        gray[i][j] = rgb[i][j][0];  
+    }
+}
+
+template<typename Dtype>
+void save_array(const char * filename, Dtype *a, int len) {
+    std::ofstream fout(filename, std::ofstream::out);
+    for (int i = 0; i < len; ++i)
+        fout << a[i] << " ";
+    fout.close();
+}
+
+template<typename Dtype>
+void save_matrix(const char * filename, Dtype ** a, int h, int w) {
+    std::ofstream fout(filename, std::ofstream::out);
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j)
+            fout << a[i][j] << " ";
+        fout << std::endl;
+    }
+    fout.close();
+}
+
+//median filter
+/*
+void shrinkGray(BytArray small, BytArray large, int smallh, int smallw,
+    bool halve_disp = true) {
+  const int MED_RADIUS = 2;
+  int x,y;
+  int a[MED_RADIUS * MED_RADIUS];
+  for (int i = 0; i < smallh; ++i)
+  for (int j = 0; j < smallw; ++j) {
+    x = 2*i, y = 2*j;
+    int cnt = 0;
+    for (int ii = 0; ii < 2; ++ii)    
+    for (int jj = 0; jj < 2; ++jj)
+      a[cnt++] = large[x + ii][y + jj];
+    std::sort(a, a + (MED_RADIUS * MED_RADIUS));
+    small[i][j] = a[1];
+    if (halve_disp)
+      small[i][j] /= 2;
+  }
+}
+*/
+
+// mean filter
+void shrinkGray(BytArray small, BytArray large, int smallh, int smallw,
+    bool halve_disp = true) {
+  int x,y;
+  for (int i = 0; i < smallh; ++i)
+  for (int j = 0; j < smallw; ++j) {
+    x = 2*i; y = 2*j;
+    small[i][j] = (large[x][y] + large[x][y+1] + large[x+1][y] + large[x+1][y+1])/4;
+    // note this is int division
+    if (halve_disp)
+      small[i][j] /= 2;
+  } 
+}
 #endif

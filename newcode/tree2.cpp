@@ -154,6 +154,8 @@ void BigObject::build_tree() {
 
     //std::sort(edges + 1, edges + m + 1, smaller_edge);
     extra::sort(edges, 1, m);
+    // std::random_shuffle(edges + 1, edges + m + 1);
+    
     mset.init(n); ts = 0;
     
     for (int i = 1; i <= m; ++i) {

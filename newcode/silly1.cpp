@@ -14,21 +14,24 @@
 
 TimeKeeper timer;
 
-BigObject left[LEVELS], right[LEVELS];
-
 const int levels = 3;
 
-const char layername[3][2][100] = { 
+BigObject left[levels], right[levels];
+
+const char layername[LEVELS][2][100] = { 
     { "nl0.pgm", "nr0.pgm"}, 
     { "nl1.pgm", "nr1.pgm"}, 
-    { "nl2.pgm", "nr2.pgm"}
+    { "nl2.pgm", "nr2.pgm"},
+    { "nl3.pgm", "nr3.pgm"}
 };
 
-const char shrinkname[3][2][100] = {
+const char shrinkname[LEVELS][2][100] = {
     { "skL0.ppm", "skR0.ppm" },
     { "skL1.ppm", "skR1.ppm" },
-    { "skL2.ppm", "skR2.ppm" }
+    { "skL2.ppm", "skR2.ppm" },
+    { "skL3.ppm", "skR3.ppm" }
 };
+
 
 int main(int args, char ** argv) {
     misc::process_args(args, argv);
@@ -61,8 +64,8 @@ timer.reset();
             // between two layers now, do the prediction
             dpf::getSupportProb(left[lvl].rgb, right[lvl].rgb, 
                                 left[lvl].H, left[lvl].W, max_disparity / (1 << lvl));
-            dpf::getProbMatrix(lvl, max_disparity / (1 << (lvl + 1)), max_disparity / (1 << lvl));
-            dpf::getInterval(0.001 * (1 << lvl));
+            dpf::getProbMatrix(lvl, max_disparity / (1 << (lvl + 1)), max_disparity / (1 << lvl), false);
+            dpf::getInterval(0.001 * (1 << lvl), tot_threshold);
         
             left[lvl].readPrediction(left[lvl + 1].disparity);
             //right[lvl].readPrediction(right[lvl + 1].disparity);
