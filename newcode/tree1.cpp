@@ -1,6 +1,8 @@
 #ifndef BASIC_CODE_FOR_DPFkjniluh3u98jf9p8
 #define BASIC_CODE_FOR_DPFkjniluh3u98jf9p8
 
+// this code is for dpf + MST
+
 #include <algorithm>
 // TimeKeeper	timer;
 
@@ -24,31 +26,10 @@ void TreeNode::add_edge(int node, int weight) {
     ++degree;
 }
 
-void BigObject::compute_gradient () {
-    double co[3] = { 0.299, 0.587, 0.114 };
-    double plus = 0.5, minus = 0.5, gray;
-    for (int x = 0; x < H; ++x) {
-        for (int j = 0; j < 3; ++j)  {
-            plus += co[j] * rgb[x][1][j]; // * rgb[j][x][1] not rgb[j][x][0]
-            minus += co[j] * rgb[x][0][j]; // * rgb[j][x][0] not rgb[j][x][1]
-        }
-        gray = plus;
-        gradient[x][0] = 127.5 + plus - minus;
-        for (int i = 1; i <= W - 2; ++i) {
-            plus = 0.5;
-            for (int j = 0; j < 3; ++j)
-                plus += co[j] * rgb[x][i + 1][j];
-            gradient[x][i] = 0.5 * (plus - minus) + 127.5;
-            minus = gray;
-            gray = plus;
-        }
-        gradient[x][W - 1] = plus - minus + 127.5;
-    }
-}
-
 const double max_gradient_color_difference= 2.0;
 const double max_color_difference = 10.0;
 const double weight_on_color = 0.11;
+
 void BigObject::computeFirstCost (int d, BigObject & right, int low, int high) { 
 	// only the cost for disparity d.
 	// printf("%d %d\n", low, high);
@@ -66,6 +47,25 @@ void BigObject::computeFirstCost (int d, BigObject & right, int low, int high) {
     }
 }
 
+void BigObject::computeFirstLabCost (int d, BigObject & right, int low, int high) { 
+  //printf("Comp, trueuting first cost\n");
+	// only the cost for disparity d.
+    for (int i = low; i <= high; ++i) {
+        // int x = nodes[order[i]].x, y = nodes[order[i]].y;
+        int x = orderX[i], y = orderY[i];
+        int where = y - d; if (where < 0) where = 0; if (where >= right.W) where = right.W - 1;
+        float cost1 = 0, diff;
+        for (int c = 0; c < 3; ++c) {
+            diff = lab[x][y][c] - right.lab[x][where][c];
+            cost1 += diff * diff;
+        }
+        cost1 = sqrt(cost1);
+        cost1 = misc::min(cost1, max_color_difference); // here is weired
+        double cost_gradient = misc::abs(gradient[x][y] - right.gradient[x][where]);
+        cost_gradient = misc::min(cost_gradient, max_gradient_color_difference);
+        cost[order[i]] = weight_on_color * cost1 + (1 - weight_on_color) * cost_gradient;
+    }
+}
 
 void BigObject::collect_edges() {
     n = H * W;
@@ -262,14 +262,16 @@ void BigObject::readPrediction(BytArray disp) {
         }
 }
 
-void BigObject::buildForest(double threshold) {
-    collect_edges();
+void BigObject::buildForest(double threshold, bool use_lab = true) {
+    if (use_lab)
+      collect_lab_edges();
+    else
+      collect_edges();
     build_tree(threshold);
     prepare_visit();
-    compute_gradient();
 }
 
-void BigObject::steroMatch(BigObject &ref, int sign) {
+void BigObject::steroMatch(BigObject &ref, int sign, bool use_lab = true) {
     // sign is a thing for the first cost.
     for (int i = 1; i <= numOT; ++i) {
         Interval treeInterval = itv[mset.find(order[oneTree[i][0]])];
@@ -278,12 +280,41 @@ void BigObject::steroMatch(BigObject &ref, int sign) {
         for (int d = treeInterval.l; d <= treeInterval.r; ++d) {
             computeFirstCost(d * sign, ref, low, high); // sign is used here
             // timer.check("first cost"); 
+            if (use_lab)
+              computeFirstLabCost(d * sign, ref, low, high); // sign is used here
+            else 
+              computeFirstCost(d * sign, ref, low, high); // sign is used here
             compute_cost_on_tree(low, high);
             // timer.check("cost on tree");
             updateDisparity(d, low, high);
         }
     }
 }
+
+void BigObject::collect_lab_edges() {
+    n = H * W;
+    int k = 0;
+    for (int i = 0; i < H; ++i)
+    for (int j = 0; j < W; ++j)
+        for (int p = 0; p < 2; ++p)
+        for (int q = 0; q < 2; ++q) if (p + q == 1)
+        if (i + p < H && j + q < W) {
+            int xx = node_number(i, j), yy = node_number(i+p, j+q);
+            float  ww = 0,  diff;
+            for (int c = 0; c < 3; ++c) {
+                diff = lab[i][j][c] - lab[i+p][j+q][c];
+                ww += diff * diff;
+            }
+            ww = sqrt(ww)/80*255;
+            if (itv[xx].cap(itv[yy]).length() > 0 || ww <= MAX_TOLERANCE) {
+                edges[++k].a = xx;
+                edges[k].b = yy;
+                edges[k].weight = ww;
+            }
+        }
+    m = k;
+}
+
 
 void BigObject::refinement() {
     for (int i = 1; i <= numOT; ++i) {
@@ -297,46 +328,11 @@ void BigObject::refinement() {
     }
 }
 
-// median filter
-void BigObject::shrinkPicture(BigObject & obj) {
-  const int MED_RADIUS = 2;
-
-  obj.H = H/2;
-  obj.W = W/2;
-
-  int x,y;
-  int a[MED_RADIUS * MED_RADIUS];
-  for (int i = 0; i < obj.H; ++i)
-  for (int j = 0; j < obj.W; ++j) 
-  for (int c = 0; c < 3; ++c) {
-    x = 2*i, y = 2*j;
-    int cnt = 0;
-    for (int ii = 0; ii < 2; ++ii)    
-    for (int jj = 0; jj < 2; ++jj)
-      a[cnt++] = rgb[x + ii][y + jj][c];
-    std::sort(a, a + (MED_RADIUS * MED_RADIUS));
-    obj.rgb[i][j][c] = a[1];
-  }
+void BigObject::init(ImageLayer & image_layer) {
+  H = image_layer.H;
+  W = image_layer.W;
+  rgb = image_layer.rgb;
+  lab = image_layer.lab;
+  gradient = image_layer.gradient;
 }
-
-/*
-void BigObject::shrinkPicture(BigObject & obj) {
-    obj.H = H / 2;
-    obj.W = W / 2;
-    for (int i = 0; i < H; ++i) 
-    for (int k = 0; k < 3; ++k)
-        rgb[i][W][k] = rgb[i][W - 1][k];
-    for (int i = 0; i < W; ++i) 
-    for (int k = 0; k < 3; ++k)
-        rgb[H][i][k] = rgb[H - 1][i][k];
-    for (int k = 0; k <3; ++k) rgb[H][W][k] = rgb[H-1][W-1][k];
-    
-    for (int i = 0; i < obj.H; ++i)
-    for (int j = 0; j < obj.W; ++j)
-    for (int k = 0; k < 3; ++k) {
-        int x = i * 2, y = j * 2;
-        obj.rgb[i][j][k] = (rgb[x][y][k]+rgb[x+1][y][k]+rgb[x][y+1][k]+rgb[x+1][y+1][k]) / 4;
-    }
-}
-*/
 #endif
