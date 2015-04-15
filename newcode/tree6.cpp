@@ -289,8 +289,8 @@ void BigObject::intersectInterval(const BigObject & small, double iou = 0.5) {
   printf("%d/%d = %f\n", cnt, H * W, cnt/double(H*W));
 }
 
-void BigObject::buildForest(double threshold, bool lab = true) {
-    if (lab)
+void BigObject::buildForest(double threshold, bool use_lab = true) {
+    if (use_lab)
       collect_lab_edges();
     else
       collect_edges();
@@ -299,13 +299,13 @@ void BigObject::buildForest(double threshold, bool lab = true) {
     compute_gradient();
 }
 
-void BigObject::steroMatch(BigObject &ref, int sign, bool lab = true) {
+void BigObject::steroMatch(BigObject &ref, int sign, bool use_lab = true) {
     // sign is a thing for the first cost.
     for (int i = 1; i <= numOT; ++i) {
         Interval treeInterval = itv[mset.find(order[oneTree[i][0]])];
         int low = oneTree[i][0], high = oneTree[i][1];
         for (int d = treeInterval.l; d <= treeInterval.r; ++d) {
-            if (lab)
+            if (use_lab)
               computeFirstLabCost(d * sign, ref, low, high); // sign is used here
             else 
               computeFirstCost(d * sign, ref, low, high); // sign is used here

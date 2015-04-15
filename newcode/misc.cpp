@@ -27,6 +27,7 @@ void process_args(int args, char ** argv) {
     if (args > 6) { strcpy(file_name[2], argv[5]); strcpy(file_name[3], argv[6]);  }
     if (args > 7) { tot_threshold = atof(argv[7]); }
     if (args > 8) { dataset = static_cast<Dataset>(atoi(argv[8])); }
+    if (args > 9) { use_lab = atoi(argv[9]); }
     //if (args > 7) { strcpy(file_name[4], argv[7]);  }
 }
 

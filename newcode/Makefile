@@ -5,23 +5,17 @@ compile-checker:
 compile-ppm-checker:
 	g++-4.8 ppm_checker_nonocc.cpp -O2 -o ../bin/ppm-checker.out 
 compile-mst :
-	g++-4.8 silly0.cpp -O2
-	cp a.out ../bin/mst.out
+	g++-4.8 silly0.cpp -O2 -o ../bin/mst.out
 compile-dpf-mst :
-	g++-4.8 silly1.cpp -O2 -msse3 -std=c++0x
-	cp a.out ../bin/dpf-mst.out
+	g++-4.8 silly1.cpp -O2 -msse3 -std=c++0x -o ../bin/dpf-mst.out
 compile-st :
-	g++-4.8 silly2.cpp -O2
-	cp a.out ../bin/st.out
+	g++-4.8 silly2.cpp -O2 -o ../bin/st.out
 compile-dpf-st :
-	g++-4.8 silly3.cpp -O2 -msse3 -std=c++0x
-	cp a.out ../bin/dpf-st.out
+	g++-4.8 silly3.cpp -O2 -msse3 -std=c++0x -o ../bin/dpf-st.out
 compile-rt :
-	g++-4.8 silly4.cpp -O2 
-	cp a.out ../bin/rt.out
+	g++-4.8 silly4.cpp -O2 -o ../bin/rt.out
 compile-dpf-rt:
-	g++-4.8 silly5.cpp -O2 -msse3 -std=c++0x
-	cp a.out ../bin/dpf-rt.out
+	g++-4.8 silly5.cpp -O2 -msse3 -std=c++0x -o ../bin/dpf-rt.out
 compile-dpf-st-lab :
 	g++-4.8 silly6.cpp -o ../bin/dpf-st-lab.out -O2 -msse3 -std=c++0x
 compile-dpf-st-smaller :
