@@ -35,6 +35,7 @@ newcode/Baby2/*
 # image result
 *.PNG
 bin/prob_image*
+bin/*
 bin/results of generated small Given Large*
 
 # statistical results

@@ -2,17 +2,20 @@ import sys
 import subprocess as sp
 
 algo = sys.argv[1]
-dataset = sys.argv[2]
-tot_threshold = sys.argv[3]
-tolerances = sys.argv[4:]
-fullsize_folder = '../testdata/fullsize/'
-result_folder = '../results/'
+whole_dataset_folder = sys.argv[2]
+dataset = sys.argv[3]
+tot_threshold = sys.argv[4]
+tolerances = sys.argv[5:]
+fullsize_folder = 'testdata/' + whole_dataset_folder + '/'
+result_folder = 'results/' + whole_dataset_folder + '/'
+
+dataset_map = {'halfsize': 0, 'fullsize': 1}
 
 dataset_folder = fullsize_folder + dataset + '/'
 left_image = dataset_folder + 'left.ppm'
 right_image = dataset_folder + 'right.ppm'
-disp_left = dataset_folder + 'displeft.ppm'
-disp_right = dataset_folder + 'dispright.ppm'
+disp_left = dataset_folder + 'displeft.pgm'
+disp_right = dataset_folder + 'dispright.pgm'
 left_out = result_folder + dataset + '_left_' + algo + '.pgm'
 right_out = result_folder + dataset + '_right_' + algo + '.pgm'
 spec = dataset_folder + 'spec.txt'
@@ -23,11 +26,13 @@ with open(spec, 'r') as f:
   scale = line_splits[1]
 print algo + '\t' + dataset + '\tmax_disp: ' + max_disp + '\tscale: ' + scale
 
-time = sp.check_output(['../bin/'+algo+'.out',
+time = sp.check_output(['bin/'+algo+'.out',
       left_image, right_image,
       max_disp, scale,
       left_out, right_out,
-      tot_threshold])
+      tot_threshold, 
+      str(dataset_map[whole_dataset_folder])
+    ])
 print time
 
 log_filename = result_folder + 'log_' + dataset + '_' + algo
@@ -35,7 +40,7 @@ log_file = open(log_filename, 'w')
 log_file.write(time + '\n')
 
 for tolerance in tolerances:
-  checker_result = sp.check_output(['../bin/ppm-checker.out',
+  checker_result = sp.check_output(['bin/checker.out',
           left_out, disp_left, disp_right,
           tolerance, scale,
           result_folder + 'err_'+dataset+'_left_'+algo+'_'+str(tolerance)+'.ppm'])

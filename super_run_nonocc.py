@@ -3,33 +3,43 @@ import sys
 import subprocess
 from subprocess import CalledProcessError
 
-DATASETS = ( 
+DATASETS = [ 
 #    'Middlebury_1',
 #    'Middlebury_4',
 #    'Middlebury_others',
 #    'halfsize',
 #    'Middlebury_bad',
-    'fullsize',
-)
+#    'fullsize'
+#    'halfsize',
+]
 ALGORITHMS = (
+    'dpf-st-lab',
     'dpf-mst',	
     'mst',
     'dpf-st',
     'st',
+    'dpf-rt',
+    'rt',
 )
-CHECKER = 'ppm-checker.out'
+CHECKER = 'checker.out'
+tot_threshold = '0.9'
+
+for dataset in sys.argv[1:] :
+  DATASETS.append(dataset) # argv[1], argv[2], ... gives the dataset
+
+dataset_table = {'halfsize': 0, 'fullsize': 1}
 
 data_path = ''
 pic_names = '' 
 total = 0
 correct = 0
 table = {}
-html_name = 'bin/SuperReport.html'
+html_name = 'results/SuperReport_nonocc_' + '_'.join(DATASETS) + '.html'
 
 def ratio(x) :
     return float(x[0]) / float(x[1])
 
-def check_results(algo, path, picture) : #, left_result = 'leftdisp.pgm', right_result = 'rightdisp.pgm') :
+def check_results(algo, path, dataset, picture) : #, left_result = 'leftdisp.pgm', right_result = 'rightdisp.pgm') :
     global correct
     global total
     para = 0
@@ -44,11 +54,13 @@ def check_results(algo, path, picture) : #, left_result = 'leftdisp.pgm', right_
         path + 'left.ppm', path + 'right.ppm', 
         para[0], para[1],
         output[0], output[1],
+        tot_threshold,
+        str(dataset_table[dataset]),
     ])
 
     tolerance = '2'
     command = ['bin/'+CHECKER, output[0],
-        path + 'displeft.ppm', path + 'dispright.ppm',
+        path + 'displeft.pgm', path + 'dispright.pgm',
         tolerance, para[1]]
 
     res = subprocess.check_output(command)
@@ -71,7 +83,7 @@ for algoritm in ALGORITHMS :
         for picture in pic_names :
             print "~~~ "+ algoritm + '@' + dataset + '/' + picture +" ~~~"
             thepath = 'testdata/' + dataset + '/' + picture + '/'
-            results = check_results(algoritm, thepath, picture)
+            results = check_results(algoritm, thepath, dataset, picture)
             table[algoritm][dataset][picture] = results
         table[algoritm][dataset]['Overall'] = [correct - temp[0], total - temp[1]]
     table[algoritm]['Overall'] = [correct - temp0[0], total - temp0[1]]
