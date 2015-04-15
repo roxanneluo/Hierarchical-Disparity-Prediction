@@ -50,9 +50,9 @@ double* getSupportProb(Picture left_rgb, Picture right_rgb,
     return support_prob;
 }
 
-void getProbMatrix(int layer, int h, int w, bool fullsize = false) {
+void getProbMatrix(int layer, int h, int w, Dataset dataset) {
     height = h; width = w;
-    gmm::genGMM_layer(layer,height,fullsize);
+    gmm::genGMM_layer(layer,height, dataset);
 	for (int j = 0; j <= width; ++j) {
         for (int i = 1; j / 2 - i >= 0; ++i) 
             prob_matrix[j / 2 - i][j] = gmm::gmm[height - i];

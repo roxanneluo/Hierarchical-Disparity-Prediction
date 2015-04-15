@@ -1,4 +1,4 @@
-all : compile-mst compile-dpf-mst compile-st compile-dpf-st compile-rt compile-dpf-rt compile-dpf-st-lab compile-checker compile-ppm-checker
+all : compile-mst compile-dpf-mst compile-st compile-dpf-st compile-rt compile-dpf-rt compile-dpf-st-lab compile-dpf-st-smaller compile-checker compile-ppm-checker
 
 compile-checker:
 	g++-4.8 checker_nonocc.cpp -O2 -o ../bin/checker.out 
@@ -24,6 +24,8 @@ compile-dpf-rt:
 	cp a.out ../bin/dpf-rt.out
 compile-dpf-st-lab :
 	g++-4.8 silly6.cpp -o ../bin/dpf-st-lab.out -O2 -msse3 -std=c++0x
+compile-dpf-st-smaller :
+	g++-4.8 silly6_ptr.cpp -o ../bin/dpf-st-smaller.out -O2 -msse3 -std=c++0x
 run-default :
 	time ./a.out	
 
