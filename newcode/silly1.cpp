@@ -17,7 +17,6 @@
 
 TimeKeeper timer;
 
-const int levels = 3;
 const int OBJ_NUM = 2;
 
 ImageLayer left_pyramid[levels], right_pyramid[levels];
@@ -62,6 +61,8 @@ int main(int args, char ** argv) {
         left_pyramid[i+1].shrinkPicture(left_pyramid[i+1].lab, left_pyramid[i].lab, left_pyramid[i].H, left_pyramid[i].W);
         right_pyramid[i+1].shrinkPicture(right_pyramid[i+1].lab, right_pyramid[i].lab, right_pyramid[i].H, right_pyramid[i].W);
       }
+      save_image_rgb(shrinkname[i+1][0], left_pyramid[i+1].rgb, 
+          left_pyramid[i+1].H, left_pyramid[i+1].W);
     }
 
 timer.reset();

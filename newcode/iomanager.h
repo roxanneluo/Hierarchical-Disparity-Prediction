@@ -51,7 +51,8 @@ void load_image(const char * filename, Picture rgb, int &H, int &W, int scale = 
                 rgb[x][y][color] = (unsigned char) (buff[++i]/scale);
 }
 
-void load_image_gray(const char * filename, IntArray gray, int &H, int &W) {
+template <typename Dtype>
+void load_image_gray(const char * filename, Dtype gray[][MAX_WIDTH], int &H, int &W) {
     // return if it is successfull
     FILE * f = fopen(filename, "rb");
     int bytesread = fread(buff, 1, BUF_LEN, f);
@@ -105,7 +106,8 @@ void save_image(const char * filename, BytArray gray, int H, int W, int scale = 
 }
 */
 
-void save_image(const char * filename, BytArray gray, int H, int W, int scale = 1) {
+template <typename Dtype>
+void save_image(const char * filename, Dtype gray[][MAX_WIDTH], int H, int W, int scale = 1) {
     FILE * f = fopen(filename, "wb");
     fprintf(f, "P5\n");
     fprintf(f, "#Produced by my silly program\n");
@@ -151,11 +153,11 @@ void save_array(const char * filename, Dtype *a, int len) {
 }
 
 template<typename Dtype>
-void save_matrix(const char * filename, Dtype ** a, int h, int w) {
+void save_matrix(const char * filename, Dtype * a, int h, int w) {
     std::ofstream fout(filename, std::ofstream::out);
     for (int i = 0; i < h; ++i) {
         for (int j = 0; j < w; ++j)
-            fout << a[i][j] << " ";
+            fout << a[i * w + j] << " ";
         fout << std::endl;
     }
     fout.close();

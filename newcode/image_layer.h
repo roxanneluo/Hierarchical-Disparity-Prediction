@@ -20,11 +20,26 @@ public:
   void computeGradient();
   void computeLabGradient();
   void computeLabEdGradient(); // euclidean distance
+
+// NOTE: disparity is shrinked into half, too
+template <typename Dtype>
+static void shrinkDisp(Dtype small [][MAX_WIDTH], int &small_h, int &small_w,
+    const Dtype large[][MAX_WIDTH], int large_h, int large_w);
+
+template <typename Dtype>
+static void shrinkGray(Dtype small [][MAX_WIDTH], int &small_h, int &small_w,
+    const Dtype large[][MAX_WIDTH], int large_h, int large_w);
+
+template <typename Dtype>
+static void shrinkArray(Dtype small [][MAX_WIDTH], int &small_h, int &small_w,
+    const Dtype large[][MAX_WIDTH], int large_h, int large_w, 
+    bool halve_disp);
 };
 
 
 
 // median filter
+/*
 void ImageLayer::shrinkPicture(ImageLayer & obj) {
   const int MED_RADIUS = 2;
 
@@ -45,9 +60,9 @@ void ImageLayer::shrinkPicture(ImageLayer & obj) {
     obj.rgb[i][j][c] = a[1];
   }
 }
+*/
 
 //mean
-/*
 void ImageLayer::shrinkPicture(ImageLayer & obj) {
     obj.H = H / 2;
     obj.W = W / 2;
@@ -66,9 +81,27 @@ void ImageLayer::shrinkPicture(ImageLayer & obj) {
         obj.rgb[i][j][k] = (rgb[x][y][k]+rgb[x+1][y][k]+rgb[x][y+1][k]+rgb[x+1][y+1][k]) / 4;
     }
 }
-*/
+
+template <typename Dtype>
+void ImageLayer::shrinkPicture(Dtype small[][MAX_WIDTH][3], Dtype large[][MAX_WIDTH][3], 
+    int large_h, int large_w) {
+  const int MED_RADIUS = 2;
+  H = large_h/2;
+  W = large_w/2;
+
+  int x,y;
+  int a[MED_RADIUS * MED_RADIUS];
+  for (int i = 0; i < H; ++i)
+  for (int j = 0; j < W; ++j) 
+  for (int c = 0; c < 3; ++c) {
+    x = 2*i, y = 2*j;
+    small[i][j][c] = (large[x][y][c]+large[x+1][y][c]+large[x][y+1][c]+large[x+1][y+1][c]) / 4;
+  }
+}
 
 
+/*
+ * median filter
 template <typename Dtype>
 void ImageLayer::shrinkPicture(Dtype small[][MAX_WIDTH][3], Dtype large[][MAX_WIDTH][3], 
     int large_h, int large_w) {
@@ -90,6 +123,7 @@ void ImageLayer::shrinkPicture(Dtype small[][MAX_WIDTH][3], Dtype large[][MAX_WI
     small[i][j][c] = a[1];
   }
 }
+*/
 
 void ImageLayer::computeLab() {
   for (int i = 0; i < H; ++i)
@@ -173,6 +207,64 @@ void ImageLayer::computeLabEdGradient () {
     }
 }
 
+template <typename Dtype>
+void ImageLayer::shrinkDisp(Dtype small [][MAX_WIDTH], int &small_h, int &small_w,
+    const Dtype large[][MAX_WIDTH], int large_h, int large_w) {
+  shrinkArray(small, small_h, small_w, large, large_h, large_w, true);
+}
 
+template <typename Dtype>
+void ImageLayer::shrinkGray(Dtype small [][MAX_WIDTH], int &small_h, int &small_w,
+    const Dtype large[][MAX_WIDTH], int large_h, int large_w) {
+  shrinkArray(small, small_h, small_w, large, large_h, large_w, false);
+}
+
+
+template <typename Dtype>
+void ImageLayer::shrinkArray(Dtype small [][MAX_WIDTH], int &small_h, int &small_w,
+    const Dtype large[][MAX_WIDTH], int large_h, int large_w, 
+    bool halve_disp) {
+  const int MED_RADIUS = 2;
+  small_h = large_h/2;
+  small_w = large_w/2;
+
+  int x,y;
+  int a[MED_RADIUS * MED_RADIUS];
+  for (int i = 0; i < small_h; ++i)
+  for (int j = 0; j < small_w; ++j) { 
+    x = 2*i, y = 2*j;
+    small[i][j]= (large[x][y]+large[x+1][y]+large[x][y+1]+large[x+1][y+1]) / 4;
+    if (halve_disp)
+      small[i][j] /= 2.0;
+  }
+}
+
+/*
+ * median filter
+// NOTE: disparity is shrinked into half, too
+template <typename Dtype>
+void ImageLayer::shrinkArray(Dtype small [][MAX_WIDTH], int &small_h, int &small_w,
+    const Dtype large[][MAX_WIDTH], int large_h, int large_w, 
+    bool halve_disp) {
+  const int MED_RADIUS = 2;
+  small_h = large_h/2;
+  small_w = large_w/2;
+
+  int x,y;
+  int a[MED_RADIUS * MED_RADIUS];
+  for (int i = 0; i < small_h; ++i)
+  for (int j = 0; j < small_w; ++j) { 
+    x = 2*i, y = 2*j;
+    int cnt = 0;
+    for (int ii = 0; ii < 2; ++ii)    
+    for (int jj = 0; jj < 2; ++jj)
+      a[cnt++] = large[x + ii][y + jj];
+    std::sort(a, a + (MED_RADIUS * MED_RADIUS));
+    small[i][j] = a[1];
+    if (halve_disp)
+      small[i][j] /= 2;
+  }
+}
+*/
 
 #endif

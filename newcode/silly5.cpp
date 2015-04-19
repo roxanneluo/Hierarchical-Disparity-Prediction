@@ -17,7 +17,6 @@
 
 TimeKeeper timer;
 
-const int levels = 3;
 const int OBJ_NUM = 2;
 
 ImageLayer left_pyramid[levels], right_pyramid[levels];
@@ -87,7 +86,7 @@ timer.reset();
         updateTable(255 * 0.1);
         left[idx].steroMatch(right[idx], 1, use_lab);
         misc::median_filter(left[idx].disparity, left[idx].H, left[idx].W, 3);
-        save_image(layername[lvl][0], left[idx].disparity, left[idx].H, left[idx].W, scale * (1 << lvl));
+        // save_image(layername[lvl][0], left[idx].disparity, left[idx].H, left[idx].W, scale * (1 << lvl));
     } // end of layer iteration.
 
 timer.check("all");

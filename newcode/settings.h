@@ -47,6 +47,7 @@ char file_name[4][300] =
 double tot_threshold = 0.9;
 
 Dataset dataset = FULL_SIZE;
-bool use_lab = true;
+bool use_lab = false;
+const int levels = 4;
 
 #endif
