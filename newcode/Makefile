@@ -1,21 +1,23 @@
-all : compile-mst compile-dpf-mst compile-st compile-dpf-st compile-rt compile-dpf-rt  compile-checker compile-ppm-checker
+all : compile-mst compile-dpf-mst compile-st compile-dpf-st compile-rt compile-dpf-rt  compile-checker compile-red-checker compile-ppm-checker
 
 compile-checker:
 	g++-4.8 checker_nonocc.cpp -O2 -o ../bin/checker.out 
+compile-red-checker:
+	g++-4.8 red_checker_nonocc.cpp -O2 -o ../bin/red-checker.out 
 compile-ppm-checker:
 	g++-4.8 ppm_checker_nonocc.cpp -O2 -o ../bin/ppm-checker.out 
 compile-mst :
 	g++-4.8 silly0.cpp -O2 -o ../bin/mst.out
 compile-dpf-mst :
-	g++-4.8 silly1.cpp -O2 -msse3 -std=c++0x -o ../bin/dpf-mst-mean-mst-GMM-0.5.out
+	g++-4.8 silly1.cpp -O2 -msse3 -std=c++0x -o ../bin/dpf-mst-mean-mst-GMM-0.5-notot.out
 compile-st :
 	g++-4.8 silly2.cpp -O2 -o ../bin/st.out
 compile-dpf-st :
-	g++-4.8 silly3.cpp -O2 -msse3 -std=c++0x -o ../bin/dpf-st-mean-mst-GMM-0.5.out
+	g++-4.8 silly3.cpp -O2 -msse3 -std=c++0x -o ../bin/dpf-st-mean-mst-GMM-0.5-notot.out
 compile-rt :
 	g++-4.8 silly4.cpp -O2 -o ../bin/rt.out
 compile-dpf-rt:
-	g++-4.8 silly5.cpp -O2 -msse3 -std=c++0x -o ../bin/dpf-rt-mean-mst-GMM-0.5.out
+	g++-4.8 silly5.cpp -O2 -msse3 -std=c++0x -o ../bin/dpf-rt-mean-mst-GMM-0.5-notot.out
 run-default :
 	time ./a.out	
 

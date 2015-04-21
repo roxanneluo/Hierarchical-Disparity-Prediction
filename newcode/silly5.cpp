@@ -74,7 +74,7 @@ timer.reset();
             dpf::getSupportProb(left[idx].rgb, right[idx].rgb, 
                                 left[idx].H, left[idx].W, max_disparity / (1 << lvl));
             dpf::getProbMatrix(lvl, max_disparity / (1 << (lvl + 1)), max_disparity / (1 << lvl), dataset);
-            dpf::getInterval(0.001 * (1 << lvl), tot_threshold);
+            dpf::getInterval(0.001 * (1 << lvl)/*, tot_threshold*/);
             left[idx].readPrediction(left[(lvl + 1)%OBJ_NUM].disparity);
             // left[idx].intersectInterval(left[(lvl + 1) % OBJ_NUM]);
         } 

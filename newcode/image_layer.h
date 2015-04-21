@@ -229,13 +229,11 @@ void ImageLayer::shrinkArray(Dtype small [][MAX_WIDTH], int &small_h, int &small
   small_w = large_w/2;
 
   int x,y;
-  int a[MED_RADIUS * MED_RADIUS];
+  double divisor = halve_disp? 8:4;
   for (int i = 0; i < small_h; ++i)
   for (int j = 0; j < small_w; ++j) { 
     x = 2*i, y = 2*j;
-    small[i][j]= (large[x][y]+large[x+1][y]+large[x][y+1]+large[x+1][y+1]) / 4;
-    if (halve_disp)
-      small[i][j] /= 2.0;
+    small[i][j]= (large[x][y]+large[x+1][y]+large[x][y+1]+large[x+1][y+1]) / divisor;
   }
 }
 

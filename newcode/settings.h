@@ -44,10 +44,10 @@ int scale = 16;
 char file_name[4][300] =
 {"left.ppm", "right.ppm", "default_left.pgm", "default_right.pgm"};
 
-double tot_threshold = 0.9;
+double tot_threshold = 0;
 
 Dataset dataset = FULL_SIZE;
 bool use_lab = false;
-const int levels = 4;
+const int levels = 3;
 
 #endif

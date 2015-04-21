@@ -78,6 +78,7 @@ void getProbMatrix(int layer, int h, int w, Dataset dataset) {
 }
 
 
+/*
 void getInterval(double threshold, double tot_threshold = 0.9) {
     double highest;
     int highest_index;
@@ -124,9 +125,9 @@ void getInterval(double threshold, double tot_threshold = 0.9) {
         interval[i][1] = rr - 1;
     }
 }
+*/
 
-/*
-void getInterval(double threshold, double tot_threshold = 0.9) {
+void getInterval(double threshold) {
     double highest;
     int highest_index;
     for (int i = 0; i <= height; ++i) {
@@ -163,7 +164,6 @@ void getInterval(double threshold, double tot_threshold = 0.9) {
         interval[i][1] = rr - 1;
     }
 }
-*/
 } // end of namespace dpf
 
 #endif 

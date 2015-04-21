@@ -10,9 +10,9 @@
 #include "../newcode/prediction.h" // the prediction model
 
 #include "../newcode/image_layer.h"
-#include "../newcode/arbol3.h" // the declaration of 'BigObject'
+#include "../newcode/arbol1.h" // the declaration of 'BigObject'
 #include "../newcode/extra.cpp"
-#include "../newcode/tree3.cpp"
+#include "../newcode/tree5.cpp"
 
 #include "../newcode/timekeeper.h"
 #include "statistics.h"

@@ -18,8 +18,7 @@ int h, w;
 // pad1 is on top and bottom,
 // pad2 is on left and right.
 // black is occluded
-// green is farther than ref
-// red is closer than ref
+// red is err 
 
 int main(int args, char ** argv) {
     // argv[1] is the output image
@@ -52,13 +51,13 @@ int main(int args, char ** argv) {
         int d = ref_left[i][j] / scale;
         if (d > 0 && j - d >= 0 && ref_left[i][j] == ref_right[i][j - d]) {
             ++total;
-            for (int c = 0; c < 3; ++c) err[i][j][c] = out[i][j];
             if (misc::abs(out[i][j] - ref_left[i][j]) < tolerance * scale) {
                 ++correct;
+                for (int c = 0; c < 3; ++c) err[i][j][c] = out[i][j];
             } else {  
-              int channel = out[i][j] < ref_left[i][j]? 1:0;
-              for (int c = 0; c < 3; ++c)  
-                if (c != channel) err[i][j][c] = 0;
+              err[i][j][0] = out[i][j];
+              //for (int c = 1; c < 3; ++c)  
+                //err[i][j][c] = 0;
             }
         } else {
             for (int c = 0; c < 3; ++c) err[i][j][c] = 0;

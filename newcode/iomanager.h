@@ -10,7 +10,7 @@
 #include "settings.h"
 
 const int BUF_LEN = MAX_WIDTH * MAX_HEIGHT * 3 + 2;
-char buff[BUF_LEN];
+unsigned char buff[BUF_LEN];
 
 void load_image(const char * filename, Picture rgb, int &H, int &W, int scale = 1) {
     // return if it is successfull
@@ -52,7 +52,8 @@ void load_image(const char * filename, Picture rgb, int &H, int &W, int scale = 
 }
 
 template <typename Dtype>
-void load_image_gray(const char * filename, Dtype gray[][MAX_WIDTH], int &H, int &W) {
+void load_image_gray(const char * filename, Dtype gray[][MAX_WIDTH], int &H, int &W,
+    int scale = 1) {
     // return if it is successfull
     FILE * f = fopen(filename, "rb");
     int bytesread = fread(buff, 1, BUF_LEN, f);
@@ -86,8 +87,10 @@ void load_image_gray(const char * filename, Dtype gray[][MAX_WIDTH], int &H, int
 
     H = value[1]; W = value[0];
     for (int x = 0; x < H; ++x)
-        for (int y = 0; y < W; ++y)
-            gray[x][y] = (unsigned char) (buff[++i]);
+        for (int y = 0; y < W; ++y) {
+            gray[x][y] = buff[++i]/scale; 
+            //!!!buff must be UNSIGNED CHAR, otherwise, 255 is negative!!!
+        }
 }
 
 /*
@@ -147,6 +150,7 @@ void rgb2gray(BytArray gray, const Picture rgb, int H, int W) {
 template<typename Dtype>
 void save_array(const char * filename, Dtype *a, int len) {
     std::ofstream fout(filename, std::ofstream::out);
+    fout << len << std::endl;
     for (int i = 0; i < len; ++i)
         fout << a[i] << " ";
     fout.close();
@@ -155,6 +159,7 @@ void save_array(const char * filename, Dtype *a, int len) {
 template<typename Dtype>
 void save_matrix(const char * filename, Dtype * a, int h, int w) {
     std::ofstream fout(filename, std::ofstream::out);
+    fout << h << " " << w << std::endl;
     for (int i = 0; i < h; ++i) {
         for (int j = 0; j < w; ++j)
             fout << a[i * w + j] << " ";

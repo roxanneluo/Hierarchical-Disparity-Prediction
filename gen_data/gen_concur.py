@@ -6,6 +6,10 @@ import os
 algo = sys.argv[1]
 in_folder = sys.argv[2]
 out_folder = sys.argv[3]
+dataset_folder = sys.argv[4]
+use_lab = sys.argv[5] if len(sys.argv) > 5 else 0
+
+dataset_table = {'halfsize':0, 'fullsize':1}
 
 time_str = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
 support_folder = out_folder + '/support_mean_' + time_str + '/'
@@ -27,8 +31,12 @@ for dataset in os.listdir(in_folder) :
   print sp.check_output(['../bin/gen-concur-' + algo + '.out',
     folder + 'left.ppm', folder + 'right.ppm',
     max_disp, scale,
-    folder + 'displeft.ppm',
     concur_folder, support_folder,
-    dataset, algo])
+    '0',
+    str(dataset_table[dataset_folder]),
+    str(use_lab),
+    dataset, algo,
+    folder + 'displeft.pgm',
+    ])
 
 
