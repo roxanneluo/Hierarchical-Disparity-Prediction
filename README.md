@@ -4,8 +4,11 @@
 
 We implement 3 tree-based algorithms MST, ST and RT and their DP versions in
 `main/*.cpp`
+
 To use them, first make the them by
-`make all`.
+```
+make all
+```.
 You can use `make main` if you just want to make * \*.cpp * in `main` folder.
 Then the executable would be made in `bin` with suffix *.out*.
 To run them, 
