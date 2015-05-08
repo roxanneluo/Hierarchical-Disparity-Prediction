@@ -10,7 +10,7 @@ To use them, first make the them by
 
 `make all`.
 
-You can use `make main` if you just want to make * \*.cpp * in `main` folder.
+You can use `make main` if you just want to make *\*.cpp* in `main` folder.
 Then the executable would be made in `bin` with suffix *.out*.
 
 
