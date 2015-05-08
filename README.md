@@ -28,6 +28,7 @@ edge weights, and is 0 otherwise
 `rt.out`.
 
 Default values for the optional arguments:
+
   - `Scale`: 256/MaxDisparity
   - `LeftOutput.pgm`: default\_left.pgm
   - `Dataset`: 1 <=> fullsize
