@@ -13,18 +13,53 @@ DATASETS = [
 #    'halfsize',
 ]
 ALGORITHMS = (
-    'dpf-st-lab',
-    'dpf-mst',	
+    #'dpf-mst-mean-mst-GMM-1',
+    #'dpf-st-mean-mst-GMM-1',
+    #'dpf-rt-mean-mst-GMM-1',
+    'dpf-mst-mean-mst-GMM-0.5-new-notot',
+    'dpf-st-mean-mst-GMM-0.5-new-notot',
+    'dpf-rt-mean-mst-GMM-0.5-new-notot',
+    'dpf-mst-mean-mst-GMM-0.5-notot',
+    'dpf-st-mean-mst-GMM-0.5-notot',
+    'dpf-rt-mean-mst-GMM-0.5-notot',
+    #'dpf-st-4-mean-mst-GMM-0.5-notot',
+    #'dpf-rt-mean-mst-GMM-0.5-notot',
+    #'dpf-st-mean-own-GMM-0.5',
+    #'dpf-st-mean-own-GMM',
+    #'dpf-mst-bai',
+    #'dpf-st-bai',
+    #'dpf-rt-bai',
+    #'dpf-mst-mean',
     'mst',
-    'dpf-st',
+    #'dpf-mst',
+    #'dpf-st-mean',
     'st',
-    'dpf-rt',
+    #'dpf-st',
     'rt',
+    #'dpf-rt-mean',
+    #'dpf-rt',
+    #'dpf-mst-4',
+    #'dpf-mst-4-lab',
+    #'dpf-st-4',
+    #'dpf-st-4-lab',
+    #'dpf-rt-4',
+    #'dpf-rt-4-lab',
+    #'dpf-mst-lab',
+    #'dpf-mst',	
+    #'mst',
+    #'dpf-st-lab',
+    #'dpf-st',
+    #'st',
+    #'dpf-rt-lab',
+    #'dpf-rt',
+    #'rt',
 )
 CHECKER = 'checker.out'
-tot_threshold = '0.9'
+tot_threshold = '0'
 
-for dataset in sys.argv[1:] :
+tolerance = sys.argv[1]
+html_name_pre = sys.argv[2]
+for dataset in sys.argv[3:] :
   DATASETS.append(dataset) # argv[1], argv[2], ... gives the dataset
 
 dataset_table = {'halfsize': 0, 'fullsize': 1}
@@ -34,7 +69,7 @@ pic_names = ''
 total = 0
 correct = 0
 table = {}
-html_name = 'results/SuperReport_nonocc_' + '_'.join(DATASETS) + '.html'
+html_name = 'results/SuperRepor_' + html_name_pre + '_err_ge_' + tolerance + '_'.join(DATASETS) + '.html'
 
 def ratio(x) :
     return float(x[0]) / float(x[1])
@@ -58,7 +93,6 @@ def check_results(algo, path, dataset, picture) : #, left_result = 'leftdisp.pgm
         str(dataset_table[dataset]),
     ])
 
-    tolerance = '2'
     command = ['bin/'+CHECKER, output[0],
         path + 'displeft.pgm', path + 'dispright.pgm',
         tolerance, para[1]]
@@ -90,8 +124,6 @@ for algoritm in ALGORITHMS :
 
 print '\nDone.\n'
 
-if len(sys.argv) > 1 :
-    html_name = sys.argv[1]
 print "Saving result to " + html_name
 report = open(html_name, 'w')
 report.write('<!DOCTYPE html>\n<html>\n<body>\n')

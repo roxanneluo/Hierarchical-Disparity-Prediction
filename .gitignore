@@ -5,6 +5,8 @@
 *.lo
 *.h.gch
 *.swp
+*.old
+*.DS_Store
 
 # Libraries
 *.lib
@@ -40,3 +42,9 @@ bin/results of generated small Given Large*
 
 # statistical results
 code/code-probability/matlab/data*
+
+# results
+results/*
+*.log
+log*
+*.txt

@@ -40,7 +40,7 @@ log_file = open(log_filename, 'w')
 log_file.write(time + '\n')
 
 for tolerance in tolerances:
-  checker_result = sp.check_output(['bin/checker.out',
+  checker_result = sp.check_output(['bin/red-checker.out',
           left_out, disp_left, disp_right,
           tolerance, scale,
           result_folder + 'err_'+dataset+'_left_'+algo+'_'+str(tolerance)+'.ppm'])
