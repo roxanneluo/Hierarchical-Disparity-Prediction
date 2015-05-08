@@ -23,8 +23,10 @@ To run them,
 model to use. Here halfsize is 0 and fullsize is 1. 
 - `UseLab` is 1 if want to use LAB color space in defining the matching cost and
 edge weights, and is 0 otherwise
+
 `Dataset` and `UseLab` would be neglected if you run `mst.out` or `st.out` or
 `rt.out`.
+
 Default values for the optional arguments:
   - `Scale`: 256/MaxDisparity
   - `LeftOutput.pgm`: default\_left.pgm
