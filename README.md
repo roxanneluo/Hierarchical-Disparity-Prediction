@@ -29,7 +29,7 @@ edge weights, and is 0 otherwise
 
 Default values for the optional arguments:
 
-  - `Scale`: 256/MaxDisparity
-  - `LeftOutput.pgm`: default\_left.pgm
-  - `Dataset`: 1 <=> fullsize
-  - `UseLab`: 0
+- `Scale`: 256/MaxDisparity
+- `LeftOutput.pgm`: default\_left.pgm
+- `Dataset`: 1 <=> fullsize
+- `UseLab`: 0
