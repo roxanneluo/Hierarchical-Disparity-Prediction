@@ -25,8 +25,8 @@ void process_args(int args, char ** argv) {
     if (args > 3) { max_disparity = atoi(argv[3]); scale = 256 / max_disparity;  }
     if (args > 4) { scale = atoi(argv[4]);  }
     if (args > 5) { strcpy(file_name[2], argv[5]); /*strcpy(file_name[3], argv[6]);*/  }
-    if (args > 6) { dataset = static_cast<Dataset>(atoi(argv[8])); }
-    if (args > 7) { use_lab = atoi(argv[9]); }
+    if (args > 6) { dataset = static_cast<Dataset>(atoi(argv[6])); }
+    if (args > 7) { use_lab = atoi(argv[7]); }
     //if (args > 7) { strcpy(file_name[4], argv[7]);  }
 }
 

@@ -3,64 +3,33 @@ import sys
 import subprocess
 from subprocess import CalledProcessError
 
+## configuration ##
 DATASETS = [ 
+#    'fullsize'
+#    'halfsize',
 #    'Middlebury_1',
 #    'Middlebury_4',
 #    'Middlebury_others',
-#    'halfsize',
 #    'Middlebury_bad',
-#    'fullsize'
-#    'halfsize',
 ]
 ALGORITHMS = (
-    #'dpf-mst-mean-mst-GMM-1',
-    #'dpf-st-mean-mst-GMM-1',
-    #'dpf-rt-mean-mst-GMM-1',
-    'dpf-mst-mean-mst-GMM-0.5-new-notot',
-    'dpf-st-mean-mst-GMM-0.5-new-notot',
-    'dpf-rt-mean-mst-GMM-0.5-new-notot',
-    'dpf-mst-mean-mst-GMM-0.5-notot',
-    'dpf-st-mean-mst-GMM-0.5-notot',
-    'dpf-rt-mean-mst-GMM-0.5-notot',
-    #'dpf-st-4-mean-mst-GMM-0.5-notot',
-    #'dpf-rt-mean-mst-GMM-0.5-notot',
-    #'dpf-st-mean-own-GMM-0.5',
-    #'dpf-st-mean-own-GMM',
-    #'dpf-mst-bai',
-    #'dpf-st-bai',
-    #'dpf-rt-bai',
-    #'dpf-mst-mean',
+    'dp_mst',
+    'dp_st',
+    'dp_rt',
     'mst',
-    #'dpf-mst',
-    #'dpf-st-mean',
     'st',
-    #'dpf-st',
     'rt',
-    #'dpf-rt-mean',
-    #'dpf-rt',
-    #'dpf-mst-4',
-    #'dpf-mst-4-lab',
-    #'dpf-st-4',
-    #'dpf-st-4-lab',
-    #'dpf-rt-4',
-    #'dpf-rt-4-lab',
-    #'dpf-mst-lab',
-    #'dpf-mst',	
-    #'mst',
-    #'dpf-st-lab',
-    #'dpf-st',
-    #'st',
-    #'dpf-rt-lab',
-    #'dpf-rt',
-    #'rt',
 )
-CHECKER = 'checker.out'
-tot_threshold = '0'
+CHECKER = 'checker_nonocc.bin'
+use_lab = '0' # set to zero as default
+####
 
+## argument list ##
 tolerance = sys.argv[1]
 html_name_pre = sys.argv[2]
 for dataset in sys.argv[3:] :
   DATASETS.append(dataset) # argv[1], argv[2], ... gives the dataset
+####
 
 dataset_table = {'halfsize': 0, 'fullsize': 1}
 
@@ -69,7 +38,7 @@ pic_names = ''
 total = 0
 correct = 0
 table = {}
-html_name = 'results/SuperRepor_' + html_name_pre + '_err_ge_' + tolerance + '_'.join(DATASETS) + '.html'
+html_name = 'results/SuperReport_' + html_name_pre + '_err_ge_' + tolerance + '_'.join(DATASETS) + '.html'
 
 def ratio(x) :
     return float(x[0]) / float(x[1])
@@ -85,15 +54,15 @@ def check_results(algo, path, dataset, picture) : #, left_result = 'leftdisp.pgm
 
     #run the algorithm
     print subprocess.check_output([
-        'bin/' + algo + '.out', 
+        'bin/main/' + algo + '.bin', 
         path + 'left.ppm', path + 'right.ppm', 
         para[0], para[1],
-        output[0], output[1],
-        tot_threshold,
+        output[0],
         str(dataset_table[dataset]),
+        use_lab,
     ])
 
-    command = ['bin/'+CHECKER, output[0],
+    command = ['bin/checker/'+CHECKER, output[0],
         path + 'displeft.pgm', path + 'dispright.pgm',
         tolerance, para[1]]
 

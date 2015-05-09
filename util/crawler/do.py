@@ -1,3 +1,7 @@
+#######
+# crawl data from the middlebury
+######
+
 urltemp = 'http://vision.middlebury.edu/stereo/data/scenes2014/zip/{}'
 tag1='<a href="{}">'
 

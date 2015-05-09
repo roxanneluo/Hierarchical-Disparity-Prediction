@@ -48,3 +48,4 @@ results/*
 *.log
 log*
 *.txt
+*.html

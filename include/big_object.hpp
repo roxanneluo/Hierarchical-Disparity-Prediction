@@ -10,28 +10,9 @@
 #include "settings.hpp"
 #include "misc.hpp" 
 #include "image_layer.hpp"
+#include "tree_common.hpp"
 
 #define MAX_TOLERANCE 7
-
-class Edge {
-public :
-    int a, b; // Node ID
-    int weight;
-};
-
-bool smaller_edge(const Edge & a, const Edge & b) 
-    { return a.weight < b.weight; }
-
-
-class TreeNode {
-public :
-	int x, y, id ; // id = its index in an array
-	int ord, up_weight; // the bfs order and the edge weight to parent after direct tree constructed
-	TreeNode() {}
-	TreeNode(int a, int b) : x(a) , y(b) {}
-    int degree, next_node[4], edge_weight[4];
-    void add_edge(int node, int weight);
-};
 
 class Interval {
 public :
@@ -55,19 +36,6 @@ class BigObject {
     Edge edges[NODES * 2]; // all candidate edges  1-based
     Edge trees[NODES]; // collected tree edges 1-based
 
-    void collect_edges(); // collect all the edges.
-    void collect_lab_edges(); // collect all the edges.
-	  void prepare_visit();  // construct the bfs order for the forest
-    void build_tree(double threshold); // build the tree given all the collected edges.
-
-    void computeFirstCost (int d, BigObject & right, int low, int high) ;
-    void computeFirstLabCost (int d, BigObject & right, int low, int high) ;
-	  void compute_cost_on_tree(int low, int high);
-
-    void updateDisparity(int d, int low, int high);
-    void updateMatchingCost(int disp, int low, int high);
-
-
     TreeNode nodes[NODES];
     bool visited[NODES];
 	  int order[NODES]; // the sequence of index, the visiting order of the tree
@@ -78,21 +46,34 @@ class BigObject {
 	  FloArrayPtr gradient;
     double best_cost[NODES], backup[NODES], cost[NODES];  
     int stable[NODES]; // can be 16-bit signed
+
+	  void prepare_visit();  // construct the bfs order for the forest
+    void updateDisparity(int d, int low, int high);
+
+    Interval itv[NODES];
+
+  protected:
+    void collect_edges(); // collect all the edges.
+    void collect_lab_edges(); // collect all the edges.
+    void build_tree(double threshold); // build the tree given all the collected edges.
+    void computeFirstCost (int d, BigObject & right, int low, int high) ;
+    void computeFirstLabCost (int d, BigObject & right, int low, int high) ;
+	  void compute_cost_on_tree(int low, int high);
+    void updateMatchingCost(int disp, int low, int high);
    
-public :
+  public :
     int H, W; // graph size, height and width
     int n; // number of nodes
     PicturePtr rgb;     // can be 8-bit unsigned
     FloPicturePtr lab; 
     BytArray disparity; 
-    Interval itv[NODES];
 
     BigObject() { rgb = NULL; lab = NULL; }
     BigObject(ImageLayer & image_layer) { init(image_layer); }
     void init(ImageLayer& image_layer);
     void initDisparity();
     void buildForest(double threshold, bool use_lab);
-    void steroMatch(BigObject &ref, int sign, bool use_lab);
+    void stereoMatch(BigObject &ref, int sign, bool use_lab);
     void refinement();
 
     void readPrediction(BytArray disp);
@@ -101,22 +82,7 @@ public :
     inline int node_number(int x, int y) const { return x * W + y + 1; }
 };
 
-
-
 // implement the common BigObject function 
-
-double table[333];
-void updateTable(double sigma) {
-    table[0] = 1;
-    for(int i = 1; i <= 255; i++)
-        table[i] = table[i-1] * exp(-1.0 / sigma);
-}
-
-void TreeNode::add_edge(int node, int weight) {
-    next_node[degree] = node;
-    edge_weight[degree] = weight;
-    ++degree;
-}
 
 const double max_gradient_color_difference= 2.0;
 const double max_color_difference = 10.0;
@@ -258,6 +224,7 @@ void BigObject::compute_cost_on_tree(int low, int high) {
 } // compute cost on a little tree
 
 
+// winner takes all
 void BigObject::updateDisparity(int d, int low, int high) {
     for (int u = low; u <= high; ++u) {
         // int i = nodes[order[u]].x;
@@ -314,7 +281,7 @@ void BigObject::buildForest(double threshold, bool use_lab = true) {
     prepare_visit();
 }
 
-void BigObject::steroMatch(BigObject &ref, int sign, bool use_lab = true) {
+void BigObject::stereoMatch(BigObject &ref, int sign, bool use_lab = true) {
     // sign is a thing for the first cost.
     for (int i = 1; i <= numOT; ++i) {
         Interval treeInterval = itv[mset.find(order[oneTree[i][0]])];

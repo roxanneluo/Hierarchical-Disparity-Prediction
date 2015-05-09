@@ -49,23 +49,7 @@ int main(int args, char ** argv) {
 // timer.check("cost on tree");
         updateDisparity(d, left, right);
     }
-//    timer.check("steroMatch");
-//    next part : refinement 
     misc::median_filter(left.disparity, left.H, left.W);
-    //misc::median_filter(right.disparity, right.H, right.W); 
-    /*
-    initDisparity(left, right);
-    findStablePixels(left, right);
-    updateTable(255 * 0.05);
-    for (int d = 0; d <= max_disparity; ++d) {
-        updateMatchingCost(d, left, right);
-        left.compute_cost_on_tree();
-        right.compute_cost_on_tree();
-        updateDisparity(d, left, right);
-    }
-    misc::median_filter(left.disparity, left.H, left.W);
-    misc::median_filter(right.disparity, right.H, right.W); 
-    */
 
 timer.check("all");
 	//save

@@ -23,15 +23,7 @@ create a new branch.cpp and change the silly.cpp includings.
 
 #include "settings.hpp"
 #include "misc.hpp" 
-
-class Edge {
-public :
-    int a, b; // Node ID
-    int weight;
-};
-
-bool smaller_edge(const Edge & a, const Edge & b) 
-    { return a.weight < b.weight; }
+#include "tree_common.hpp"
 
 class MergeSet {
 public :
@@ -40,17 +32,6 @@ public :
     void init(int x);
     bool merge(int a, int b);
 };
-
-class TreeNode {
-public :
-	int x, y, id ; // id = its index in an array
-	int ord, up_weight; // the bfs order and the edge weight to parent after direct tree constructed
-	TreeNode() {}
-	TreeNode(int a, int b) : x(a) , y(b) {}
-    int degree, next_node[4], edge_weight[4];
-    void add_edge(int node, int weight);
-};
-
 
 class BigObject {
 public :

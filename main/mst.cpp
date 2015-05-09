@@ -49,7 +49,7 @@ int main(int args, char ** argv) {
 // timer.check("cost on tree");
         updateDisparity(d, left, right);
     }
-//    timer.check("steroMatch");
+//    timer.check("stereoMatch");
 //    next part : refinement 
     misc::median_filter(left.disparity, left.H, left.W);
     //misc::median_filter(right.disparity, right.H, right.W); 

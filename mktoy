@@ -1,7 +1,0 @@
-all: Gen_Toy Filter_MST Filter_RAND
-Gen_Toy:
-	g++ code/gen_toy_pic.cpp -o bin/Gen_Toy.out -O2 -Wall -std=c++0x
-Filter_MST:
-	g++ code/filter_MST.cpp -o bin/Filter_MST.out -O2 -Wall -std=c++0x
-Filter_RAND:
-	g++ code/filter_rand.cpp -o bin/Filter_RAND.out -O2 -Wall -std=c++0x
