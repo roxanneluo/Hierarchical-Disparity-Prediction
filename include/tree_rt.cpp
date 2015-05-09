@@ -4,24 +4,10 @@
 #include <algorithm>
 
 // This is for a simple random tree.
-
-double table[333];
-void updateTable(double sigma) {
-    table[0] = 1;
-    for(int i = 1; i <= 255; i++)
-        table[i] = table[i-1] * exp(-1.0 / sigma);
-}
-
 int MergeSet::find(int x) {
     if (f[x] != x) 
         f[x] = find(f[x]);
     return f[x];
-}
-
-void TreeNode::add_edge(int node, int weight) {
-    next_node[degree] = node;
-    edge_weight[degree] = weight;
-    ++degree;
 }
 
 void BigObject::compute_gradient () {

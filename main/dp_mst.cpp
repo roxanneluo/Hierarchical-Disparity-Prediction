@@ -59,8 +59,8 @@ int main(int args, char ** argv) {
         left_pyramid[i+1].shrinkPicture(left_pyramid[i+1].lab, left_pyramid[i].lab, left_pyramid[i].H, left_pyramid[i].W);
         right_pyramid[i+1].shrinkPicture(right_pyramid[i+1].lab, right_pyramid[i].lab, right_pyramid[i].H, right_pyramid[i].W);
       }
-      save_image_rgb(shrinkname[i+1][0], left_pyramid[i+1].rgb, 
-          left_pyramid[i+1].H, left_pyramid[i+1].W);
+      /*save_image_rgb(shrinkname[i+1][0], left_pyramid[i+1].rgb, 
+          left_pyramid[i+1].H, left_pyramid[i+1].W);*/
     }
 
 timer.reset();
@@ -86,7 +86,7 @@ timer.reset();
         updateTable(255 * 0.1);
         left[idx].stereoMatch(right[idx], 1, use_lab);
         misc::median_filter(left[idx].disparity, left[idx].H, left[idx].W, 3);
-        save_image(layername[lvl][0], left[idx].disparity, left[idx].H, left[idx].W, scale * (1 << lvl));
+        //save_image(layername[lvl][0], left[idx].disparity, left[idx].H, left[idx].W, scale * (1 << lvl));
     } // end of layer iteration.
 
 timer.check("all");

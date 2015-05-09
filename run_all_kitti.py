@@ -4,19 +4,15 @@ import subprocess
 
 import httplib
 
-ALGORITHMS = (
-  'Original',
-  'ST',
-  'RandTree',
-  'MSF_ALL_MST',
-  'MSF_ALL_ST',
-  'MSF2_TEST',
-)
-# run_all_waseda.py alg testdata
-# alg: mst dpf-mst
+#### arguments ####
 alg = sys.argv[1] 
 maxdisp = sys.argv[2]
 scale = sys.argv[3]
+####
+
+#### configuration ####
+use_lab = '0'
+####
 
 path = 'testdata/kitti_0009/'
 #datasets = subprocess.check_output(['ls', path]).split()
@@ -29,11 +25,12 @@ right_result = ''
 def run_test_with_dataset(alg) :
     """ path should end with a / """
     what = subprocess.check_output([
-        './bin/'+alg+'.out', 
+        './bin/main/'+alg+'.bin', 
         left, right, 
         maxdisp, scale,
-        left_result, right_result,
-        '0', '1' #fullsize
+        left_result,
+        '1', #fullsize,
+        use_lab,
     ])
     print what
 

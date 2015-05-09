@@ -38,8 +38,13 @@ To run on a single testcase,
       then the HTML file would be saved at
         `results/SuperReport_HTMLPre_err_ge_Tolerance_Dataset1[_Dataset2_...].html` and the stdout would be saved at
         `results/LogFileName`.
-2. For KITTI,
+2. For KITTI, run
 
+`python run_all_kitti.py Algo MaxDisparity Scale`
+
+3. For waseda (Low-quality dataset), run
+
+`python run_all_waseda.py Algo MaxDisparity Scale`
 
 In the sequel, we give more detailed description of the codes.
 
