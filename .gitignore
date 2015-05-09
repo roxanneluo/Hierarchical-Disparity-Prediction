@@ -44,7 +44,6 @@ bin/results of generated small Given Large*
 code/code-probability/matlab/data*
 
 # results
-results/.*
 *.log
 log*
 *.txt
