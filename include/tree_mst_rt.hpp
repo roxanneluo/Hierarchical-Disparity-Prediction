@@ -33,39 +33,5 @@ public :
     bool merge(int a, int b);
 };
 
-class BigObject {
-public :
-    int n, m; // number of nodes and edges
-    int ts; // number of tree edges
-    int H, W; // graph size, height and width
-    inline int node_number(int x, int y) { return x * W + y + 1; }
-    inline void node_location(int p, int &x, int &y) {--p; x = p / W; y = p % W; }
-	MergeSet mset; // for buiding the tree
-    Edge edges[NODES * 2]; // all candidate edges  1-based
-    Edge trees[NODES]; // collected tree edges 1-based
-    // next three are in trunck.cpp
-    void collect_edges(); // collect all the edges.
-	void prepare_visit();  // construct the bfs order for the forest
-    // next three are in branch.cpp
-    void build_tree(); // build the tree given all the collected edges.
-
-	void compute_cost_on_tree();
-    void compute_gradient();
-
-    TreeNode nodes[NODES];
-    bool visited[NODES];
-	int order[NODES]; // the sequence of index, the visiting order of the tree
-
-    void computeFirstCost (int d, BigObject & right) ;
-
-    void copyLeftCostToRight (int d, BigObject & left);
-
-    void getDisparity(BigObject & ref, bool left);
-
-	FloArray cost, gradient, backup, best_cost; // no idea 
-	BytArray disparity; 
-    Picture rgb;     // can be 8-bit unsigned
-    IntArray stable; // can be 16-bit signed
-};
-
+#include "original_big_object.hpp"
 #endif

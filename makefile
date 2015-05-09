@@ -17,7 +17,7 @@ UTIL_BINS := $(addprefix $(BUILD_DIR)/, ${UTIL_SRCS:.cpp=.bin})
 GEN_DATA_SRCS := $(shell find gen_data -name "*.cpp")
 GEN_DATA_BINS := $(addprefix $(BUILD_DIR)/, ${GEN_DATA_SRCS:.cpp=.bin})
 #include
-INCLUDED = $(foreach dir, $(INCLUDE_DIRS), $(shell ls $(dir)))
+INCLUDED = $(foreach dir, $(INCLUDE_DIRS), $(addprefix $(dir)/, $(shell ls $(dir))))
 
 ALL_BINS := $(MAIN_BINS) $(CHECKER_BINS) $(UTIL_BINS) $(GEN_DATA_BINS)
 
@@ -33,8 +33,10 @@ gen_data: init $(GEN_DATA_BINS)
 
 $(ALL_BUILD_DIRS):
 	mkdir -p $@
-$(BUILD_DIR)/main/%.bin: main/%.cpp $(INCLUDED)
+
+$(BUILD_DIR)/main/%.bin: main/%.cpp $(INCLUDED) 
 	$(CXX) $< -o $@ $(CXX_FLAGS)
+
 $(BUILD_DIR)/%.bin: %.cpp
 	$(CXX) $< -o $@ $(CXX_FLAGS)
 

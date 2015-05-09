@@ -25,15 +25,7 @@ create a new branch.cpp and change the silly.cpp includings.
 
 #include "settings.hpp"
 #include "misc.hpp" 
-
-class Edge {
-public :
-    int a, b; // Node ID
-    int weight;
-};
-
-bool smaller_edge(const Edge & a, const Edge & b) 
-    { return a.weight < b.weight; }
+#include "tree_common.hpp"
 
 class MergeSet {
 public :
@@ -45,50 +37,5 @@ public :
     bool good(int a, int b, int w);
 };
 
-class TreeNode {
-public :
-	int x, y, id ; // id = its index in an array
-	int ord, up_weight; // the bfs order and the edge weight to parent after direct tree constructed
-	TreeNode() {}
-	TreeNode(int a, int b) : x(a) , y(b) {}
-    int degree, next_node[4], edge_weight[4];
-    void add_edge(int node, int weight);
-};
-
-
-class BigObject {
-public :
-    int n, m; // number of nodes and edges
-    int ts; // number of tree edges
-    int H, W; // graph size, height and width
-    inline int node_number(int x, int y) { return x * W + y + 1; }
-    inline void node_location(int p, int &x, int &y) {--p; x = p / W; y = p % W; }
-	MergeSet mset; // for buiding the tree
-    Edge edges[NODES * 2]; // all candidate edges  1-based
-    Edge trees[NODES]; // collected tree edges 1-based
-    // next three are in trunck.cpp
-    void collect_edges(); // collect all the edges.
-	void prepare_visit();  // construct the bfs order for the forest
-    // next three are in branch.cpp
-    void build_tree(); // build the tree given all the collected edges.
-
-	void compute_cost_on_tree();
-    void compute_gradient();
-
-    TreeNode nodes[NODES];
-    bool visited[NODES];
-	int order[NODES]; // the sequence of index, the visiting order of the tree
-
-    void computeFirstCost (int d, BigObject & right) ;
-
-    void getDisparity(BigObject & ref, bool left);
-
-	FloArray cost, gradient, backup, best_cost; // no idea 
-	BytArray disparity;   
-	Picture rgb;     // can be 8-bit unsigned
-  BytArray rgb_[3];
-	IntArray stable; // can be 16-bit signed
-
-};
-
+#include "original_big_object.hpp"
 #endif
