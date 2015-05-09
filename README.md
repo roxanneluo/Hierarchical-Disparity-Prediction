@@ -40,11 +40,11 @@ To run on a single testcase,
         `results/LogFileName`.
 2. For KITTI, run
 
-`python run_all_kitti.py Algo MaxDisparity Scale`
+  `python run_all_kitti.py Algo MaxDisparity Scale`
 
 3. For waseda (Low-quality dataset), run
 
-`python run_all_waseda.py Algo MaxDisparity Scale`
+  `python run_all_waseda.py Algo MaxDisparity Scale`
 
 In the sequel, we give more detailed description of the codes.
 
@@ -101,6 +101,12 @@ GNDRightDisp.pgm Tolerance Scale [ErrMap] [ErrAllRed]`.
   Erroneous pixels are all shown in red if *ErrAllRed* != 0.
 
 
+### Util
+Some codes that might be useful are in folder `util`. Fo example, all GND disparity maps
+are in form *.ppm* for *fullsize* dataset. You can convert them to pgm by
+using `rgb2gray.py`. Make codes in `util` by `make util`. And check each *.py* for
+their specific usage.
+
 
 ### Generate Statistical Data for GMM Generation and Other Matlab-related Tests
 These codes are in `gen_data`. Make and run them: 
@@ -127,8 +133,45 @@ Arguments:
 - `ResultsFolder`: *ConcurFolder* would be `ResultFolder/concur_CurrentDateTime/`
   and *SupportFolder* = `ResultFolder/support_CurrentDateTime/`. 
 
-### Util
-Some codes that might be useful are in folder `util`. Fo example, all GND disparity maps
-are in form *.ppm* for *fullsize* dataset. You can convert them to pgm by
-using `rgb2gray.py`. Make codes in `util` by `make util`. And check each *.py* for
-their specific usage.
+### Compute GMM needed for DPM
+1. Generate Concurrence Matrices as above.
+2. Open `matlab/readConcur.m`. Change `filename_format` to use *ConcurFolder*
+   and *Algo*.
+3. Open Matlab, `cd matlab` and find the GMM
+
+    `>> findGMMDrawPicForPaper(FullOrHalf, K, DatasetRatios, Times, Width);`
+  
+    Arguments:
+
+    - `FullOrHalf`: "fullsize" or "halfsize"
+    - `K`: find a GMM using 1,2,...,K gaussians.
+    - `DatasetRatios`[array]: for each *ratio* in array *DatasetRatios*, random
+      sample *ratio\*(#of all testcases)* testcases from the dataset and
+      generate GMM for each *ratio*.
+    - `Times`: For each k in [1,K] and for each ratio in *DatasetRatios*, try *Times* to find the best GMM because ill-conditioned sigma sometimes makes it hard to find one GMM by a single trial. 
+
+    Outputs:
+    
+    - `../results/pic/GMM/GMM_l_S.eps`, `../results/pic/GMM/GMM_l_S.fig`: *l* is layer index.
+    -  `../results/GMM up to K Kernels for Times times gnd vs. Algo
+       CurrentDateTime.html` 
+
+### Simulate the DPM process and draw figures 
+To draw `PixelIntv_l`, `concur_l,{l-1}`, simulated and statistical (true) `P(D_l|D_{l-1})` (sgl), `P(D_{l-1}|D_l)` (lgs), and to obtain HTMLs for the uncover ratio, interval ratio and error rate w.r.t. true `P(D_{l-1}|D_l)`, 
+`cd matlab`, open Matlab and run 
+
+`>> drawPicsForPaper(HTMLNameSpec, FullOrHalf, Test, Draw, Save,
+Level, DatasetRatio)`
+
+Arguments:
+
+- `HTMLNameSpec`[str]: the HTMLs would be saved at `../results/Prefix Report HTMLNameSpec
+  FullOrHalf Prec DatasetRatio.html`, where *Prefix* is "Uncover Ratio" or "E[err]" or "Interval".
+- `FullOrHalf`[str]: "fullsize" or "halfsize".
+- `Test`[bool]: true if just test a few testcases, see `getDataSet.m`. Otherwise, get
+  results for the complete dataset.
+- `Draw`[bool]: true if want to show the figures. Uncomment the figures you want
+  to draw in function `drawAll`.
+- `Save`[bool]: The figures would be saved in folders `sgl`, `lgs`, `PixelIntv` and `concur` under folder `../results/pic/FullOrHalf/`.
+- `Level`[int]: number of layers.
+- `DatasetRatio`[double]: used to choose corresponding GMM.
