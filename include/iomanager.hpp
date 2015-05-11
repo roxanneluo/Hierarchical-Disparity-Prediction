@@ -167,40 +167,4 @@ void save_matrix(const char * filename, Dtype * a, int h, int w) {
     }
     fout.close();
 }
-
-//median filter
-/*
-void shrinkGray(BytArray small, BytArray large, int smallh, int smallw,
-    bool halve_disp = true) {
-  const int MED_RADIUS = 2;
-  int x,y;
-  int a[MED_RADIUS * MED_RADIUS];
-  for (int i = 0; i < smallh; ++i)
-  for (int j = 0; j < smallw; ++j) {
-    x = 2*i, y = 2*j;
-    int cnt = 0;
-    for (int ii = 0; ii < 2; ++ii)    
-    for (int jj = 0; jj < 2; ++jj)
-      a[cnt++] = large[x + ii][y + jj];
-    std::sort(a, a + (MED_RADIUS * MED_RADIUS));
-    small[i][j] = a[1];
-    if (halve_disp)
-      small[i][j] /= 2;
-  }
-}
-*/
-
-// mean filter
-void shrinkGray(BytArray small, BytArray large, int smallh, int smallw,
-    bool halve_disp = true) {
-  int x,y;
-  for (int i = 0; i < smallh; ++i)
-  for (int j = 0; j < smallw; ++j) {
-    x = 2*i; y = 2*j;
-    small[i][j] = (large[x][y] + large[x][y+1] + large[x+1][y] + large[x+1][y+1])/4;
-    // note this is int division
-    if (halve_disp)
-      small[i][j] /= 2;
-  } 
-}
 #endif

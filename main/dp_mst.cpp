@@ -7,8 +7,7 @@
 #include "prediction.hpp" // the prediction model
 
 #include "image_layer.hpp"
-#include "tree_dp_mst_rt.hpp" // the declaration of 'BigObject'
-#include "tree_dp_mst.cpp"
+#include "tree_dp_mst.hpp" // the declaration of 'BigObject'
 #include "extra.hpp"
 
 #include "timekeeper.hpp"
@@ -18,7 +17,7 @@ TimeKeeper timer;
 const int OBJ_NUM = 2;
 
 ImageLayer left_pyramid[levels], right_pyramid[levels];
-BigObject left[OBJ_NUM], right[OBJ_NUM];
+DPMSTBigObject left[OBJ_NUM], right[OBJ_NUM];
 
 const char layername[LEVELS][2][100] = { 
     { "nl0.pgm", "nr0.pgm"}, 
@@ -59,8 +58,8 @@ int main(int args, char ** argv) {
         left_pyramid[i+1].shrinkPicture(left_pyramid[i+1].lab, left_pyramid[i].lab, left_pyramid[i].H, left_pyramid[i].W);
         right_pyramid[i+1].shrinkPicture(right_pyramid[i+1].lab, right_pyramid[i].lab, right_pyramid[i].H, right_pyramid[i].W);
       }
-      save_image_rgb(shrinkname[i+1][0], left_pyramid[i+1].rgb, 
-          left_pyramid[i+1].H, left_pyramid[i+1].W);
+      /*save_image_rgb(shrinkname[i+1][0], left_pyramid[i+1].rgb, 
+          left_pyramid[i+1].H, left_pyramid[i+1].W);*/
     }
 
 timer.reset();
@@ -84,9 +83,9 @@ timer.reset();
         left[idx].buildForest(0.95, use_lab);
         left[idx].initDisparity();
         updateTable(255 * 0.1);
-        left[idx].steroMatch(right[idx], 1, use_lab);
+        left[idx].stereoMatch(right[idx], 1, use_lab);
         misc::median_filter(left[idx].disparity, left[idx].H, left[idx].W, 3);
-        save_image(layername[lvl][0], left[idx].disparity, left[idx].H, left[idx].W, scale * (1 << lvl));
+        //save_image(layername[lvl][0], left[idx].disparity, left[idx].H, left[idx].W, scale * (1 << lvl));
     } // end of layer iteration.
 
 timer.check("all");

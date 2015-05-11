@@ -1,7 +1,7 @@
 
-#include "settings.h"
-#include "iomanager.h"
-#include "misc.cpp"
+#include "settings.hpp"
+#include "iomanager.hpp"
+#include "misc.hpp"
 
 Picture ref;
 BytArray out;

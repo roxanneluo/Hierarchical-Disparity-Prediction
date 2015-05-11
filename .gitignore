@@ -5,6 +5,7 @@
 *.lo
 *.h.gch
 *.swp
+*.swo
 *.old
 *.DS_Store
 
@@ -27,7 +28,6 @@
 
 #test data
 test.cpp
-testdata*
 *.zip
 *.ppm
 *.pgm
@@ -44,7 +44,7 @@ bin/results of generated small Given Large*
 code/code-probability/matlab/data*
 
 # results
-results/*
 *.log
 log*
 *.txt
+*.html

@@ -1,5 +1,0 @@
-all : stable_RAND stable_MST
-stable_RAND :
-	g++ code/stablepoints_rand.cpp -o bin/Stable_RAND.out -O2 -Wall -std=c++0x
-stable_MST :
-	g++ code/stablepoints_MST.cpp -o bin/Stable_MST.out -O2 -Wall -std=c++0x
