@@ -1,6 +1,4 @@
-// This code is for dpf with ST
-
-// !!! be care with the includes !!!!!!1
+// !!! be care with the includes !!!!!!
 
 #include <string>
 #include "settings.hpp" // the global variables, the constants, the array size 
@@ -10,9 +8,8 @@
 #include "prediction.hpp" // the prediction model
 
 #include "image_layer.hpp"
-#include "tree_dp_mst_rt.hpp" // the declaration of 'BigObject'
+#include "tree_dp_mst.hpp" // the declaration of 'BigObject'
 #include "extra.hpp"
-#include "tree_dp_mst.cpp"
 
 #include "timekeeper.hpp"
 #include "statistics.hpp"
@@ -25,10 +22,10 @@ TimeKeeper timer;
 
 const int OBJ_NUM = 2;
 
-ImageLayer left_pyramid[levels], right_pyramid[levels];
 BytArray gnds[levels];
 int gnd_h[levels], gnd_w[levels];
-BigObject left[OBJ_NUM], right[OBJ_NUM];
+ImageLayer left_pyramid[levels], right_pyramid[levels];
+DPMSTBigObject left[OBJ_NUM], right[OBJ_NUM];
 
 const char layername[LEVELS][2][100] = { 
     { "nl0.pgm", "nr0.pgm"}, 

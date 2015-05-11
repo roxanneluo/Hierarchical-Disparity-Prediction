@@ -5,9 +5,8 @@
 #include "prediction.hpp" // the prediction model
 
 #include "image_layer.hpp"
-#include "tree_dp_mst_rt.hpp" // the declaration of 'BigObject'
 #include "extra.hpp"
-#include "tree_dp_rt.cpp"
+#include "tree_dp_rt.hpp"
 
 #include "timekeeper.hpp"
 
@@ -16,7 +15,7 @@ TimeKeeper timer;
 const int OBJ_NUM = 2;
 
 ImageLayer left_pyramid[levels], right_pyramid[levels];
-BigObject left[OBJ_NUM], right[OBJ_NUM];
+DPRTBigObject left[OBJ_NUM], right[OBJ_NUM];
 
 const char layername[LEVELS][2][100] = { 
     { "nl0.pgm", "nr0.pgm"}, 

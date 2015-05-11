@@ -12,11 +12,12 @@ bool smaller_edge(const Edge & a, const Edge & b)
 
 class TreeNode {
 public :
-	int x, y, id ; // id = its index in an array
-	int ord, up_weight; // the bfs order and the edge weight to parent after direct tree constructed
-	TreeNode() {}
-	TreeNode(int a, int b) : x(a) , y(b) {}
+    int x, y, id ; // id = its index in an array
+    int ord, up_weight; // the bfs order and the edge weight to parent after direct tree constructed
     int degree, next_node[4], edge_weight[4];
+    TreeNode() : degree(0), ord(-1) {}
+    TreeNode(int a, int b)
+      : x(a) , y(b), degree(0), ord(-1) {}
     void add_edge(int node, int weight);
 };
 

@@ -1,38 +1,17 @@
 #ifndef __BIG_OBJECT__
 #define __BIG_OBJECT__
-
-#include <cstdlib>
-#include <cstdio>
-#include <algorithm>
-#include <ctime>
-#include <cmath>
-
 #include "settings.hpp"
 #include "misc.hpp" 
-#include "image_layer.hpp"
 #include "tree_common.hpp"
-
-#define MAX_TOLERANCE 7
-
-class Interval {
-public :
-    int l, r;
-    Interval() : l(0), r(-1)  {}
-    Interval(int a, int b) : l(a), r(b) {}
-    Interval cap(Interval b) { return Interval(misc::max(l, b.l), misc::min(r, b.r)); }
-    // problem in cup : the Intervals must NOT be DISJOINT !!
-    Interval cup(Interval b)  { return Interval(misc::min(l, b.l), misc::max(r, b.r)); } 
-    int length() { return r - l + 1;  }  //  r - l - 1;  or r - l ??
-};
-
-class MergeSet;
+#include "merge_set.hpp"
+#include "extra.hpp"
+#include "image_layer.hpp"
 
 class BigObject {
-  private :
+  protected :
     int m; // number of edges
     int ts; // number of tree edges
-    inline void node_location(int p, int &x, int &y) {--p; x = p / W; y = p % W; }
-	  MergeSet mset; // for buiding the tree
+    MergeSet *mset; // for buiding the tree
     Edge edges[NODES * 2]; // all candidate edges  1-based
     Edge trees[NODES]; // collected tree edges 1-based
 
@@ -40,27 +19,20 @@ class BigObject {
     bool visited[NODES];
 	  int order[NODES]; // the sequence of index, the visiting order of the tree
 	  int orderX[NODES], orderY[NODES];
-    int numOT, oneTree[NODES][2];
 
-
-	  FloArrayPtr gradient;
-    double best_cost[NODES], backup[NODES], cost[NODES];  
+	  FloArrayPtr gradient;  
+    double best_cost[NODES], cost[NODES], backup[NODES]; // no idea 
     int stable[NODES]; // can be 16-bit signed
 
-	  void prepare_visit();  // construct the bfs order for the forest
-    void updateDisparity(int d, int low, int high);
+    virtual void prepare_visit();  // construct the bfs order for the forest 
+    virtual void collect_edges(); // collect all the edges. 
+    virtual void collect_lab_edges(); // collect all the edges.
+    virtual void build_tree(); // build the tree given all the collected edges. 
+    virtual void compute_cost_on_tree(int low = 1, int high = -1);
+    virtual void update_disparity(int d, int low = 1, int high = -1);
+    inline void node_location(int p, int &x, int &y) {--p; x = p / W; y = p % W; }
+    inline int node_number(int x, int y) { return x * W + y + 1; }
 
-    Interval itv[NODES];
-
-  protected:
-    void collect_edges(); // collect all the edges.
-    void collect_lab_edges(); // collect all the edges.
-    void build_tree(double threshold); // build the tree given all the collected edges.
-    void computeFirstCost (int d, BigObject & right, int low, int high) ;
-    void computeFirstLabCost (int d, BigObject & right, int low, int high) ;
-	  void compute_cost_on_tree(int low, int high);
-    void updateMatchingCost(int disp, int low, int high);
-   
   public :
     int H, W; // graph size, height and width
     int n; // number of nodes
@@ -68,26 +40,42 @@ class BigObject {
     FloPicturePtr lab; 
     BytArray disparity; 
 
-    BigObject() { rgb = NULL; lab = NULL; }
-    BigObject(ImageLayer & image_layer) { init(image_layer); }
+    BigObject(MergeSet * merge_set)
+      :mset(merge_set) {rgb = NULL; lab = NULL;}
+    BigObject(MergeSet *merge_set, ImageLayer & image_layer)
+    :mset(merge_set), H(image_layer.H), W(image_layer.W)
+    { init(image_layer); }
+
     void init(ImageLayer& image_layer);
     void initDisparity();
-    void buildForest(double threshold, bool use_lab);
-    void stereoMatch(BigObject &ref, int sign, bool use_lab);
-    void refinement();
+    void buildTree(bool use_lab = false);
+    void updateMatchingCost(int disp, int low = 1, int high = -1);
+    void copyLeftCostToRight (int d, BigObject & left, int low = 1, int high = -1);
+    void computeFirstCost (int d, BigObject & right, int low = 1, int high = -1) ;
+    void computeFirstLabCost (int d, BigObject & right, int low = 1, int high = -1) ;
+    void stereoMatch(BigObject &ref, int sign, int max_disparity, 
+        bool use_lab = false); // 
 
-    void readPrediction(BytArray disp);
-    void noPrediction(int max_disp);
 
-    inline int node_number(int x, int y) const { return x * W + y + 1; }
+    friend void findStablePixels(BigObject & left, BigObject & right);
+    friend void updateMatchingCost(int disp, BigObject & left, BigObject & right);
 };
 
-// implement the common BigObject function 
+void BigObject::init(ImageLayer & image_layer) {
+  rgb = image_layer.rgb;
+  lab = image_layer.lab;
+  H = image_layer.H;
+  W = image_layer.W;
+  n = H*W;
+  gradient = image_layer.gradient;
+}
 
 const double max_gradient_color_difference= 2.0;
 const double max_color_difference = 10.0;
 const double weight_on_color = 0.11;
-void BigObject::computeFirstCost (int d, BigObject & right, int low, int high) { 
+void BigObject::computeFirstCost (int d, BigObject & right,
+    int low, int high) { 
+    if (high < 0) high = n;
 	// only the cost for disparity d.
 	// printf("%d %d\n", low, high);
      for (int i = low; i <= high; ++i) {
@@ -105,6 +93,7 @@ void BigObject::computeFirstCost (int d, BigObject & right, int low, int high) {
 }
 
 void BigObject::computeFirstLabCost (int d, BigObject & right, int low, int high) { 
+    if (high < 0) high = n;
   //printf("Comp, trueuting first cost\n");
 	// only the cost for disparity d.
     for (int i = low; i <= high; ++i) {
@@ -124,29 +113,8 @@ void BigObject::computeFirstLabCost (int d, BigObject & right, int low, int high
     }
 }
 
-void BigObject::collect_edges() {
-    n = H * W;
-    int k = 0;
-    for (int i = 0; i < H; ++i)
-    for (int j = 0; j < W; ++j)
-        for (int p = 0; p < 2; ++p)
-        for (int q = 0; q < 2; ++q) if (p + q == 1)
-        if (i + p < H && j + q < W) {
-            int xx = node_number(i, j), yy = node_number(i+p, j+q), ww = 0;
-            for (int c = 0; c < 3; ++c) 
-                ww = misc::max(ww, misc::abs(rgb[i][j][c] - rgb[i+p][j+q][c]));
-            if (itv[xx].cap(itv[yy]).length() > 0 || ww <= MAX_TOLERANCE) {
-                edges[++k].a = xx;
-                edges[k].b = yy;
-                edges[k].weight = ww;
-            }
-        }
-    m = k;
-}
-
 void BigObject::prepare_visit() {
     //next part would reorganize the tree
-    numOT = 0;
     for (int i = 1; i <= n; ++i) {
         nodes[i].id = i;
         nodes[i].degree = 0;
@@ -173,7 +141,6 @@ void BigObject::prepare_visit() {
 				orderY[++numy] = nodes[root].y;	
         nodes[root].ord = num;
         nodes[root].up_weight = 0;
-        oneTree[++numOT][0] = num; // 
         for (int i = num; i <= num; ++i) { // this is a bfs
             int t = order[i];
             for (int j = 0; j < nodes[t].degree; ++j) {
@@ -188,14 +155,50 @@ void BigObject::prepare_visit() {
                 }
             }
         } // end for bfs
-        oneTree[numOT][1] = num;
     }// end for finding a root
 }
+// In the following functions, 
+// I put left and right together to save the ij iterations.
+// this is inside the 0-maxdisparity iteration, so I need to save it.
 
+void BigObject::initDisparity() {
+    for (int i = 1; i <= n; ++i) 
+        best_cost[i] = 1e30;
+}
+
+// winner takes all
+void BigObject::update_disparity(int d, int low, int high) {
+    if (high < 0) high = n;
+    for (int u = low; u <= high; ++u) {
+        // int i = nodes[order[u]].x;
+        // int j = nodes[order[u]].y;
+        int t = order[u];
+        if (cost[t] < best_cost[t]) {
+            best_cost[t] = cost[t];
+            // disparity[/*nodes[t].x*/orderX[u]][/*nodes[t].y*/orderY[u]] = d;
+            disparity[orderX[u]][orderY[u]] = d;
+        }
+    }
+}
+
+void BigObject::updateMatchingCost(int disp, int low, int high) {
+    // If (i,j) is an unstable pixel, cost is 0 for all disparities.
+    // Otherwise update it.
+    if (high < 0) high = n;
+    for (int u = low; u <= high; ++u) {
+        // int i = nodes[order[u]].x;
+        // int j = nodes[order[u]].y;
+        int t = order[u];
+        if (stable[t] >= 0) 
+           cost[t] = misc::abs(disp - stable[t]);
+        else cost[t] = 0;
+    }
+}
 
 void BigObject::compute_cost_on_tree(int low, int high) {
     // order[low .. high] is a connected tree.
 
+    if (high < 0) high = n;
     for (int u = low; u <= high; ++u) 
         backup[order[u]] = cost[order[u]];
 
@@ -223,81 +226,50 @@ void BigObject::compute_cost_on_tree(int low, int high) {
     }
 } // compute cost on a little tree
 
+void BigObject::copyLeftCostToRight(int d, BigObject & left, int low, int high) {
+  if(high < 0) high = n;
 
-// winner takes all
-void BigObject::updateDisparity(int d, int low, int high) {
-    for (int u = low; u <= high; ++u) {
-        // int i = nodes[order[u]].x;
-        // int j = nodes[order[u]].y;
-        int t = order[u];
-        if (cost[t] < best_cost[t]) {
-            best_cost[t] = cost[t];
-            // disparity[/*nodes[t].x*/orderX[u]][/*nodes[t].y*/orderY[u]] = d;
-            disparity[orderX[u]][orderY[u]] = d;
-        }
-    }
+  int x,y, where;
+  for (int i = low; i <= high; ++i) {
+    x = orderX[i], y = orderY[i];
+    where = y+d;
+    if (where < W) cost[order[i]] = left.cost[node_number(x,where)];
+    else cost[order[i]] = left.cost[node_number(x, W-1)];
+  }
 }
 
-void BigObject::updateMatchingCost(int disp, int low, int high) {
-    // If (i,j) is an unstable pixel, cost is 0 for all disparities.
-    // Otherwise update it.
-    for (int u = low; u <= high; ++u) {
-        // int i = nodes[order[u]].x;
-        // int j = nodes[order[u]].y;
-        int t = order[u];
-        if (stable[t] >= 0) 
-           cost[t] = misc::abs(disp - stable[t]);
-        else cost[t] = 0;
-    }
+/*
+void BigObject::copyLeftCostToRight(int d, BigObject & left) {
+  for (int x = 0; x < H; ++x) {
+	  for (int y = 0; y < W; ++y) {
+		  int where = y + d;
+      if (where < W) cost[x][y] = left.cost[x][y]; // I think it should be left.cost[x][where]
+			else cost[x][y] = cost[x][y - 1];
+		}
+	}
 }
+TODO
+*/ 
 
 
-void BigObject::initDisparity() {
-    for (int i = 0; i <= n; ++i) 
-        best_cost[i] = 1e30;
-}
-
-void BigObject::noPrediction(int max_disp) {
-    for (int i = H * W; i >= 0; --i) {
-        itv[i].l = 0;
-        itv[i].r = max_disp - 1;
-    }
-}
-
-void BigObject::readPrediction(BytArray disp) {
+void BigObject::collect_edges() {
+    n = H * W;
+    //m = 2 * H * W - H - W;
+    int k = 0;
     for (int i = 0; i < H; ++i)
-        for (int j = 0; j < W; ++j) {
-            itv[node_number(i, j)].l = DP::interval[disp[i / 2][j / 2]][0];
-            itv[node_number(i, j)].r = DP::interval[disp[i / 2][j / 2]][1];
+    for (int j = 0; j < W; ++j)
+        for (int p = 0; p < 2; ++p)
+        for (int q = 0; q < 2; ++q) if (p + q == 1)
+        if (i + p < H && j + q < W) {
+            ++k;
+            edges[k].a = node_number(i, j);
+            edges[k].b = node_number(i+p, j+q);
+            edges[k].weight = 0;
+            for (int c = 0; c < 3; ++c) 
+                edges[k].weight = misc::max(
+                    edges[k].weight, misc::abs(rgb[i][j][c] - rgb[i+p][j+q][c]));
         }
-}
-
-void BigObject::buildForest(double threshold, bool use_lab = true) {
-    if (use_lab)
-      collect_lab_edges();
-    else
-      collect_edges();
-    build_tree(threshold);
-    prepare_visit();
-}
-
-void BigObject::stereoMatch(BigObject &ref, int sign, bool use_lab = true) {
-    // sign is a thing for the first cost.
-    for (int i = 1; i <= numOT; ++i) {
-        Interval treeInterval = itv[mset.find(order[oneTree[i][0]])];
-        int low = oneTree[i][0], high = oneTree[i][1];
-        // printf("treeInterval %d %d\n", treeInterval.l, treeInterval.r);
-        for (int d = treeInterval.l; d <= treeInterval.r; ++d) {
-            // timer.check("first cost"); 
-            if (use_lab)
-              computeFirstLabCost(d * sign, ref, low, high); // sign is used here
-            else 
-              computeFirstCost(d * sign, ref, low, high); // sign is used here
-            compute_cost_on_tree(low, high);
-            // timer.check("cost on tree");
-            updateDisparity(d, low, high);
-        }
-    }
+    m = k;
 }
 
 void BigObject::collect_lab_edges() {
@@ -315,33 +287,82 @@ void BigObject::collect_lab_edges() {
                 ww += diff * diff;
             }
             ww = sqrt(ww)/80*255;
-            if (itv[xx].cap(itv[yy]).length() > 0 || ww <= MAX_TOLERANCE) {
-                edges[++k].a = xx;
-                edges[k].b = yy;
-                edges[k].weight = ww;
-            }
+            edges[++k].a = xx;
+            edges[k].b = yy;
+            edges[k].weight = ww;
         }
     m = k;
 }
 
+void BigObject::build_tree() {
+    //std::sort(edges + 1, edges + m + 1, smaller_edge);
+    extra::sort(edges, 1, m);
+    mset->init(n); ts = 0;
+    for (int i = 1; i <= m; ++i)
+        if (mset->merge(edges[i].a, edges[i].b)) {
+            trees[++ts] = edges[i];
+        }
+}
 
-void BigObject::refinement() {
-    for (int i = 1; i <= numOT; ++i) {
-         Interval treeInterval = itv[mset.find(order[oneTree[i][0]])];
-         int low = oneTree[i][0], high = oneTree[i][1];
-         for (int d = treeInterval.l; d <= treeInterval.r; ++d) {
-             updateMatchingCost(d, low, high);
-             compute_cost_on_tree(low, high);
-             updateDisparity(d, low, high);
-         }
+void BigObject::buildTree(bool use_lab) {
+    if (use_lab) collect_lab_edges();
+    else collect_edges();
+	  build_tree();
+	  prepare_visit();;
+}
+
+void BigObject::stereoMatch(BigObject &ref, int sign, int max_disparity,
+    bool use_lab) {
+    // sign is a thing for the first cost.
+    for (int d = 0; d <= max_disparity; ++d) {
+        // timer.check("first cost"); 
+        if (use_lab) computeFirstLabCost(d * sign, ref); // sign is used here
+        else computeFirstCost(d * sign, ref); // sign is used here
+        compute_cost_on_tree();
+        // timer.check("cost on tree");
+        update_disparity(d);
     }
 }
 
-void BigObject::init(ImageLayer & image_layer) {
-  H = image_layer.H;
-  W = image_layer.W;
-  rgb = image_layer.rgb;
-  lab = image_layer.lab;
-  gradient = image_layer.gradient;
+
+
+/*******************
+ * for both left and right
+ */
+void updateMatchingCost(int disp, BigObject & left, BigObject & right) {
+    // If (i,j) is an unstable pixel, cost is 0 for all disparities.
+    // Otherwise update it.
+    int H = left.H, W = right.W;
+    int idx;
+    for (int i = 0; i < H; ++i) 
+        for (int j = 0; j < W; ++j) {
+            idx = left.node_number(i,j);
+            if (left.stable[idx] >= 0) 
+                left.cost[idx] = misc::abs(disp - left.stable[idx]);
+            else left.cost[idx] = 0;
+
+            if (right.stable[idx] >= 0) 
+                right.cost[idx] = misc::abs(disp - right.stable[idx]);
+            else right.cost[idx] = 0;
+        }
 }
+
+
+void findStablePixels(BigObject & left, BigObject & right) {
+    int idx;
+    for (int i = 0; i < left.H; ++i)
+        for (int j = 0; j < right.W; ++j) {
+            idx = left.node_number(i,j);
+            int d = left.disparity[i][j];
+            left.stable[idx] = left.disparity[i][j]; // if stable[i][j] = -1, then it is not stable
+            if (j - d < 0 || d == 0 || misc::abs(right.disparity[i][j - d] - d) >= 1) 
+                left.stable[idx] = -1;
+            d = right.disparity[i][j];
+            right.stable[idx] = right.disparity[i][j];
+            if (j + d >= left.W || d == 0 || misc::abs(left.disparity[i][j + d] - d) >= 1) 
+                right.stable[idx] = -1;
+        }
+}
+            
+
 #endif

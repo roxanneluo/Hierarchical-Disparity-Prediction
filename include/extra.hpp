@@ -1,6 +1,8 @@
 #ifndef EXTRA_FEATURES_LEEEEEROY_JENKINS_IH98343uhioj2b3ofu
 #define EXTRA_FEATURES_LEEEEEROY_JENKINS_IH98343uhioj2b3ofu
 
+#include "tree_common.hpp"
+
 namespace extra {
 
 Edge swapping[NODES * 2];

@@ -1,50 +1,35 @@
 #ifndef BASIC_CODE_FOR_DPFkjniluh3u98jf9p8
 #define BASIC_CODE_FOR_DPFkjniluh3u98jf9p8
 
-// this code is for dpf + MST
-
 #include <algorithm>
-#include "extra.hpp"
-// TimeKeeper	timer;
+#include "dp_big_object.hpp"
 
-int MergeSet::find(int x) {
-    if (f[x] != x) 
-        f[x] = find(f[x]);
-    return f[x];
-}
+class DPRTBigObject: public DPBigObject {
+ public:
+  DPRTBigObject():DPBigObject(new MergeSet) {}
+  DPRTBigObject(ImageLayer &image_layer)
+    :DPBigObject(new MergeSet, image_layer) {}
+  
+  void build_tree(double threshold);
+};
 
-
-
-void MergeSet::init(int x) {
-    n = x;
-    for (int i = 0; i <= n; ++i) f[i] = i;
-}
-
-bool MergeSet::merge(int a, int b) {
-    if (find(a) != find(b)) { 
-        f[find(a)] = find(b);
-        return true;
-    } else
-    return false;
-}
-
-void BigObject::build_tree(double threshold) {
+void DPRTBigObject::build_tree(double threshold) {
 
     //std::sort(edges + 1, edges + m + 1, smaller_edge); 
-    extra::sort(edges, 1, m);
-    //std::random_shuffle(edges + 1, edges + m + 1);
-    mset.init(n); ts = 0;
+    //extra::sort(edges, 1, m);
+    std::random_shuffle(edges + 1, edges + m + 1);
+    mset->init(n); ts = 0;
     for (int i = 1; i <= m; ++i) {
-        Interval t1 = itv[mset.find(edges[i].a)];
-        Interval t2 = itv[mset.find(edges[i].b)];
+        Interval t1 = itv[mset->find(edges[i].a)];
+        Interval t2 = itv[mset->find(edges[i].b)];
         Interval t3 = t1.cap(t2);
         Interval t4 = t1.cup(t2);
         double tmp = t3.length();
         tmp /= t4.length(); 
         if ( tmp < threshold ) continue;
-        if (mset.merge(edges[i].a, edges[i].b)) {
+        if (mset->merge(edges[i].a, edges[i].b)) {
             trees[++ts] = edges[i];
-            itv[mset.find(edges[i].a)] = t4; 
+            itv[mset->find(edges[i].a)] = t4; 
         }
     }
 }

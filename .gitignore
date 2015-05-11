@@ -5,6 +5,7 @@
 *.lo
 *.h.gch
 *.swp
+*.swo
 *.old
 *.DS_Store
 

@@ -1,55 +1,38 @@
 #include "settings.hpp" // the global variables, the constants, the array size 
 #include "misc.hpp" // misc. 
 #include "iomanager.hpp" // read and write pictures.
-#include "tree_mst_rt.hpp" // the declaration of 'BigObject'
+#include "tree_rt.hpp"
 #include "extra.hpp"
-#include "tree_rt.cpp"
 #include "ctmf.h"
 #include "timekeeper.hpp"
 
-BigObject left, right;
+ImageLayer left_layer, right_layer;
+RTBigObject left, right;
 
 TimeKeeper timer;
 
-// consider merging trunk and branch pal
 int main(int args, char ** argv) {
     misc::process_args(args, argv);
-    load_image(file_name[0], left.rgb, left.H, left.W);
-    load_image(file_name[1], right.rgb, right.H, right.W);
+    load_image(file_name[0], left_layer.rgb, left_layer.H, left_layer.W);
+    load_image(file_name[1], right_layer.rgb, right_layer.H, right_layer.W);
+    left.init(left_layer); right.init(right_layer);
     timer.reset();
 
-    misc::median_filter_rgb(left.rgb, left.H, left.W, 1);
+    //misc::median_filter_rgb(left.rgb, left.H, left.W, 1);
     //misc::median_filter_rgb(right.rgb, right.H, right.W, 1);
-	// next part build the trees
-	left.collect_edges();
-	left.build_tree();
-	left.prepare_visit();;
-	
-	//right.collect_edges();
-	//right.build_tree();
-	//right.prepare_visit();
-    
-    load_image(file_name[0], left.rgb, left.H, left.W);
-    //load_image(file_name[1], right.rgb, right.H, right.W);
-
-    left.compute_gradient();
-	right.compute_gradient();
-	
+    if (use_lab) {
+      left_layer.computeLab();
+      // misc::median_filter_rgb(left.lab, left.H, left.W, 1);
+    }
+    left.buildTree(use_lab);	
+    left_layer.computeGradient();
+    right_layer.computeGradient();
     // next part : compute disparity
-    initDisparity(left, right);
+    left.initDisparity();
     updateTable(255 * 0.1);
 // timer.check("build forest");
-    for (int d = 0; d <= max_disparity; ++d) {
-        left.computeFirstCost(d, right);
-        // right.copyLeftCostToRight(d, left);
-        // right.computeFirstCost(-d, left); // improvement can be done here
-// timer.check("first cost");
-        left.compute_cost_on_tree();
-        // right.compute_cost_on_tree();
-// timer.check("cost on tree");
-        updateDisparity(d, left, right);
-    }
-    misc::median_filter(left.disparity, left.H, left.W);
+    left.stereoMatch(right, 1, max_disparity, use_lab);    
+    misc::median_filter(left.disparity, left.H, left.W); //TODO: why radius = 2, not 3 as dp
 
 timer.check("all");
 	//save
