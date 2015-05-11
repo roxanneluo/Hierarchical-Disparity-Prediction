@@ -70,8 +70,8 @@ To run them,
 - `UseLab` is 1 if you want to use LAB color space in defining the matching cost and
 edge weights, and is 0 otherwise
 
-`Dataset` and `UseLab` would be neglected if you run `mst.out` or `st.out` or
-`rt.out`.
+`Dataset` would be neglected if you run `mst.out` or `st.out` or
+`rt.out`, but it has to be provided if you want to specify `use_lab`.
 
 Default values for the optional arguments:
 
