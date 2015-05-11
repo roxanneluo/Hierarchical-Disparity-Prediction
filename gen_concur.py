@@ -11,6 +11,7 @@ use_lab = sys.argv[5] if len(sys.argv) > 5 else 0
 
 dataset_table = {'halfsize':0, 'fullsize':1}
 
+out_folder = out_folder + '/' + dataset
 time_str = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
 support_folder = out_folder + '/support_test_' + time_str + '/'
 concur_folder = out_folder + '/concur_test_' + time_str + '/'
