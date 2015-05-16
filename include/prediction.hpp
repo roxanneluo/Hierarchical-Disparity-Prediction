@@ -82,6 +82,7 @@ void getProbMatrix(int layer, int h, int w, Dataset dataset) {
  * its difference between getInterval is that the expansion of 
  * interval won't stop if total <= tot_threshold
  */
+int max_prob_index[MAX_WIDTH];
 void getIntervalWithTotalThreshold(double threshold, double tot_threshold = 0.9) {
     double highest;
     int highest_index;
@@ -91,7 +92,7 @@ void getIntervalWithTotalThreshold(double threshold, double tot_threshold = 0.9)
         for (int j = 1; j <= width; ++j) {
             if (highest < prob_matrix[i][j]) {
                 highest = prob_matrix[i][j];
-                highest_index = j;
+                max_prob_index[i] = highest_index = j;
             }
         }
         if (dcmp(highest, 0.0) == 0) {
