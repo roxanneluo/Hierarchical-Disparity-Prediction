@@ -1,6 +1,20 @@
 # Fast Non-local Stereo Matching based on Hierarchical Disparity Prediction
+##INSTALL DEPENDENCIES
+1. libpng
+2. python
+3. g++
 
 ##USAGE
+
+Let `$ROOT_DIR` be the root directory of this project.
+### Obtain testdata
+```
+cd $ROOT_DIR
+wget http://bcmi.sjtu.edu.cn/~luoxuan/iccv2015/testdata_iccv2015.zip
+unzip testdata_iccv2015.zip
+rm testdata_iccv2015.zip
+```
+then the datasets would be saved in folder `testdata`.
 
 ### The Simplest Way
 First run `make all`.
@@ -10,19 +24,21 @@ First run `make all`.
 
       `python run_single.py Algo Dataset Testcase Tolerance1 [Tolerance2] [Tolerance3]...`
 
+      e.g., `python run_single.py Algo halfsize Aloe 1 2`.
+
       Arguments:
-      - `Algo.out`: the name of the algorithm. Replace *Algo* with mst, st, rt or
+      - `Algo.bin`: the name of the algorithm. Replace *Algo* with mst, st, rt or
   dp\_mst, dp\_st, dp\_rt
       - `Dataset`: the index for the dataset and it is used to switch which GMM
 model to use. Here halfsize is 0 and fullsize is 1. 
       - `Testcase`: eg., Aloe, Baby1, ...
 To run on a single testcase,
-      - `Tolerance*`[int]: Note that the *OutputDisparity = ComputedDisparity \*
-        Scale*. *|OutputDisparity - GNDDisparity| >= Scale \* Tolence* is regarded erroneous.
+      - `Tolerance*`[int]: Note that the OutputDisparity = ComputedDisparity \*
+        Scale. |OutputDisparity - GNDDisparity| >= Scale \* Tolence is regarded erroneous.
 
       Outputs:
       - `results/Dataset/Testcase_left_Algo.pgm`: Left output disparity map.
-      - `results/Dataset/err_Testcase_left_Algo_Tolerance*.ppm`: Error Map for
+      - `results/Dataset/err_Tolerance*_Testcase_left_Algo.ppm`: Error Map for
         each Tolerance. Erroneous pixels are shown in red if they are closer 
         than gnd and in green if they are farther than gnd.
 
@@ -34,6 +50,8 @@ To run on a single testcase,
     space in `CHECKER` and `use_lab`. Run
 
       `python -u super_run_nonocc.py Tolerance HTMLPre Dataset1 [Dataset2] ... |tee results/LogFileName`,
+
+      e.g., `python -u super_run_nonocc.py 1 test halfsize |tee results/Log_test_err_ge_1_halfsize.txt`,
   
       then the HTML file would be saved at
         `results/SuperReport_HTMLPre_err_ge_Tolerance_Dataset1[_Dataset2_...].html` and the stdout would be saved at
@@ -42,9 +60,13 @@ To run on a single testcase,
 
   `python run_all_kitti.py Algo MaxDisparity Scale`
 
+  e.g., `python run_all_kitti.py dp_mst 160 1`
+
 3. For waseda (Low-quality dataset), run
 
   `python run_all_waseda.py Algo MaxDisparity Scale`
+
+  e.g., `python run_all_waseda.py Algo 31 8`
 
 In the sequel, we give more detailed description of the codes.
 
@@ -67,6 +89,8 @@ To run them,
 `./Algo.bin LeftInput.ppm RightInput.ppm MaxDisparity [Scale] [LeftOutput.pgm]
 [Dataset] [UseLab]`
 
+e.g., `./dp_mst.bin testdata/halfsize/Aloe/left.ppm testdata/halfsize/Aloe/right.ppm 135 2 results/halfsize/Aloe_left_dp_mst.pgm 0 0`.
+
 - `UseLab` is 1 if you want to use LAB color space in defining the matching cost and
 edge weights, and is 0 otherwise
 
@@ -88,9 +112,9 @@ To obtain the error rate in the nonoccluded regions, make and run it:
 
 ```
 make checker
-./bin/checker/checker_nonocc.bin LeftOutput.pgm GNDLeftDisp.pgm
-GNDRightDisp.pgm Tolerance Scale [ErrMap] [ErrAllRed]`.
+./bin/checker/checker_nonocc.bin LeftOutput.pgm GNDLeftDisp.pgm GNDRightDisp.pgm Tolerance Scale [ErrMap] [ErrAllRed].
 ```
+e.g., `./bin/checker/checker_nonocc.bin results/halfsize/Aloe_left_dp_mst.pgm testdata/halfsize/Aloe/displeft.pgm testdata/halfsize/Aloe/dispright.pgm 1 2 results/halfsize/err_1_Aloe_left_dp_mst.ppm`.
 
 - `GNDLeftDisp.pgm`, `GNDRightDisp.pgm`: the ground truth disparity map for the left and right images.
 - `Tolerance`[int]: |OutputDisparity - GNDDisparity| >= Scale \* Tolence is regarded erroneous.
@@ -116,8 +140,14 @@ These codes are in `gen_data`. Make and run them:
 
 ```
 make gen_data
-./bin/gen_data/gen_concur_dp_Algo.bin LeftInput.ppm RightInput.ppm MaxDisparity
-Scale GNDLeftDisparityMap Dataset Algo ConcurFolder SupportFolder
+./bin/gen_data/gen_concur_dp_Algo.bin LeftInput.ppm RightInput.ppm MaxDisparity Scale GNDLeftDisparityMap Dataset Algo ConcurFolder SupportFolder
+```
+
+e.g.,
+```
+make gen_data
+mkdir -p results/stat/ && mkdir -p results/stat/concur_test && mkdir -p results/stat/support_test
+./bin/gen_data/gen_concur_dp_mst.bin testdata/halfsize/Aloe/left.ppm testdata/halfsize/Aloe/right.ppm 135 2 testdata/halfsize/Aloe/displeft.pgm halfsize mst results/stat/halfsize/concur_test resutls/stat/halfsize/support_test
 ```
 
 Outputs:
@@ -130,9 +160,16 @@ To run them on a whole dataset, run
 
 `python gen_concur.py Algo DatasetFolder ResultFolder Dataset [UseLab]`
 
+e.g., 
+
+```
+mkdir -p results/stat
+python gen_concur.py dp_mst testdata/halfsize results/stat halfsize
+```
+
 Arguments:
 
-- `DatasetFolder`: eg., testdata/fullsize
+- `DatasetFolder`: e.g., testdata/fullsize
 - `ResultsFolder`: *ConcurFolder* would be `ResultFolder/concur_CurrentDateTime/`
   and *SupportFolder* = `ResultFolder/support_CurrentDateTime/`. 
 
@@ -143,6 +180,7 @@ Arguments:
 3. Open Matlab, `cd matlab` and find the GMM
 
     `>> findGMMDrawPicForPaper(FullOrHalf, K, DatasetRatios, Times, Width);`
+    e.g., `>> findGMMDrawPicForPaper('halfsize', 4, [1 0.5 0.3], 20, 0.1);`
   
     Arguments:
 
@@ -165,6 +203,9 @@ To draw `PixelIntv_l`, `concur_l,{l-1}`, simulated and statistical (true) `P(D_l
 
 `>> drawPicsForPaper(HTMLNameSpec, FullOrHalf, Test, Draw, Save,
 Level, DatasetRatio)`
+
+e.g., `>> drawPicsForPaper('test', 'halfsize', false, true, true,
+3, 0.5)`
 
 Arguments:
 
