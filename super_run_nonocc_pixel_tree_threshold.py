@@ -87,8 +87,9 @@ for algoritm in ALGORITHMS :
     total = 0
     correct = 0
     temp0 = (correct, total)
+    table[algorithm]['Overall'] = 0
     for dataset in DATASETS :
-        table[algoritm][dataset] = {}
+        table[algorithm][dataset] = {'Overall':0}
         pic_names = subprocess.check_output(['ls', 'testdata/' + dataset + '/']).split()
         temp = (correct, total)
         for picture in pic_names :
@@ -96,8 +97,9 @@ for algoritm in ALGORITHMS :
             thepath = 'testdata/' + dataset + '/' + picture + '/'
             results = check_results(algoritm, thepath, dataset, picture)
             table[algoritm][dataset][picture] = results
-        table[algoritm][dataset]['Overall'] = [correct - temp[0], total - temp[1]]
-    table[algoritm]['Overall'] = [correct - temp0[0], total - temp0[1]]
+            table[algorithm][dataset]['Overall'] += results
+        table[algorithm][dataset]['Overall'] /= float(len(pic_names))
+    table[algorithm]['Overall'] /= float(len(DATASETS))
 
 print '\nDone.\n'
 
