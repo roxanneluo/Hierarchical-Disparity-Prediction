@@ -219,3 +219,13 @@ Arguments:
 - `Save`[bool]: The figures would be saved in folders `sgl`, `lgs`, `PixelIntv` and `concur` under folder `../results/pic/FullOrHalf/`.
 - `Level`[int]: number of layers.
 - `DatasetRatio`[double]: used to choose corresponding GMM.
+
+### Branches
+master: the up-to-date reliable core code
+real-reorganize: the up-to-date core code. possibly unreliable. If it is
+reliable, it gets merged with master.
+add-kitti-tool: contain kitti tools in addition to the core code, master.
+other-algo: contain others' related algorithms such as libelas in addition to
+add-kitti-tool
+
+
