@@ -52,3 +52,11 @@ log*
 # original code from their project page
 st-original-code/*
 mst-original-code/*
+
+# cmake
+*.bin
+*.cmake
+*.make
+*.internal
+*.marks
+*cache
