@@ -9,6 +9,7 @@
 #include "extra.hpp"
 
 #include "timekeeper.hpp"
+#include "forest.hpp"
 
 TimeKeeper timer;
 
@@ -45,7 +46,6 @@ int main(int args, char ** argv) {
         return 0;
     }
 
-timer.reset();
     if (use_lab) {
       left_pyramid[0].computeLab();
       right_pyramid[0].computeLab();
@@ -76,19 +76,21 @@ timer.reset();
             // left[idx].intersectInterval(left[(lvl + 1) % OBJ_NUM]);
         } 
         // Now use the INTERVAL to find the new disparities.
-        left_pyramid[lvl].computeGradient();
-        right_pyramid[lvl].computeGradient();
         left[idx].buildForest(tree_intv_threshold, use_lab);
-        left[idx].initDisparity();
-        updateTable(255 * 0.1);
-        left[idx].stereoMatch(right[idx], 1, use_lab);
-        misc::median_filter(left[idx].disparity, left[idx].H, left[idx].W, 3);
+        printf("layer %d: %f\n", lvl, Forest::get_avg_treeIntv(left[idx]));
+        printf("layer %d: %d %f\n", lvl, left[idx].numOfTree(), 
+            Forest::get_mean_treeIntv(left[idx]));
+
+        if (lvl > 0) {
+          left_pyramid[lvl].computeGradient();
+          right_pyramid[lvl].computeGradient();
+          left[idx].initDisparity();
+          updateTable(255 * 0.1);
+          left[idx].stereoMatch(right[idx], 1, use_lab);
+          misc::median_filter(left[idx].disparity, left[idx].H, left[idx].W, 3);
+        }
         //save_image(layername[lvl][0], left[idx].disparity, left[idx].H, left[idx].W, scale * (1 << lvl));
     } // end of layer iteration.
-
-timer.check("all");
-
-    save_image(file_name[2], left[0].disparity, left[0].H, left[0].W, scale);
 
     return 0;
 }

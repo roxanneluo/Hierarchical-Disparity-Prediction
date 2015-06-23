@@ -2,17 +2,35 @@
 #define INPUT_OUTPUT_MANAGER_MAR_2014
 
 #include <cstdio>
-#include <cstring>
+#include <string>
 #include <cctype>
 #include <fstream>
 #include <algorithm>
 #include <cassert>
+#include <png++/png.hpp>
 #include "settings.hpp"
+#include "io_disp.hpp"
 
+using std::string;
 const int BUF_LEN = MAX_WIDTH * MAX_HEIGHT * 3 + 2;
 unsigned char buff[BUF_LEN];
 
+void load_image_png(const char * filename, Picture rgb, int &H, int &W, int scale);
+void load_image_ppm(const char * filename, Picture rgb, int &H, int &W, int scale);
 void load_image(const char * filename, Picture rgb, int &H, int &W, int scale = 1) {
+  string name = filename;
+  int pos = name.find_last_of(".");
+  string type = name.substr(pos+1);
+  if (type == "ppm")
+    load_image_ppm(filename, rgb, H, W, scale);
+  else if (type == "png")
+    load_image_png(filename, rgb, H, W, scale);
+  else assert(false);
+}
+
+
+
+void load_image_ppm(const char * filename, Picture rgb, int &H, int &W, int scale = 1) {
     // return if it is successfull
     FILE * f = fopen(filename, "rb");
     int bytesread = fread(buff, 1, BUF_LEN, f);
@@ -52,8 +70,20 @@ void load_image(const char * filename, Picture rgb, int &H, int &W, int scale = 
 }
 
 template <typename Dtype>
-void load_image_gray(const char * filename, Dtype gray[][MAX_WIDTH], int &H, int &W,
+void load_image_gray_png(const char * filename, Dtype disp[][MAX_WIDTH], int &H, int &W, 
     int scale = 1) {
+  DisparityImage im(filename);
+  H = im.height();
+  W = im.width();
+  for (int i = 0; i < H; ++i)
+  for (int j = 0; j < W; ++j) {
+    disp[i][j] = im.getDisp(j,i)/ scale;
+  }
+}
+
+template <typename Dtype>
+void load_image_gray_pgm(const char * filename, Dtype gray[][MAX_WIDTH], 
+    int &H, int &W, int scale = 1) {
     // return if it is successfull
     FILE * f = fopen(filename, "rb");
     int bytesread = fread(buff, 1, BUF_LEN, f);
@@ -93,6 +123,19 @@ void load_image_gray(const char * filename, Dtype gray[][MAX_WIDTH], int &H, int
         }
 }
 
+template <typename Dtype>
+void load_image_gray(const char * filename, Dtype disp[][MAX_WIDTH], int &H, int &W, 
+    int scale = 1) {
+  string name = filename;
+  int pos = name.find_last_of(".");
+  string type = name.substr(pos+1);
+  if (type == "pgm")
+    load_image_gray_pgm(filename, disp, H, W, scale);
+  else if (type == "png")
+    load_image_gray_png(filename, disp, H, W, scale);
+  else assert(false);
+}
+
 /*
 void save_image(const char * filename, BytArray gray, int H, int W, int scale = 1) {
   std::ofstream fout(filename, std::ofstream::binary);
@@ -109,8 +152,46 @@ void save_image(const char * filename, BytArray gray, int H, int W, int scale = 
 }
 */
 
+void load_image_png(const char * filename, Picture rgb,int &H, int &W, int scale = 1) {
+  png::image< png::rgb_pixel > image(filename);
+  H = image.get_height();
+  W = image.get_width();
+  for (int i = 0; i < H; ++i)
+  for (int j = 0; j < W; ++j) {
+    png::rgb_pixel p = image.get_pixel(j,i);
+    rgb[i][j][0] = p.red / scale;
+    rgb[i][j][1] = p.green / scale;
+    rgb[i][j][2] = p.blue / scale;
+  }
+}
+
+
+void save_image_png(const char * filename, const BytArray disp, int H, int W, int scale = 1);
 template <typename Dtype>
-void save_image(const char * filename, Dtype gray[][MAX_WIDTH], int H, int W, int scale = 1) {
+void save_image_pgm(const char * filename, Dtype gray[][MAX_WIDTH], int H, int W, int scale = 1);
+void save_image(const char * filename, const BytArray disp, int H, int W, int scale = 1) {
+  string name = filename;
+  int pos = name.find_last_of(".");
+  string type = name.substr(pos+1);
+  if (type == "pgm")
+    save_image_pgm(filename, disp, H, W, scale);
+  else if (type == "png")
+    save_image_png(filename, disp, H, W,scale);
+  else
+    assert(false);
+}
+
+void save_image_png(const char * filename, const BytArray disp, int H, int W, int scale) {
+  DisparityImage im(W, H);
+  for (int i = 0; i < H; ++i)
+    for (int j = 0; j < W; ++j) {
+      im.setDisp(j,i, disp[i][j] * scale / 256.0);
+    }
+  im.write(filename);
+}
+
+template <typename Dtype>
+void save_image_pgm(const char * filename, Dtype gray[][MAX_WIDTH], int H, int W, int scale) {
     FILE * f = fopen(filename, "wb");
     fprintf(f, "P5\n");
     fprintf(f, "#Produced by my silly program\n");
@@ -140,10 +221,14 @@ void save_image_rgb(const char * filename, Picture rgb, int H, int W, int scale 
 }
 
 void rgb2gray(BytArray gray, const Picture rgb, int H, int W) {
+    int color_sum;
     for (int i = 0; i < H; ++i)
     for (int j = 0; j < W; ++j) {
-        assert(rgb[i][j][0] == rgb[i][j][1] && rgb[i][j][1] == rgb[i][j][2]);
-        gray[i][j] = rgb[i][j][0];  
+        //assert(rgb[i][j][0] == rgb[i][j][1] && rgb[i][j][1] == rgb[i][j][2]);
+        color_sum = 0;
+        for (int c = 0; c < 3; ++c)
+          color_sum += rgb[i][j][c];  
+        gray[i][j] = color_sum/3;
     }
 }
 
@@ -167,4 +252,6 @@ void save_matrix(const char * filename, Dtype * a, int h, int w) {
     }
     fout.close();
 }
+
+
 #endif

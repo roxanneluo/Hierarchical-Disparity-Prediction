@@ -1,14 +1,18 @@
 function [ratio, interval, err] = drawPicsForPaper(HTMLNameSpec,...
                                     full_or_half, test,draw, save,...
                                     level, datasetRatio)
-    path = sprintf('../results/pic/%s/', full_or_half);
+    path = sprintf('../results/matlab/pic/%s/', full_or_half);
     mkdir(path)
     mkdir([path 'sgl'])
     mkdir([path 'lgs'])
     mkdir([path 'PixelIntv'])
     mkdir([path 'concur'])
     
-    prec = 0.001;
+    if strcmp(full_or_half,'fullsize')
+      prec = 0.064;
+    else
+      prec = 0.004;
+    end
     pixelIntvOnly = false;
     times = 1;
     dataset = getDataSet(test, full_or_half);
@@ -42,7 +46,7 @@ function [ratio, interval, err] = drawPicsForPaper(HTMLNameSpec,...
        end
     end
     
-    HTMLNameSpec = sprintf('../results/%s %s prec=%f,datasetRatio=%f',...
+    HTMLNameSpec = sprintf('%s %s prec=%f,datasetRatio=%f',...
       HTMLNameSpec, full_or_half, prec, datasetRatio);
    
     genRatioHTMLReport(ratio, dataset, level, para, 'Uncover Ratio',HTMLNameSpec,'sigma');
@@ -248,8 +252,8 @@ function drawAll(A, largeGivenSmall, trueLargeGivenSmall, trueSmallGivenLarge,..
     end
     %f = figure(); 
     %filename = sprintf('%s_PixelIntv_{%d}',dataset, large);
-    %draw(pixelIntv, 1,1,1, filename, true,...
-    %     save,[path,'PixelIntv/']); 
+    draw(pixelIntv, 1,1,1, filename, true,...
+         save,[path,'PixelIntv/']); 
 %     figure();
 %     draw(largeGivenSmall, 1,1,1, [dataset,' largeGivenSmall ',suffix],false);
 %     figure();
@@ -267,7 +271,7 @@ function genRatioHTMLReport(ratio, dataset, level, para, prefix, nameSpec,paraNa
     avg = mean(avgEach,3);
     paraLen = size(para,2);
     dataSetSize = size(dataset,2);
-    f = fopen(['../results/', prefix,' Report ',nameSpec,'.html'],'w');
+    f = fopen(['../results/matlab/', prefix,' Report ',nameSpec,'.html'],'w');
     fprintf(f,'<!DOCTYPE html>\n<html>\n<body>\n');
     fprintf(f,['<h1>',prefix,' Report ',nameSpec,'</h1>\n']);
 %     avg------------------------------------------------------------------

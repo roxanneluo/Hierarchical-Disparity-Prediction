@@ -6,6 +6,8 @@
 
 import sys
 filename = sys.argv[1]
+times = int(sys.argv[2]) if len(sys.argv) > 2 else 100
+digit = int(sys.argv[3]) if len(sys.argv) > 3 else 1
 
 with open(filename, 'r') as f:
   line = f.readline()
@@ -13,10 +15,10 @@ with open(filename, 'r') as f:
     fields = line.split()
     testcase = fields[0]
     row = '{' + testcase + '}'
-    errs = [float(fields[i]) * 100 for i in range(1, len(fields))]
+    errs = [float(fields[i]) * times for i in range(1, len(fields))]
     for err in errs:
       row += ' & {'
-      row += '%.1f}' % err
+      row += ('%.'+str(digit) + 'f}') % err
     row += ' \\\\ \\hline'
     print row
     line = f.readline()

@@ -136,7 +136,7 @@ int main(int args, char ** argv) {
         // Now use the INTERVAL to find the new disparities.
         left_pyramid[lvl].computeGradient();
         right_pyramid[lvl].computeGradient();
-        left[idx].buildForest(0.95, use_lab);
+        left[idx].buildForest(tree_intv_threshold, use_lab);
         left[idx].initDisparity();
         updateTable(255 * 0.1);
         left[idx].stereoMatch(right[idx], 1, use_lab);

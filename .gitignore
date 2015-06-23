@@ -48,3 +48,7 @@ code/code-probability/matlab/data*
 log*
 *.txt
 *.html
+
+# original code from their project page
+st-original-code/*
+mst-original-code/*

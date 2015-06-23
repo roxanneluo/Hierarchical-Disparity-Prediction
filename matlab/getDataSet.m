@@ -60,5 +60,10 @@ function dataset = getDataSet(test, full_or_half)
       {'Wood1', 105}, ...
       {'Wood2', 127}, ...
     };
+  case 'kitti'
+      dataset = cell(1,194);
+      for i = 0:193
+        dataset{i+1} = {sprintf('000%.3d_10.png',i), 256};
+      end
   end
 end

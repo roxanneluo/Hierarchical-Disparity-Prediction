@@ -24,7 +24,7 @@ public :
     void check(const char * a) {
         if (! on) return;
         double now = clock();
-        printf("check point #%d - %s: %.3fs\n", ++checked,
+        printf("check point #%d - %s: %.10fs\n", ++checked,
                a, (now - last) / CLOCKS_PER_SEC);
         last = now;
     }

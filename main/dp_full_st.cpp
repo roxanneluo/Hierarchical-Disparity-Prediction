@@ -79,6 +79,7 @@ timer.reset();
         left_pyramid[lvl].computeGradient();
         right_pyramid[lvl].computeGradient();
         left[idx].buildForest(tree_intv_threshold, use_lab);
+        left[idx].noPrediction(max_disparity / (1 << lvl));
         left[idx].initDisparity();
         updateTable(255 * 0.1);
         left[idx].stereoMatch(right[idx], 1, use_lab);

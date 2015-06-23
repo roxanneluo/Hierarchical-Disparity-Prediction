@@ -42,11 +42,12 @@ namespace stat {
     misc::process_args(args, argv);
     int arg_idx = 5;
     gnd_left_disp_name = argv[arg_idx++];
-    arg_idx +=2;
+    arg_idx +=4;
     dataset_name = argv[arg_idx++];
     algo = argv[arg_idx++];
     concur_folder = argv[arg_idx++];
     support_folder = argv[arg_idx++];
   }
 }
+
 #endif

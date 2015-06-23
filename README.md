@@ -100,6 +100,9 @@ GNDRightDisp.pgm Tolerance Scale [ErrMap] [ErrAllRed]`.
   in red if they are closer than gnd and in green if they are farther than gnd.
   Erroneous pixels are all shown in red if *ErrAllRed* != 0.
 
+Another checker is `checker/checker_left_nonocc.cpp`, which compute the number
+of correct pixels and total number of pixels in non-occluded regions. Pixels
+with disparity > 0 are regarded non-occluded.
 
 ### Util
 Some codes that might be useful are in folder `util`. Fo example, all GND disparity maps

@@ -47,6 +47,7 @@ int main(int args, char ** argv) {
         return 0;
     }
 
+timer.reset();
     if (use_lab) {
       left_pyramid[0].computeLab();
       right_pyramid[0].computeLab();
@@ -62,7 +63,6 @@ int main(int args, char ** argv) {
           left_pyramid[i+1].H, left_pyramid[i+1].W);*/
     }
 
-timer.reset();
     for (int lvl = levels - 1; lvl >= 0; -- lvl) {
         int idx = lvl % OBJ_NUM;
         left[idx].init(left_pyramid[lvl]);
@@ -73,14 +73,14 @@ timer.reset();
             DP::getSupportProb(left[idx].rgb, right[idx].rgb, 
                                 left[idx].H, left[idx].W, max_disparity / (1 << lvl));
             DP::getProbMatrix(lvl, max_disparity / (1 << (lvl + 1)), max_disparity / (1 << lvl), dataset);
-            DP::getInterval(0.001 * (1 << lvl));
+            DP::getInterval(pixel_intv_threshold * (1 << lvl));
             left[idx].readPrediction(left[(lvl + 1)%OBJ_NUM].disparity);
             // left[idx].intersectInterval(left[(lvl + 1) % OBJ_NUM]);
         } 
         // Now use the INTERVAL to find the new disparities.
         left_pyramid[lvl].computeGradient();
         right_pyramid[lvl].computeGradient();
-        left[idx].buildForest(0.95, use_lab);
+        left[idx].buildForest(tree_intv_threshold, use_lab);
         left[idx].initDisparity();
         updateTable(255 * 0.1);
         left[idx].stereoMatch(right[idx], 1, use_lab);

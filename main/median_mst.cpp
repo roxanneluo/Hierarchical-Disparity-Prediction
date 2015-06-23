@@ -7,6 +7,7 @@
 #include "timekeeper.hpp"
 
 ImageLayer left_layer, right_layer;
+ImageLayer left_median;
 MSTBigObject left, right;
 
 TimeKeeper timer;
@@ -17,14 +18,21 @@ int main(int args, char ** argv) {
     load_image(file_name[0], left_layer.rgb, left_layer.H, left_layer.W);
     load_image(file_name[1], right_layer.rgb, right_layer.H, right_layer.W);
     timer.reset();
-    left.init(left_layer); right.init(right_layer);
 
-    //misc::median_filter_rgb(right.rgb, right.H, right.W, 1);
+    left_median.H = left_layer.H, left_median.W = left_layer.W;
+    misc::median_filter(left_layer.rgb, left_median.rgb, 
+        left_median.H, left_median.W, 1);
     if (use_lab) {
       left_layer.computeLab();
+      right_layer.computeLab();
+      left_median.computeLab();
       //misc::median_filter_rgb(left.lab, left.H, left.W, 1);
     }
+
+    left.init(left_median);
     left.buildTree(use_lab);	
+
+    left.init(left_layer); right.init(right_layer);
     left_layer.computeGradient();
     right_layer.computeGradient();
     //right.buildTree(use_lab);
