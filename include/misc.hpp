@@ -28,7 +28,7 @@ void process_args(int args, char ** argv) {
     if (args > 5) { strcpy(file_name[2], argv[5]); /*strcpy(file_name[3], argv[6]);*/  }
     if (args > 6) { dataset = static_cast<Dataset>(atoi(argv[6])); }
     if (args > 7) { use_lab = atoi(argv[7]); }
-    if (args > 9) { 
+    if (args == 10) { 
       pixel_intv_threshold = std::stof(argv[8]);
       tree_intv_threshold = std::stof(argv[9]);
     } else {
