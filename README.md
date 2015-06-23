@@ -6,6 +6,16 @@
 
 ##USAGE
 
+Let `$ROOT_DIR` be the root directory of this project.
+### Obtain testdata
+```
+cd $ROOT_DIR
+wget http://bcmi.sjtu.edu.cn/~luoxuan/iccv2015/testdata_iccv2015.zip
+unzip testdata_iccv2015.zip
+rm testdata_iccv2015.zip
+```
+then the datasets would be saved in folder `testdata`.
+
 ### The Simplest Way
 First run `make all`.
 
@@ -79,7 +89,7 @@ To run them,
 `./Algo.bin LeftInput.ppm RightInput.ppm MaxDisparity [Scale] [LeftOutput.pgm]
 [Dataset] [UseLab]`
 
-e.g., `./dp_mst.bin testdata/halfsize/Aloe/left.ppm testdata/halfsize/Aloe/right.ppm 135 2 results/halfsize/Aloe_left_dp_mst.pgm halfsize 0`.
+e.g., `./dp_mst.bin testdata/halfsize/Aloe/left.ppm testdata/halfsize/Aloe/right.ppm 135 2 results/halfsize/Aloe_left_dp_mst.pgm 0 0`.
 
 - `UseLab` is 1 if you want to use LAB color space in defining the matching cost and
 edge weights, and is 0 otherwise
@@ -102,11 +112,9 @@ To obtain the error rate in the nonoccluded regions, make and run it:
 
 ```
 make checker
-./bin/checker/checker_nonocc.bin LeftOutput.pgm GNDLeftDisp.pgm
-GNDRightDisp.pgm Tolerance Scale [ErrMap] [ErrAllRed].
+./bin/checker/checker_nonocc.bin LeftOutput.pgm GNDLeftDisp.pgm GNDRightDisp.pgm Tolerance Scale [ErrMap] [ErrAllRed].
 ```
-e.g., `./bin/checker/checker_nonocc.bin results/halfsize/Aloe_left_dp_mst.pgm
-testdata/halfsize/Aloe/displeft.pgm testdata/halfsize/Aloe/dispright.pgm 1 2 results/halfsize/err_1_Aloe_left_dp_mst.ppm`.
+e.g., `./bin/checker/checker_nonocc.bin results/halfsize/Aloe_left_dp_mst.pgm testdata/halfsize/Aloe/displeft.pgm testdata/halfsize/Aloe/dispright.pgm 1 2 results/halfsize/err_1_Aloe_left_dp_mst.ppm`.
 
 - `GNDLeftDisp.pgm`, `GNDRightDisp.pgm`: the ground truth disparity map for the left and right images.
 - `Tolerance`[int]: |OutputDisparity - GNDDisparity| >= Scale \* Tolence is regarded erroneous.
@@ -132,8 +140,14 @@ These codes are in `gen_data`. Make and run them:
 
 ```
 make gen_data
-./bin/gen_data/gen_concur_dp_Algo.bin LeftInput.ppm RightInput.ppm MaxDisparity
-Scale GNDLeftDisparityMap Dataset Algo ConcurFolder SupportFolder
+./bin/gen_data/gen_concur_dp_Algo.bin LeftInput.ppm RightInput.ppm MaxDisparity Scale GNDLeftDisparityMap Dataset Algo ConcurFolder SupportFolder
+```
+
+e.g.,
+```
+make gen_data
+mkdir -p results/stat/ && mkdir -p results/stat/concur_test && mkdir -p results/stat/support_test
+./bin/gen_data/gen_concur_dp_mst.bin testdata/halfsize/Aloe/left.ppm testdata/halfsize/Aloe/right.ppm 135 2 testdata/halfsize/Aloe/displeft.pgm halfsize mst results/stat/halfsize/concur_test resutls/stat/halfsize/support_test
 ```
 
 Outputs:
@@ -147,6 +161,7 @@ To run them on a whole dataset, run
 `python gen_concur.py Algo DatasetFolder ResultFolder Dataset [UseLab]`
 
 e.g., 
+
 ```
 mkdir -p results/stat
 python gen_concur.py dp_mst testdata/halfsize results/stat halfsize
@@ -204,3 +219,14 @@ Arguments:
 - `Save`[bool]: The figures would be saved in folders `sgl`, `lgs`, `PixelIntv` and `concur` under folder `../results/pic/FullOrHalf/`.
 - `Level`[int]: number of layers.
 - `DatasetRatio`[double]: used to choose corresponding GMM.
+
+### Branches
+
+- master: the up-to-date reliable core code
+- real-reorganize: the up-to-date core code. possibly unreliable. If it is
+reliable, it gets merged with master.
+- add-kitti-tool: contain kitti tools in addition to the core code, master.
+- other-algo: contain others' related algorithms such as libelas in addition to
+add-kitti-tool
+
+
