@@ -25,6 +25,8 @@ left_out = result_folder + testcase + '_left_' + algo + '.pgm'
 right_out = result_folder + testcase + '_right_' + algo + '.pgm'
 spec = testcase_folder + 'spec.txt'
 
+sp.check_output(['mkdir', '-p', result_folder])
+
 with open(spec, 'r') as f:
   line_splits = f.read().split()
   max_disp = line_splits[0]
