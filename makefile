@@ -1,7 +1,7 @@
-CXX := g++-4.8
+CXX := g++
 
 BUILD_DIR := bin
-SRC_DIRS := main checker util gen_data iterative
+SRC_DIRS := main checker util gen_data 
 INCLUDE_DIRS := include
 
 #main
@@ -38,6 +38,9 @@ $(ALL_BUILD_DIRS):
 	mkdir -p $@
 
 $(BUILD_DIR)/main/%.bin: main/%.cpp $(INCLUDED) 
+	$(CXX) $< -o $@ $(CXX_FLAGS)
+
+$(BUILD_DIR)/gen_data/%.bin: gen_data/%.cpp gen_data/statistics.hpp $(INCLUDED) 
 	$(CXX) $< -o $@ $(CXX_FLAGS)
 
 $(BUILD_DIR)/%.bin: %.cpp
