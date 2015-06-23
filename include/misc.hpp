@@ -4,6 +4,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <string>
 
 //#include "median.h"
 #include "ctmf.h"
@@ -27,11 +28,39 @@ void process_args(int args, char ** argv) {
     if (args > 5) { strcpy(file_name[2], argv[5]); /*strcpy(file_name[3], argv[6]);*/  }
     if (args > 6) { dataset = static_cast<Dataset>(atoi(argv[6])); }
     if (args > 7) { use_lab = atoi(argv[7]); }
-    //if (args > 7) { strcpy(file_name[4], argv[7]);  }
+    if (args > 9) { 
+      pixel_intv_threshold = std::stof(argv[8]);
+      tree_intv_threshold = std::stof(argv[9]);
+    } else {
+      pixel_intv_threshold = pixel_threshold_table[dataset];
+      tree_intv_threshold = tree_threshold_table[dataset];
+    }
 }
 
 // ctmf's version of median.
+const int CTMF_MEMSIZE = 1024 * 512;
 BytArray tmp4ctmf, tmp4ctmf2;
+void median_filter(BytArray a, int h, int w, int radius = 2) {
+    for (int i = 0; i < h; ++i) for (int j = 0; j < w; ++j) tmp4ctmf[i][j] = a[i][j];
+    int step = &a[1][1] - &a[0][1];
+    ctmf(tmp4ctmf[0], a[0], w, h, step, step, radius, 1, CTMF_MEMSIZE);
+    //ctmf(tmp4ctmf[0], a[0], w, h, step, step, radius, 1, w * h);
+}
+
+Picture ctmf_temp_pic;
+void median_filter(Picture p, int h, int w, int radius = 2) {
+  int cn = 3;
+  int step = &p[1][0][0] - &p[0][0][0];
+  memcpy(ctmf_temp_pic, p, MAX_WIDTH * MAX_HEIGHT * cn);
+  ctmf(&ctmf_temp_pic[0][0][0], &p[0][0][0], w, h, step, step, radius, cn, CTMF_MEMSIZE); 
+}
+
+void median_filter(Picture src, Picture dst,  int h, int w, int radius = 2) {
+    int step = &src[1][0][0] - &src[0][0][0];
+    ctmf(&src[0][0][0], &dst[0][0][0], w, h, step, step, radius, 3, CTMF_MEMSIZE);
+}
+
+/*
 void median_filter(BytArray a, int h, int w, int radius = 2) {
     for (int i = 0; i < h; ++i) for (int j = 0; j < w; ++j) tmp4ctmf[i][j] = a[i][j];
     int step = &a[1][1] - &a[0][1];
@@ -47,6 +76,7 @@ void median_filter_rgb(Picture a, int h, int w, int radius = 2) {
         for (int i = 0; i < h; ++i) for (int j = 0; j < w; ++j) a[i][j][c] = tmp4ctmf2[i][j];
     }
 }
+*/
 
 float LABf(float t) 
 {
@@ -65,7 +95,7 @@ float XYZf(int x)
     return y / 12.92 * 100;
 }
 
-void RGB_to_LAB(const int * rgb, float * lab)
+void RGB_to_LAB(const unsigned char * rgb, float * lab)
 {
     float X = 0.4124*XYZf(rgb[0]) + 0.3576*XYZf(rgb[1]) + 0.1192*XYZf(rgb[2]);
     float Y = 0.2126*XYZf(rgb[0]) + 0.7152*XYZf(rgb[1]) + 0.0722*XYZf(rgb[2]);

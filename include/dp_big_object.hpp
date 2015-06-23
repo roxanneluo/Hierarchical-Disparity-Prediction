@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <ctime>
 #include <cmath>
+#include <cassert>
 
 #include "settings.hpp"
 #include "misc.hpp" 
@@ -13,8 +14,10 @@
 #include "tree_common.hpp"
 #include "merge_set.hpp"
 #include "big_object.hpp"
+#include "timekeeper.hpp"
 
 #define MAX_TOLERANCE 7
+typedef const int (*OneTree)[2];
 
 class Interval {
 public :
@@ -53,6 +56,13 @@ class DPBigObject: public BigObject {
 
     void readPrediction(BytArray disp);
     void noPrediction(int max_disp);
+
+    OneTree treeStartEnd() const  {return oneTree;}
+    inline int numOfTree() const  {return numOT;}
+    inline const Interval& getTreeInterval(int u) const  {
+      return itv[mset->find(order[u])];
+    }
+
 };
 
 // implement the common DPBigObject function 
@@ -129,7 +139,7 @@ void DPBigObject::prepare_visit() {
 void DPBigObject::noPrediction(int max_disp) {
     for (int i = H * W; i >= 0; --i) {
         itv[i].l = 0;
-        itv[i].r = max_disp - 1;
+        itv[i].r = max_disp;
     }
 }
 
@@ -157,13 +167,13 @@ void DPBigObject::stereoMatch(DPBigObject &ref, int sign, bool use_lab) {
         int low = oneTree[i][0], high = oneTree[i][1];
         // printf("treeInterval %d %d\n", treeInterval.l, treeInterval.r);
         for (int d = treeInterval.l; d <= treeInterval.r; ++d) {
-            // timer.check("first cost"); 
+            //timer.check("first cost"); 
             if (use_lab)
               computeFirstLabCost(d * sign, ref, low, high); // sign is used here
             else 
               computeFirstCost(d * sign, ref, low, high); // sign is used here
             compute_cost_on_tree(low, high);
-            // timer.check("cost on tree");
+            //timer.check("cost on tree");
             update_disparity(d, low, high);
         }
     }
@@ -205,5 +215,7 @@ void DPBigObject::collect_lab_edges() {
         }
     m = k;
 }
+
+
 
 #endif

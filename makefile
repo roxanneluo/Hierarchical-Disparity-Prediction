@@ -1,7 +1,7 @@
 CXX := g++-4.8
 
 BUILD_DIR := bin
-SRC_DIRS := main checker util gen_data
+SRC_DIRS := main checker util gen_data iterative
 INCLUDE_DIRS := include
 
 #main
@@ -19,12 +19,15 @@ GEN_DATA_BINS := $(addprefix $(BUILD_DIR)/, ${GEN_DATA_SRCS:.cpp=.bin})
 #include
 INCLUDED = $(foreach dir, $(INCLUDE_DIRS), $(addprefix $(dir)/, $(shell ls $(dir))))
 
-ALL_BINS := $(MAIN_BINS) $(CHECKER_BINS) $(UTIL_BINS) $(GEN_DATA_BINS)
+#ALL_BINS := $(MAIN_BINS) $(CHECKER_BINS) $(UTIL_BINS) $(GEN_DATA_BINS)
+ALL_CPP := $(foreach sdir, $(SRC_DIRS), $(shell find $(sdir) -name "*.cpp"))
+ALL_BINS := $(addprefix $(BUILD_DIR)/, ${ALL_CPP:.cpp=.bin})
 
 ALL_BUILD_DIRS := $(addprefix $(BUILD_DIR)/, $(SRC_DIRS))
-CXX_FLAGS := -O2 -msse3 -std=c++0x $(foreach dir, $(INCLUDE_DIRS), -I$(dir))
+CXX_FLAGS := -lpng -O2 -msse3 -std=c++11 $(foreach dir, $(INCLUDE_DIRS), -I$(dir))
 
-all: main checker util gen_data
+#all: main checker util gen_data
+all: $(ALL_CPP) init $(ALL_BINS)
 init:$(ALL_BUILD_DIRS)
 main: init $(MAIN_BINS)
 checker: init $(CHECKER_BINS)

@@ -17,8 +17,8 @@ int main(int args, char ** argv) {
     misc::process_args(args, argv);
     load_image(file_name[0], left_layer.rgb, left_layer.H, left_layer.W);
     load_image(file_name[1], right_layer.rgb, right_layer.H, right_layer.W);
-    left.init(left_layer); right.init(right_layer);
   timer.reset();
+    left.init(left_layer); right.init(right_layer);
 
     //misc::median_filter_rgb(left.rgb, left.H, left.W, 1);
     //misc::median_filter_rgb(right.rgb, right.H, right.W, 1);

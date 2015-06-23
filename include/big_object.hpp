@@ -6,6 +6,7 @@
 #include "merge_set.hpp"
 #include "extra.hpp"
 #include "image_layer.hpp"
+#include "timekeeper.hpp"
 
 class BigObject {
   protected :
@@ -30,9 +31,10 @@ class BigObject {
     virtual void build_tree(); // build the tree given all the collected edges. 
     virtual void compute_cost_on_tree(int low = 1, int high = -1);
     virtual void update_disparity(int d, int low = 1, int high = -1);
-    inline void node_location(int p, int &x, int &y) {--p; x = p / W; y = p % W; }
-    inline int node_number(int x, int y) { return x * W + y + 1; }
 
+    inline void node_location(int p, int &x, int &y) const  
+      {--p; x = p / W; y = p % W; }
+    inline int node_number(int x, int y) const { return x * W + y + 1; }
   public :
     int H, W; // graph size, height and width
     int n; // number of nodes
@@ -59,6 +61,11 @@ class BigObject {
 
     friend void findStablePixels(BigObject & left, BigObject & right);
     friend void updateMatchingCost(int disp, BigObject & left, BigObject & right);
+
+    inline void treeNodeLocation(int u, int &x, int &y) const {
+      int p = order[u];
+      node_location(p, x, y);
+    }
 };
 
 void BigObject::init(ImageLayer & image_layer) {
@@ -71,7 +78,7 @@ void BigObject::init(ImageLayer & image_layer) {
 }
 
 const double max_gradient_color_difference= 2.0;
-const double max_color_difference = 10.0;
+const double max_color_difference = 10.0; // st and mst all set it to 7 in the original code. but we set it to 10
 const double weight_on_color = 0.11;
 void BigObject::computeFirstCost (int d, BigObject & right,
     int low, int high) { 

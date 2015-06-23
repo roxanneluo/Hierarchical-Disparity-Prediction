@@ -1,6 +1,6 @@
 function findGMMDrawPicForPaper(full_or_half, K,dataSetRatio,times, width)
     scale = 2;
-    level = 4;
+    level = 3;
     smallMax = 150;
     smallM = ones(level,1);
     smallM(2) = smallMax;
@@ -14,7 +14,7 @@ function findGMMDrawPicForPaper(full_or_half, K,dataSetRatio,times, width)
     dataSet = dataSet(randsample(N,N));
     NRatio = max(size(dataSetRatio));
     
-    prefix = sprintf('new %s GMM up to %d Kernels for %d times gnd vs. mst %s',...
+    prefix = sprintf('%s GMM up to %d Kernels for %d times gnd vs. mst %s',...
         full_or_half, K,times, datestr(now)); 
     f = fopen(['../results/',prefix,'.html'],'w');
     printHTMLHead(f,prefix);
@@ -91,8 +91,8 @@ function findGMMDrawPicForPaper(full_or_half, K,dataSetRatio,times, width)
             legend(legendNames);
             set(gca,'position',[0.06,0.06,0.9,0.9]);
             ylim([0,max(maxp,max(trueDistr))+0.05]);
-             folder = ['pic/GMM/' full_or_half '/'];
-             mkdir folder;
+             folder = ['../results/matlab/pic/GMM/'];mkdir folder;
+             folder = [folder  full_or_half '/']; mkdir folder;
             string = sprintf('GMM_%d_%d',large,scale);
              set(gcf,'position',[200,200,541,340]);
 %               set(gcf, 'renderer','opengl');

@@ -1,21 +1,27 @@
 function concur = readConcur(dataset, small, large)
-%%{
+%{
   filename_format= ['/Users/roxanne/repos/stereo-cake/results/stat/' ...
             'halfsize/concur_mean_2015-04-21-20:34:49/'...
             'concur_%s_dpf-mst_%d,%d.txt'];
-%%}
-%{
+%}
+%%{
     filename_format= ['/Users/roxanne/repos/stereo-cake/results/stat/' ...
             'fullsize/concur_mean_2015-04-21-18:50:09/'...
             'concur_%s_dpf-mst_%d,%d.txt'];
-%}        
+%%}        
 %{
   % exp for GMM
   filename_format= ['/Users/roxanne/repos/stereo-cake/results/stat/' ...
             'fullsize/concur_mean_2015-04-19-19:43:19/'...
             'concur_%s_dpf-mst_%d,%d.txt'];
 %}
-  
+%{ 
+    %kitti
+  filename_format= ['/Users/roxanne/repos/stereo-cake/results/stat/' ...
+            'kitti/concur_dp_mst_2015-05-27-22:21:29/'...
+            'concur_%s_dp_mst_%d,%d.txt'];
+%}
+
   
   filename = sprintf(filename_format, dataset, small, large);
   file = fopen(filename,'r');

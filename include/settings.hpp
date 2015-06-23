@@ -1,6 +1,7 @@
 #ifndef Settings_for_the_project_MAR_2014
 #define Settings_for_the_project_MAR_2014
 
+#include <cstdio>
 
 
 #define MAX_HEIGHT 1150
@@ -14,9 +15,9 @@ typedef int IntArray [MAX_HEIGHT][MAX_WIDTH];
 typedef float FloArray [MAX_HEIGHT][MAX_WIDTH];
 typedef bool BooArray [MAX_HEIGHT][MAX_WIDTH];
 
-typedef int Picture [MAX_HEIGHT][MAX_WIDTH][3]; // RGB
+typedef unsigned char Picture [MAX_HEIGHT][MAX_WIDTH][3]; // RGB
 typedef float FloPicture [MAX_HEIGHT][MAX_WIDTH][3]; // Lab color space
-typedef int (*PicturePtr) [MAX_WIDTH][3];
+typedef unsigned char (*PicturePtr) [MAX_WIDTH][3];
 typedef float (*FloPicturePtr) [MAX_WIDTH][3];
 typedef float (*FloArrayPtr) [MAX_WIDTH];
 // if this becase 8-bit, be careful. 
@@ -40,12 +41,16 @@ const int LEVELS = 4;
 
 int max_disparity = 16;
 int scale = 16;
-
 char file_name[4][300] =
 {"left.ppm", "right.ppm", "default_left.pgm", "default_right.pgm"};
 
 Dataset dataset = FULL_SIZE;
 bool use_lab = false;
 const int levels = 3;
+
+double pixel_threshold_table[DATASET_NUM] = {0.004,0.064};
+double tree_threshold_table[DATASET_NUM] = {0.95, 0.6};
+double pixel_intv_threshold;
+double tree_intv_threshold;
 
 #endif

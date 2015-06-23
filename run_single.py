@@ -9,7 +9,7 @@ tolerances = sys.argv[4:]
 ####
 ## configuration ##
 use_lab = '0' # set to zero as default
-err_all_red = '0' 
+err_all_red = '1' 
 ##
 fullsize_folder = 'testdata/' + dataset + '/'
 result_folder = 'results/' + dataset + '/'
@@ -49,7 +49,7 @@ for tolerance in tolerances:
           left_out, disp_left, disp_right,
           tolerance, scale,
           result_folder +
-          'err_'+testcase+'_left_'+algo+'_'+str(tolerance)+'.ppm',
+          'err_'+str(tolerance)+'_'+testcase+'_left_'+algo+'.ppm',
           err_all_red])
   print checker_result
   correct = int(checker_result.split()[0])
