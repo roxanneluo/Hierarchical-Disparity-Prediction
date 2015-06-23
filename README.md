@@ -6,6 +6,16 @@
 
 ##USAGE
 
+Let `$ROOT_DIR` be the root directory of this project.
+### Obtain testdata
+```
+cd $ROOT_DIR
+wget http://bcmi.sjtu.edu.cn/~luoxuan/iccv2015/testdata_iccv2015.zip
+unzip testdata_iccv2015.zip
+rm testdata_iccv2015.zip
+```
+then the datasets would be saved in folder `testdata`.
+
 ### The Simplest Way
 First run `make all`.
 
