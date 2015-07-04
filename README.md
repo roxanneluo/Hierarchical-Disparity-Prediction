@@ -4,6 +4,12 @@
 2. python
 3. g++
 
+### Install for Ubuntu
+`sudo apt-get install libpng-dev`
+
+### Install for Mac
+`brew install libpng`
+
 ##USAGE
 
 Let `$ROOT_DIR` be the root directory of this project.
