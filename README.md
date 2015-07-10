@@ -1,11 +1,23 @@
 # Fast Non-local Stereo Matching based on Hierarchical Disparity Prediction
 ##INSTALL DEPENDENCIES
-1. libpng
+1. libpng++
 2. python
-3. g++
+3. g++ (which supports c++0x or c++11. g++-4.8 and above versions will work.)
 
 ### Install for Ubuntu
-`sudo apt-get install libpng-dev`
+#### Install g++
+First, install g++-4.8, for example, by 
+```
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt-get update
+sudo apt-get install gcc-4.8
+sudo apt-get install g++-4.8
+```
+Then change `CXX` in `makefile` to use a suitable g++ version.
+#### Install libpng++
+```
+sudo apt-get install libpng++-dev
+```
 
 ### Install for Mac
 `brew install libpng`

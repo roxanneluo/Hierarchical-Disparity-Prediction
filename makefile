@@ -1,4 +1,4 @@
-CXX := g++
+CXX := g++-4.8 # g++
 
 BUILD_DIR := bin
 SRC_DIRS := main checker util gen_data 
